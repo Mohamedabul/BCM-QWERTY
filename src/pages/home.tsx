@@ -20,10 +20,10 @@ const Home = () => {
     },
   });
 
-  const latestProperties = data?.data ?? [];
+  // const latestProperties = data?.data ?? [];
 
-  if (isLoading) return <Typography>Loading...</Typography>;
-  if (isError) return <Typography>Something went wrong!</Typography>;
+  // if (isLoading) return <Typography>Loading...</Typography>;
+  // if (isError) return <Typography>Something went wrong!</Typography>;
 
   return (
     <Box>

@@ -81,11 +81,11 @@ export interface Google {
     id: {
       initialize: (input: IdConfiguration) => void;
       prompt: (
-        momentListener?: (res: PromptMomentNotification) => void,
+        momentListener?: (res: PromptMomentNotification) => void
       ) => void;
       renderButton: (
         parent: HTMLElement,
-        options: GsiButtonConfiguration,
+        options: GsiButtonConfiguration
       ) => void;
       disableAutoSelect: () => void;
       storeCredential: (credentials: Credential, callback: () => void) => void;
@@ -93,7 +93,7 @@ export interface Google {
       onGoogleLibraryLoad: () => void;
       revoke: (
         hint: string,
-        callback: (done: RevocationResponse) => void,
+        callback: (done: RevocationResponse) => void
       ) => void;
     };
   };
