@@ -1,35 +1,36 @@
-import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Typography,
-} from "@mui/material";
+  import {
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
+    Typography,
+  } from "@mui/material";
+  import { useState } from "react";
 
-export default function accordionHelper(ChildDetails: any) {
-  return (props: any) => {
-    return (
-      <Accordion
-        sx={props.accordionStyle}
-      >
-        <AccordionSummary
-          expandIcon={null}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100%",
-          }}
-        >
-          <Typography sx={{ textAlign: "center", width: "100%" }}>
-            Capability Title
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <ChildDetails/>
-        </AccordionDetails>
-      </Accordion>
-    );
-  };
-}
+  export default function accordionHelper(ChildDetails: any) {
+    return (props: any) => {
+
+      return (
+        <Accordion sx={props.accordionStyle}>
+          <AccordionSummary
+            expandIcon={null}
+            aria-controls="panel1a-content"
+            id="panel1a-header"
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <Typography sx={{ textAlign: "center", width: "100%" }}>
+              {props.title}
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <h1>hello</h1>
+            <ChildDetails {...props.childProps} />
+          </AccordionDetails>
+        </Accordion>
+      );
+    };
+  }
