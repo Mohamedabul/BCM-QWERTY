@@ -1,8 +1,11 @@
 import React from 'react'
+import Cardcontainer from "../../Cardcontainer";
 
 function AllCapabilities() {
   return (
-    <div>All Capabilities</div>
+    <div>All Capabilities
+      <Cardcontainer />
+    </div>
   )
 }
 
