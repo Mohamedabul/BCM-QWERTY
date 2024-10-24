@@ -9,7 +9,7 @@ function AllCapabilities() {
   const [cabablityList, setCapabilityList] = useState<any[]>([]);
 
   const fetchCabability = async () => {
-    const resp = await fetch("http://localhost:5000/api/coreCapability");
+    const resp = await fetch(process.env.REACT_APP_API_URL+"coreCapability");
     const data = await resp.json();
     setCapabilityList(data);
   }

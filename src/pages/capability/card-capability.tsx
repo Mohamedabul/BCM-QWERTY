@@ -18,7 +18,7 @@ const CapabilityCard = (props: any) => {
   const bgColor = useMemo(() => getRandomColor(), []);
 
   const handleExpand = async () => {
-    const resp = await fetch("http://localhost:5000/api/domain");
+    const resp = await fetch(process.env.REACT_APP_API_URL+"domain");
     const data = await resp.json();
     setDomainList(data);
   };

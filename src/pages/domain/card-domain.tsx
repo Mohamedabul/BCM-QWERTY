@@ -14,7 +14,7 @@ const DomainCard = (props: any) => {
   const [subDomainList, setSubDomainList] = useState<any>([]);
 
   const handleExpand = async () => {
-    const resp = await fetch("http://localhost:5000/api/subdomain");
+    const resp = await fetch(process.env.REACT_APP_API_URL+"subdomain");
     const data = await resp.json();
     setSubDomainList(data);
   };
