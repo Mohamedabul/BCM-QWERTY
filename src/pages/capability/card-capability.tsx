@@ -31,6 +31,7 @@ const CapabilityCard = (props: any) => {
             height: "100%",
             backgroundColor: bgColor,
             boxShadow: "none",
+            color: 'white'
           }}
           onChange={handleChange(handleExpand)}
         >
