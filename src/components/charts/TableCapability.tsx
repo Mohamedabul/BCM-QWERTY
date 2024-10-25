@@ -25,42 +25,42 @@ const rows = [
     domain: "Contact Management",
     subDomain1: "Classify Demand",
     noApplication: "3",
-    details: "Additional information about Customer Relationship",
+    // details: "Additional information about Customer Relationship",
   },
   {
-    businessCapability: "Enterprise Support",
+    businessCapability: "Customer Relationship",
     domain: "Contact Management",
     subDomain1: "Contact Interaction",
     noApplication: "6",
-    details: "Details for Enterprise Support.",
+    // details: "Details for Enterprise Support.",
   },
   {
-    businessCapability: "Finance",
+    businessCapability: "Customer Relationship",
     domain: "Contact Management",
     subDomain1: "Inbound Contact",
     noApplication: "4",
-    details: "Finance-related details.",
+    // details: "Finance-related details.",
   },
   {
-    businessCapability: "Finance",
+    businessCapability: "Customer Relationship",
     domain: "Contact Management",
     subDomain1: "Manage Interaction",
     noApplication: "1",
-    details: "Finance-related details.",
+    // details: "Finance-related details.",
   },
   {
-    businessCapability: "Finance",
+    businessCapability: "Customer Relationship",
     domain: "Contact Management",
     subDomain1: "Outbound Contact",
     noApplication: "-",
-    details: "Finance-related details.",
+    // details: "Finance-related details.",
   },
   {
-    businessCapability: "Finance",
+    businessCapability: "Customer Relationship",
     domain: "Contact Management",
     subDomain1: "Route Contact",
     noApplication: "2",
-    details: "Finance-related details.",
+    // details: "Finance-related details.",
   },
 ];
 
@@ -128,7 +128,7 @@ const CapabilityTable = () => {
                     </IconButton>
                   </TableCell> */}
                 </TableRow>
-                <TableRow>
+                {/* <TableRow>
                   <TableCell colSpan={5} sx={{ padding: 0, borderBottom: 'none' }}>
                     <Collapse in={expandedRow === index} timeout="auto" unmountOnExit>
                       <Fade in={expandedRow === index}>
@@ -146,7 +146,7 @@ const CapabilityTable = () => {
                       </Fade>
                     </Collapse>
                   </TableCell>
-                </TableRow>
+                </TableRow> */}
               </React.Fragment>
             ))}
           </TableBody>
