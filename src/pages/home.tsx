@@ -9,6 +9,7 @@ import {
   TotalRevenue,
   PropertyCard,
 } from "components";
+import CapabilityTable from "components/charts/TableCapability";
 
 const Home = () => {
   const { data, isLoading, isError } = useList({
@@ -64,7 +65,7 @@ const Home = () => {
         direction={{ xs: "column", lg: "row" }}
         gap={4}
       >
-        <TotalRevenue />
+        <CapabilityTable/>
       </Stack>
 
     </Box>
