@@ -40,8 +40,8 @@ const CapabilityTable = () => {
         const result = await response.json();
         setData(result.response.map((item: { core_capability: any; domain: any; subdomain: any; noApplication: any; }) => ({
           businessCapability: item.core_capability,
-          domain: item.domain??0,
-          subDomain: item.subdomain??0,
+          domain: item.domain??'',
+          subDomain: item.subdomain??'',
           noApplication:item.noApplication??0
         })));
       } catch (error) {
