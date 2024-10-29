@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getRandomColor, handleChange } from "utils/helperFunctions";
 import DomainCard from "pages/domain/card-domain";
 import CustomMenu from "components/common/CustomMenu";
@@ -16,6 +16,7 @@ import { ShimmerBox } from "utils/ShimmerBox";
 const CapabilityCard = (props: any) => {
   const [domainList, setDomainList] = useState<any>([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [name, setName] = useState(props.name);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const bgColor = useMemo(() => getRandomColor(), []);
@@ -46,6 +47,7 @@ const CapabilityCard = (props: any) => {
 
   const updateCapabilityName = async (newName: string) => {
     try{
+      setName(newName);
       const resp = await fetch(process.env.REACT_APP_API_URL+`coreCapability/${props.id}`, {
         method: "PATCH",
         headers: {
@@ -53,8 +55,10 @@ const CapabilityCard = (props: any) => {
         },
         body: JSON.stringify({ name: newName }),
       });
+      
       if(resp.ok){
         console.log("Capability name updated successfully");
+        
       }else{
         console.log("Failed to update capability name");
       }
@@ -65,7 +69,7 @@ const CapabilityCard = (props: any) => {
 
   const deleteCapability = async () => {
     try{
-      const resp = await fetch(process.env.REACT_APP_API_URL+"coreCapability/${props.id}", {
+      const resp = await fetch(process.env.REACT_APP_API_URL+`coreCapability/${props.id}`, {
         method: "DELETE",
       });
       if(resp.ok){
@@ -91,6 +95,7 @@ const CapabilityCard = (props: any) => {
           onSave={(newName) => {
             updateCapabilityName(newName);
             setIsEditModalOpen(false); 
+            
           }}
         />
         <Accordion
@@ -116,7 +121,7 @@ const CapabilityCard = (props: any) => {
             <Typography
               sx={{ textAlign: "center", width: "100%", fontWeight: "bold" }}
             >
-              {props.name}
+              {name}
             </Typography>
           </AccordionSummary>
           <AccordionDetails
