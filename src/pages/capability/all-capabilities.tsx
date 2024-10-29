@@ -21,7 +21,7 @@ function AllCapabilities() {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={2}>
-        {cabablityList.map((cabablity) =><CapabilityCard key={cabablity.id} name={cabablity.name}/>)}
+        {cabablityList.map((cabablity) =><CapabilityCard key={cabablity.id} name={cabablity.name} id={cabablity.id}/>)}
 
       </Grid>
     </Box>

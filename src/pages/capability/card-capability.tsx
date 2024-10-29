@@ -46,7 +46,7 @@ const CapabilityCard = (props: any) => {
 
   const updateCapabilityName = async (newName: string) => {
     try{
-      const resp = await fetch(process.env.REACT_APP_API_URL+"coreCapability/${props.id}", {
+      const resp = await fetch(process.env.REACT_APP_API_URL+`coreCapability/${props.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
