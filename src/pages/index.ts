@@ -3,7 +3,7 @@ import { Login } from "./login";
 import MyProfile from "./my-profile";
 import AllCapabilities from "./capability/all-capabilities";
 import CreateCapability from "./capability/create-capability";
-import EditCapability from "./capability/edit-capability";
+// import EditCapability from "./capability/edit-capability";
 import CapabilityDetails from "./analytics/capability-details";
 
 export {
@@ -12,6 +12,6 @@ export {
   MyProfile,
   AllCapabilities,
   CreateCapability,
-  EditCapability,
+  // EditCapability,
   CapabilityDetails,
 };

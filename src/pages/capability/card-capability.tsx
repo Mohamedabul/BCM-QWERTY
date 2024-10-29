@@ -1,10 +1,7 @@
 import { useMemo, useState } from "react";
 import { getRandomColor, handleChange } from "utils/helperFunctions";
 import DomainCard from "pages/domain/card-domain";
-import EditIcon from '@mui/icons-material/Edit';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import EditCapability from "pages/capability/edit-capability";
-
+import CustomMenu from "components/common/CustomMenu";
 import {
   Accordion,
   Box,
@@ -12,16 +9,7 @@ import {
   AccordionDetails,
   Typography,
   Grid,
-  IconButton,
-  Menu,
-  MenuItem,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Button,
-} from "@mui/material";
+  } from "@mui/material";
 import GridItem from "utils/GridItem";
 import { ShimmerBox } from "utils/ShimmerBox";
 
@@ -49,77 +37,62 @@ const CapabilityCard = (props: any) => {
     setIsEditModalOpen(true);
     handleMenuClose();
   };
-  const handleCloseModal = () => {
-    setIsEditModalOpen(false);
-  };
-  const handleDeleteClick = () => {
+  
+  const handleDeleteClick = async () => {
     setIsDeleteDialogOpen(true);
+    await deleteCapability();
     handleMenuClose();
   };
-  const handleCloseDeleteDialog = () => {
-    setIsDeleteDialogOpen(false);
-  };
-  const confirmDelete = () => {
-    console.log("Confirmed deletion of capability:", props.name);
-    setIsDeleteDialogOpen(false);
+
+  const updateCapabilityName = async (newName: string) => {
+    try{
+      const resp = await fetch(process.env.REACT_APP_API_URL+"coreCapability/${props.id}", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: newName }),
+      });
+      if(resp.ok){
+        console.log("Capability name updated successfully");
+      }else{
+        console.log("Failed to update capability name");
+      }
+    }catch(error){
+      console.log("Error updating capability name:", error);
+    }
   };
 
+  const deleteCapability = async () => {
+    try{
+      const resp = await fetch(process.env.REACT_APP_API_URL+"coreCapability/${props.id}", {
+        method: "DELETE",
+      });
+      if(resp.ok){
+        console.log("Capability deleted successfully");
+      }else{
+        console.log("Failed to delete capability");
+      }
+    }catch(error){
+      console.log("Error deleting capability:", error);
+    }
+  };
+    
   return (
     <Grid item xs={3}>
       <GridItem sx={{ backgroundColor: bgColor,position:'relative' }}>
-      <IconButton
-          onClick={handleMenuOpen}
-          sx={{
-            position: 'absolute',
-            top: '8px',
-            right: '8px',
-            zIndex: 2,
-            padding: '4px',
-          }}
-        >
-          <MoreVertIcon sx={{ fontSize: 18 }} />
-        </IconButton>
-        <Menu sx={{opacity:0.8}}
+        <CustomMenu
           anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
+          onOpen={handleMenuOpen}
           onClose={handleMenuClose}
-        >
-          <MenuItem onClick={handleEditClick}>Edit</MenuItem>
-          <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
-        </Menu>
-        {isEditModalOpen && (
-          <EditCapability
-            open={isEditModalOpen}
-            onClose={handleCloseModal}
-            capabilityName={props.name}
-            onSave={(newName) => {
-              console.log("New capability name:", newName);
-              setIsEditModalOpen(false); 
-            }}
-          />
-        )}
-        <Dialog
-          open={isDeleteDialogOpen}
-          onClose={handleCloseDeleteDialog}
-          aria-labelledby="delete-dialog-title"
-          aria-describedby="delete-dialog-description"
-        >
-          <DialogTitle id="delete-dialog-title">Confirm Deletion</DialogTitle>
-          <DialogContent>
-            <DialogContentText id="delete-dialog-description">
-              Are you sure you want to delete the capability "{props.name}"?
-              This action cannot be undone.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDeleteDialog} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={confirmDelete} color="warning">
-              Delete
-            </Button>
-          </DialogActions>
-        </Dialog>
+          onEdit={handleEditClick}
+          onDelete={handleDeleteClick}
+          capabilityName={props.name}
+          onSave={(newName) => {
+            updateCapabilityName(newName);
+            setIsEditModalOpen(false); 
+          }}
+        />
         <Accordion
           sx={{
             height: "100",
@@ -196,3 +169,4 @@ const CapabilityCard = (props: any) => {
 };
 
 export default CapabilityCard;
+
