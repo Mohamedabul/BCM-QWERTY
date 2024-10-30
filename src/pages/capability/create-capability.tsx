@@ -1,129 +1,122 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
-import { CustomButton } from "components";
+import  CustomButton  from "components/common/CustomButton";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
+import { IResourceComponentsProps, useCreate } from "@refinedev/core";
 
 const modalStyle = {
-    position: "absolute" as "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 500,
-    colors: 'black',
-    bgcolor: "background.paper",
-    boxShadow: 24,
-    p: 4,
-    borderRadius: 2,
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 500,
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+  borderRadius: 2,
+};
+
+type CreateCapabilityProps = {
+  open: boolean;
+  onClose: () => void;
+  capabilityName?: string;
+  onSave: (name: string) => void;
+};
+
+
+type CombinedProps = IResourceComponentsProps<any, any> & CreateCapabilityProps;
+
+const CreateCapability: React.FC<CombinedProps> = ({
+  open = true,
+  onClose = () => {},
+  capabilityName = "",
+  onSave = (name) => console.log("Saved capability name:", name),
+}) => {
+  const [name, setName] = useState<string>(capabilityName);
+
+  const { mutate } = useCreate();
+
+  useEffect(() => {
+    setName(capabilityName);
+  }, [capabilityName]);
+  const handleSave = async () => {
+    // if (name.length < 40) {
+    //   alert("Please enter at least 40 characters.");
+    //   return;
+    // }
+  
+    try {
+      
+      const response = await fetch(process.env.REACT_APP_API_URL+"coreCapability", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name }), 
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to create capability: ${response.statusText}`);
+      }
+  
+      console.log("Capability created successfully");
+      onSave(name);  
+      setName("");   
+      onClose();     
+    } catch (error) {
+      console.error("Error creating capability:", error);
+      alert("Failed to create capability. Please try again.");
+    }
   };
 
-  type CreateCapabilityProps = {
-      open?: boolean;
-      onClose?: () => void;
-      capabilityName?: string;
-      onSave?: (name: string) => void;
-    };
-
-function CreateCapability() {
   return (
-    <div>create-Capability</div>
-  )
-}
+    <Modal open={open} onClose={onClose}>
+      <Box sx={modalStyle}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Typography variant="h6" component="h2">
+            Add new Business Capability Information
+          </Typography>
+          <IconButton onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
+        <Typography variant="body2" color="textSecondary" mb={2}>
+          Add new Business Capability Information
+        </Typography>
+        <Typography variant="body2" color="textSecondary" mb={3}>
+          Include min. 40 characters to make it more interesting
+        </Typography>
+        <TextField
+          fullWidth
+          variant="outlined"
+          label="Add new Business Capability name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          margin="normal"
+        />
+        <Box display="flex" justifyContent="space-between" mt={3}>
+          <CustomButton 
+           title="Cancel"
+           backgroundColor="transparent"
+           color="rgba(0, 0, 0, 0.87)"
+           handleClick={onClose}/>
+            
+          
+          <CustomButton
+            handleClick={handleSave}
+            backgroundColor="#2979ff"
+            color="white"
+            title="Save"
+          />
+          
+        </Box>
+      </Box>
+    </Modal>
+  );
+};
 
-export default CreateCapability
-
-// import React, { useState, useEffect } from "react";
-// import Box from "@mui/material/Box";
-// import Modal from "@mui/material/Modal";
-// import Typography from "@mui/material/Typography";
-// import TextField from "@mui/material/TextField";
-// import { CustomButton } from "components";
-// import IconButton from "@mui/material/IconButton";
-// import CloseIcon from "@mui/icons-material/Close";
-// import { IResourceComponentsProps } from "@refinedev/core";
-// import { colors } from "@mui/material";
-
-// const modalStyle = {
-//   position: "absolute" as "absolute",
-//   top: "50%",
-//   left: "50%",
-//   transform: "translate(-50%, -50%)",
-//   width: 500,
-//   colors: 'black',
-//   bgcolor: "background.paper",
-//   boxShadow: 24,
-//   p: 4,
-//   borderRadius: 2,
-// };
-
-// type EditCapabilityProps = {
-//   open?: boolean;
-//   onClose?: () => void;
-//   capabilityName?: string;
-//   onSave?: (name: string) => void;
-// };
-
-// type CombinedProps = IResourceComponentsProps<any, any> & EditCapabilityProps;
-
-// function EditCapability({
-//   open = true, 
-//   onClose = () => {},
-//   capabilityName = "Default Capability",
-//   onSave = (name) => console.log("Saved capability name:", name),
-// }: CombinedProps) {
-//   const [name, setName] = useState<string>(capabilityName);
-
-//   useEffect(() => {
-//     setName(capabilityName);
-//   }, [capabilityName]);
-
-//   const handleSave = () => {
-//     onSave(name);
-//     onClose();
-//   };
-
-//   return (
-//    <Modal open={open} onClose={onClose}>
-//       <Box sx={modalStyle}>
-//         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", }}>
-//           <Typography variant="h6">Edit Business Capability Information</Typography>
-//           <IconButton onClick={onClose}
-//             sx={{ color: "black" }}>
-//             <CloseIcon />
-//           </IconButton>
-//         </Box>
-//         <Typography variant="body2" sx={{ mt: 2}}>
-//           Edit Business Capability name<span style={{ color: "red" }}> *</span>
-//         </Typography>
-//         <Typography variant="body1" color="textSecondary" sx={{ mb: 2, fontSize: "12px" }}>
-//           Include min. 40 characters to make it more interesting
-//         </Typography>
-//         <TextField
-//           fullWidth
-//           variant="outlined"
-//           value={name}
-//           onChange={(e) => setName(e.target.value)}
-//         />
-//         <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
-//         <CustomButton 
-//             title="Cancel"
-//             backgroundColor="transparent"
-//             color="rgba(0, 0, 0, 0.87)"
-//             handleClick={onClose}
-//           />
-//           <CustomButton 
-//             title="Save"
-//             backgroundColor="#1976d2"
-//             color="white"
-//             handleClick={handleSave}
-//           />
-//         </Box>
-//       </Box>
-//     </Modal>
-//   )
-// };
-
-// export default EditCapability
+export default CreateCapability;

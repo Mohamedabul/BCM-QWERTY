@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { getRandomColor, handleChange } from "utils/helperFunctions";
-import DomainCard from "pages/domain/card-domain";
+import DomainCardWithMenu from "pages/domain/domaincardwithmenu";
 import CustomMenu from "components/common/CustomMenu";
 import {
   Accordion,
@@ -92,6 +92,9 @@ const CapabilityCard = (props: any) => {
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
           capabilityName={props.name}
+          label="Buissiness Capability"
+          editEndpoint={`${process.env.REACT_APP_API_URL}/coreCapability/${props.id}`}
+          deleteEndpoint={`${process.env.REACT_APP_API_URL}/coreCapability/${props.id}`}
           onSave={(newName) => {
             updateCapabilityName(newName);
             setIsEditModalOpen(false); 
@@ -152,7 +155,7 @@ const CapabilityCard = (props: any) => {
               ) : (
                 domainList.map((domain: any, index: any) => (
                   <>
-                    <DomainCard key={domain.id} name={domain.name} />
+                    <DomainCardWithMenu key={domain.id} name={domain.name} id={domain.id} />
                     {index < domainList.length - 1 && (
                       <hr
                         style={{

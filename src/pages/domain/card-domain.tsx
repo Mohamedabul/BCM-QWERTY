@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import accordionHelper from "utils/accordionHelper";
-import SubDomainCard from "pages/sub-domain/card-sub-domain";
+import SubDomainCardWithMenu from "pages/sub-domain/subdomaincardwithmenu";
 import { ShimmerBox } from "utils/ShimmerBox";
 
 const DomainCard = (props: any) => {
@@ -58,7 +58,7 @@ const DomainCard = (props: any) => {
         ) : (
           subDomainList.map((subDomain: any, index: any) => (
             <>
-              <SubDomainCard key={subDomain.id} name={subDomain.name} />
+              <SubDomainCardWithMenu key={subDomain.id} name={subDomain.name} />
               {index < subDomainList.length - 1 && (
                 <hr
                   style={{

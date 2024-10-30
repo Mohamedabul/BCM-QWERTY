@@ -31,7 +31,7 @@ import {
   Login,
   MyProfile,
   AllCapabilities,
-  CreateCapability,
+  // CreateCapability,
   EditCapability,
   CapabilityDetails,
 } from "pages";
@@ -138,7 +138,7 @@ function App() {
             {
               name: "capability",
               list: AllCapabilities,
-              create: CreateCapability,
+              // create: CreateCapability,
               edit: EditCapability,
               icon: <BusinessCenterIcon />,
             },
