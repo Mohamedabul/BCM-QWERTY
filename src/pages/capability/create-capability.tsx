@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
-import  CustomButton  from "components/common/CustomButton";
+import CustomButton from "components/common/CustomButton";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import { IResourceComponentsProps, useCreate } from "@refinedev/core";
@@ -27,7 +27,6 @@ type CreateCapabilityProps = {
   onSave: (name: string) => void;
 };
 
-
 type CombinedProps = IResourceComponentsProps<any, any> & CreateCapabilityProps;
 
 const CreateCapability: React.FC<CombinedProps> = ({
@@ -48,25 +47,27 @@ const CreateCapability: React.FC<CombinedProps> = ({
     //   alert("Please enter at least 40 characters.");
     //   return;
     // }
-  
+
     try {
-      
-      const response = await fetch(process.env.REACT_APP_API_URL+"coreCapability", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name }), 
-      });
-  
+      const response = await fetch(
+        process.env.REACT_APP_API_URL + "coreCapability",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name }),
+        }
+      );
+
       if (!response.ok) {
         throw new Error(`Failed to create capability: ${response.statusText}`);
       }
-  
+
       console.log("Capability created successfully");
-      onSave(name);  
-      setName("");   
-      onClose();     
+      onSave(name);
+      setName("");
+      onClose();
     } catch (error) {
       console.error("Error creating capability:", error);
       alert("Failed to create capability. Please try again.");
@@ -76,7 +77,12 @@ const CreateCapability: React.FC<CombinedProps> = ({
   return (
     <Modal open={open} onClose={onClose}>
       <Box sx={modalStyle}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={2}
+        >
           <Typography variant="h6" component="h2">
             Add new Business Capability Information
           </Typography>
@@ -94,25 +100,25 @@ const CreateCapability: React.FC<CombinedProps> = ({
           fullWidth
           variant="outlined"
           label="Add new Business Capability name"
+          color="secondary"
           value={name}
           onChange={(e) => setName(e.target.value)}
           margin="normal"
         />
         <Box display="flex" justifyContent="space-between" mt={3}>
-          <CustomButton 
-           title="Cancel"
-           backgroundColor="transparent"
-           color="rgba(0, 0, 0, 0.87)"
-           handleClick={onClose}/>
-            
-          
+          <CustomButton
+            title="Cancel"
+            backgroundColor="transparent"
+            color="rgba(0, 0, 0, 0.87)"
+            handleClick={onClose}
+          />
+
           <CustomButton
             handleClick={handleSave}
             backgroundColor="#2979ff"
             color="white"
             title="Save"
           />
-          
         </Box>
       </Box>
     </Modal>

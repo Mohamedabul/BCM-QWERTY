@@ -50,7 +50,7 @@ function AllCapabilities() {
       />
       </Box>
       <Grid container spacing={2}>
-        {cabablityList.map((cabablity) =><CapabilityCard key={cabablity.id} name={cabablity.name} id={cabablity.id}/>)}
+        {cabablityList.map((cabablity) =><CapabilityCard key={cabablity.id} name={cabablity.name} id={cabablity.id} fetchCabability={fetchCabability}/>)}
 
       </Grid>
       <CreateCapability

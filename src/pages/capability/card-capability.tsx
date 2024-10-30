@@ -9,12 +9,14 @@ import {
   AccordionDetails,
   Typography,
   Grid,
-  } from "@mui/material";
+} from "@mui/material";
 import GridItem from "utils/GridItem";
 import { ShimmerBox } from "utils/ShimmerBox";
+import { objectToQueryString } from "components/common/helper";
 
 const CapabilityCard = (props: any) => {
   const [domainList, setDomainList] = useState<any>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [name, setName] = useState(props.name);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -22,9 +24,13 @@ const CapabilityCard = (props: any) => {
   const bgColor = useMemo(() => getRandomColor(), []);
 
   const handleExpand = async () => {
-    const resp = await fetch(process.env.REACT_APP_API_URL+"domain");
+    setLoading(true);
+    const params = {core_id: props.id};
+    const queryString = objectToQueryString(params);
+    const resp = await fetch(process.env.REACT_APP_API_URL + `domainByCapability?${queryString}`);
     const data = await resp.json();
     setDomainList(data);
+    setLoading(false);
   };
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -38,7 +44,7 @@ const CapabilityCard = (props: any) => {
     setIsEditModalOpen(true);
     handleMenuClose();
   };
-  
+
   const handleDeleteClick = async () => {
     setIsDeleteDialogOpen(true);
     await deleteCapability();
@@ -46,45 +52,51 @@ const CapabilityCard = (props: any) => {
   };
 
   const updateCapabilityName = async (newName: string) => {
-    try{
+    try {
       setName(newName);
-      const resp = await fetch(process.env.REACT_APP_API_URL+`coreCapability/${props.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name: newName }),
-      });
-      
-      if(resp.ok){
+      const resp = await fetch(
+        process.env.REACT_APP_API_URL + `coreCapability/${props.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name: newName }),
+        }
+      );
+
+      if (resp.ok) {
         console.log("Capability name updated successfully");
-        
-      }else{
+      } else {
         console.log("Failed to update capability name");
       }
-    }catch(error){
+    } catch (error) {
       console.log("Error updating capability name:", error);
     }
   };
 
   const deleteCapability = async () => {
-    try{
-      const resp = await fetch(process.env.REACT_APP_API_URL+`coreCapability/${props.id}`, {
-        method: "DELETE",
-      });
-      if(resp.ok){
+    try {
+      const resp = await fetch(
+        process.env.REACT_APP_API_URL + `coreCapability/${props.id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (resp.ok) {
         console.log("Capability deleted successfully");
-      }else{
+        props.fetchCabability()
+      } else {
         console.log("Failed to delete capability");
       }
-    }catch(error){
+    } catch (error) {
       console.log("Error deleting capability:", error);
     }
   };
-    
+
   return (
     <Grid item xs={3}>
-      <GridItem sx={{ backgroundColor: bgColor,position:'relative' }}>
+      <GridItem sx={{ backgroundColor: bgColor, position: "relative" }}>
         <CustomMenu
           anchorEl={anchorEl}
           onOpen={handleMenuOpen}
@@ -93,20 +105,22 @@ const CapabilityCard = (props: any) => {
           onDelete={handleDeleteClick}
           capabilityName={props.name}
           label="Buissiness Capability"
-          editEndpoint={`${process.env.REACT_APP_API_URL}/coreCapability/${props.id}`}
-          deleteEndpoint={`${process.env.REACT_APP_API_URL}/coreCapability/${props.id}`}
+          editEndpoint={`${process.env.REACT_APP_API_URL}coreCapability/${props.id}`}
+          deleteEndpoint={`${process.env.REACT_APP_API_URL}coreCapability/${props.id}`}
           onSave={(newName) => {
             updateCapabilityName(newName);
-            setIsEditModalOpen(false); 
-            
+            setIsEditModalOpen(false);
           }}
         />
         <Accordion
           sx={{
-            height: "100",
+            minheight: "100",
             backgroundColor: bgColor,
             boxShadow: "none",
-            color: 'white'
+            color: "white",
+            margin: 0,
+            padding: 0,
+            maxWidth: "100%",
           }}
           onChange={handleChange(handleExpand)}
         >
@@ -118,44 +132,54 @@ const CapabilityCard = (props: any) => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              height: "60px", //changed from 100% to 60px for unique height 
+              height: "60px",
+              margin: 0,
+              padding: 0,
+              maxWidth: "100%",
             }}
           >
             <Typography
-              sx={{ textAlign: "center", width: "100%", fontWeight: "bold" }}
+              sx={{
+                textAlign: "center",
+                width: "100%",
+                fontWeight: "bold",
+                maxWidth: "100%",
+              }}
             >
               {name}
             </Typography>
           </AccordionSummary>
           <AccordionDetails
             sx={{
-              padding: 0,
-              margin: 0,
+              margin: 1,
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              width: "100%",
+              minWidth: "100%",
             }}
           >
             <Box
               sx={{
-                maxWidth: "200px",
-                width: "100%",
+                minWidth: "100%",
                 textAlign: "center",
-                padding: "10px 0",
                 height: "100%",
+                marginX: 2,
               }}
             >
-              {domainList.length === 0 ? (
+              {loading ? (
                 <>
-                  <ShimmerBox sx={{ height: "100px" }} />
-                  <ShimmerBox sx={{ height: "100px" }} />
-                  <ShimmerBox sx={{ height: "100px" }} />
+                  <ShimmerBox sx={{ height: "100px", minWidth: "100%" }} />
+                  <ShimmerBox sx={{ height: "100px", minWidth: "100%" }} />
+                  <ShimmerBox sx={{ height: "100px", minWidth: "100%" }} />
                 </>
               ) : (
                 domainList.map((domain: any, index: any) => (
-                  <>
-                    <DomainCardWithMenu key={domain.id} name={domain.name} id={domain.id} />
+                  <Box key={domain.id}>
+                    <DomainCardWithMenu
+                      name={domain.name}
+                      id={domain.id}
+                      onSave={handleExpand}
+                    />
                     {index < domainList.length - 1 && (
                       <hr
                         style={{
@@ -165,7 +189,7 @@ const CapabilityCard = (props: any) => {
                         }}
                       />
                     )}
-                  </>
+                  </Box>
                 ))
               )}
             </Box>
@@ -177,4 +201,3 @@ const CapabilityCard = (props: any) => {
 };
 
 export default CapabilityCard;
-

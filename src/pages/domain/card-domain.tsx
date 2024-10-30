@@ -5,18 +5,24 @@ import {
   AccordionSummary,
   AccordionDetails,
   Typography,
+  Box
 } from "@mui/material";
-import accordionHelper from "utils/accordionHelper";
 import SubDomainCardWithMenu from "pages/sub-domain/subdomaincardwithmenu";
 import { ShimmerBox } from "utils/ShimmerBox";
+import { objectToQueryString } from "components/common/helper";
 
 const DomainCard = (props: any) => {
   const [subDomainList, setSubDomainList] = useState<any>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleExpand = async () => {
-    const resp = await fetch(process.env.REACT_APP_API_URL+"subdomain");
+    setLoading(true);
+    const params = {domain_id: props.id};
+    const queryString = objectToQueryString(params);
+    const resp = await fetch(process.env.REACT_APP_API_URL+`subdomainBydomain?${queryString}`);
     const data = await resp.json();
     setSubDomainList(data);
+    setLoading(false);
   };
 
   return (
@@ -27,7 +33,7 @@ const DomainCard = (props: any) => {
         boxShadow: "none",
         color: "black",
         padding: 0,
-        borderRadius: "8px"
+        borderRadius: "8px",
       }}
       onChange={handleChange(handleExpand)}
     >
@@ -44,12 +50,12 @@ const DomainCard = (props: any) => {
           borderRadius: "8px"
         }}
       >
-        <Typography sx={{ textAlign: "center", width: "100%" }}>
+        <Typography sx={{ textAlign: "center", width: "100%", fontWeight: "bold" }}>
           {props.name}
         </Typography>
       </AccordionSummary>
       <AccordionDetails>
-        {subDomainList.length === 0 ? (
+        {loading ? (
           <>
             <ShimmerBox sx={{ height: "100px" }} />
             <ShimmerBox sx={{ height: "100px" }} />
@@ -57,8 +63,8 @@ const DomainCard = (props: any) => {
           </>
         ) : (
           subDomainList.map((subDomain: any, index: any) => (
-            <>
-              <SubDomainCardWithMenu key={subDomain.id} name={subDomain.name} />
+            <Box key={subDomain.id}>
+              <SubDomainCardWithMenu name={subDomain.name} onSave={handleExpand}  id={subDomain.id} />
               {index < subDomainList.length - 1 && (
                 <hr
                   style={{
@@ -68,7 +74,7 @@ const DomainCard = (props: any) => {
                   }}
                 />
               )}
-            </>
+            </Box>
           ))
         )}
       </AccordionDetails>

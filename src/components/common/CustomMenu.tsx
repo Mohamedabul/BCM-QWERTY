@@ -1,19 +1,31 @@
 // Menu.tsx
-import React, { useState, useEffect } from 'react';
-import { Menu, MenuItem, IconButton, Modal, Box, Typography, TextField,Dialog,
-         DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import CloseIcon from '@mui/icons-material/Close';
-import { CustomButton } from 'components';
-import { MenuProps } from 'interfaces/common';
+import React, { useState, useEffect } from "react";
+import {
+  Menu,
+  MenuItem,
+  IconButton,
+  Modal,
+  Box,
+  Typography,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import CloseIcon from "@mui/icons-material/Close";
+import { CustomButton } from "components";
+import { MenuProps } from "interfaces/common";
 
 const modalStyle = {
-  position: 'absolute' as 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
   width: 500,
-  bgcolor: 'background.paper',
+  bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
   borderRadius: 2,
@@ -25,23 +37,32 @@ type EditCapabilityProps = {
   label: string;
   onSave?: (name: string) => void;
   color?: string;
-  editEndpoint?: string;   
+  editEndpoint?: string;
   deleteEndpoint?: string;
+  menuStyle?: object;
 };
 
-const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({ anchorEl, onClose, onDelete, onOpen,onEdit,onSave,
+const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
+  anchorEl,
+  onClose,
+  onDelete,
+  onOpen,
+  onEdit,
+  onSave,
   capabilityName,
   label,
   color,
   editEndpoint,
-  deleteEndpoint }) => {
+  deleteEndpoint,
+  menuStyle,
+}) => {
   const [isEditOpen, setEditOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [name, setName] = useState<string>(capabilityName??'');
+  const [name, setName] = useState<string>(capabilityName ?? "");
 
   const handleEditOpen = () => {
     setEditOpen(true);
-    onClose(); 
+    onClose();
   };
 
   const handleEditClose = () => {
@@ -50,22 +71,22 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({ anchorEl, onClo
 
   const handleSave = async () => {
     if (!editEndpoint) {
-      console.error('Edit endpoint is missing');
+      console.error("Edit endpoint is missing");
       return;
     }
     try {
-      const response = await fetch(editEndpoint??'', {
-        method: 'PATCH',
+      const response = await fetch(editEndpoint ?? "", {
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ name }),
       });
-  
+
       if (!response.ok) {
         throw new Error(`Failed to edit ${label}: ${response.statusText}`);
       }
-  
+
       onSave?.(name);
       console.log(`Saved ${label} name:`, name);
       handleEditClose();
@@ -73,24 +94,24 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({ anchorEl, onClo
       console.error(`Error saving ${label}:`, error);
     }
   };
-  
+
   const confirmDelete = async () => {
     if (!deleteEndpoint) {
-      console.error('Delete endpoint is missing');
+      console.error("Delete endpoint is missing");
       return;
     }
     try {
-      const response = await fetch(deleteEndpoint??'', {
-        method: 'DELETE',
+      const response = await fetch(deleteEndpoint ?? "", {
+        method: "DELETE",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
-  
+
       if (!response.ok) {
         throw new Error(`Failed to delete ${label}: ${response.statusText}`);
       }
-  
+
       if (onDelete) onDelete();
       console.log(`Confirmed deletion of ${label}:`, name);
       setIsDeleteDialogOpen(false);
@@ -106,9 +127,8 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({ anchorEl, onClo
     setIsDeleteDialogOpen(false);
   };
 
-
   useEffect(() => {
-    setName(capabilityName); 
+    setName(capabilityName);
   }, [capabilityName]);
 
   return (
@@ -116,14 +136,14 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({ anchorEl, onClo
       <IconButton
         onClick={onOpen}
         sx={{
-          position: 'absolute',
-          top: '8px',
-          right: '8px',
+          position: "absolute",
+          top: 0,
+          right: 0,
           zIndex: 2,
-          padding: '4px',
+          ...menuStyle,
         }}
       >
-        <MoreVertIcon sx={{ fontSize: 18, color: color }} />
+        <MoreVertIcon sx={{ fontSize: 20, color: color }} />
       </IconButton>
 
       <Menu
@@ -139,25 +159,41 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({ anchorEl, onClo
       {/* Modal for editing capability */}
       <Modal open={isEditOpen} onClose={handleEditClose}>
         <Box sx={modalStyle}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             <Typography variant="h6">Edit {label} Information</Typography>
-            <IconButton onClick={handleEditClose} sx={{ color: 'black' }}>
+            <IconButton onClick={handleEditClose} sx={{ color: "black" }}>
               <CloseIcon />
             </IconButton>
           </Box>
           <Typography variant="body2" sx={{ mt: 2 }}>
-            Edit {label} name<span style={{ color: 'red' }}> *</span>
+            Edit {label} name<span style={{ color: "red" }}> *</span>
           </Typography>
-          <Typography variant="body1" color="textSecondary" sx={{ mb: 2, fontSize: '12px' }}>
+          <Typography
+            variant="body1"
+            color="textSecondary"
+            sx={{ mb: 2, fontSize: "12px" }}
+          >
             Include min. 40 characters to make it more interesting
           </Typography>
           <TextField
             fullWidth
             variant="outlined"
+            color="secondary"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            sx={{
+              "&:focus": {
+                backgroundColor:"blue",
+              },
+            }}
           />
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
             <CustomButton
               title="Cancel"
               backgroundColor="transparent"
@@ -182,7 +218,8 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({ anchorEl, onClo
         <DialogTitle id="delete-dialog-title">Confirm Deletion</DialogTitle>
         <DialogContent>
           <DialogContentText id="delete-dialog-description">
-            Are you sure you want to delete the {label} "{capabilityName}"? This action cannot be undone.
+            Are you sure you want to delete the {label} "{capabilityName}"? This
+            action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -205,6 +242,3 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({ anchorEl, onClo
 };
 
 export default CustomMenu;
-
-
-

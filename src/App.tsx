@@ -130,7 +130,7 @@ function App() {
           catchAll={<ErrorComponent />}
           resources={[
             {
-              name: "analytics",
+              name: "templates",
               list: AllCapabilities,
               show: CapabilityDetails,
               icon: <AssessmentIcon />,
