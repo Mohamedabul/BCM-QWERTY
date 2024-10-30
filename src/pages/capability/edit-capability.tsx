@@ -1,3 +1,20 @@
+import React from 'react'
+
+function EditCapability() {
+  return (
+    <div>create-Capability</div>
+  )
+}
+
+export default EditCapability
+
+
+
+
+
+
+
+
 // import React, { useState, useEffect } from "react";
 // import Box from "@mui/material/Box";
 // import Modal from "@mui/material/Modal";
