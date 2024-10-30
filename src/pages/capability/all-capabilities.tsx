@@ -22,7 +22,7 @@ function AllCapabilities() {
   },[]);
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Box display="flex"  justifyContent="flex-start" alignContent={"center"} alignItems="center" justifyItems={"left"} marginBottom={2} gap={2}>
+      <Box display="flex"  justifyContent="flex-end" alignContent={"center"} alignItems="center" justifyItems={"left"} marginBottom={2} gap={2}>
       <CustomButton
         icon={ <AddIcon/>}
         type="button"
