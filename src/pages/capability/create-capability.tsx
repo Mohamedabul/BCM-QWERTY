@@ -24,7 +24,8 @@ type CreateCapabilityProps = {
   open: boolean;
   onClose: () => void;
   capabilityName?: string;
-  onSave: (name: string) => void;
+  label: string,
+  clickHandler: any;
 };
 
 type CombinedProps = IResourceComponentsProps<any, any> & CreateCapabilityProps;
@@ -33,7 +34,8 @@ const CreateCapability: React.FC<CombinedProps> = ({
   open = true,
   onClose = () => {},
   capabilityName = "",
-  onSave = (name) => console.log("Saved capability name:", name),
+  label,
+  clickHandler
 }) => {
   const [name, setName] = useState<string>(capabilityName);
 
@@ -43,31 +45,11 @@ const CreateCapability: React.FC<CombinedProps> = ({
     setName(capabilityName);
   }, [capabilityName]);
   const handleSave = async () => {
-    // if (name.length < 40) {
-    //   alert("Please enter at least 40 characters.");
-    //   return;
-    // }
-
     try {
-      const response = await fetch(
-        process.env.REACT_APP_API_URL + "coreCapability",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ name }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to create capability: ${response.statusText}`);
-      }
-
-      console.log("Capability created successfully");
-      onSave(name);
-      setName("");
-      onClose();
+      await clickHandler({name},() => {
+        setName("");
+        onClose();
+      });
     } catch (error) {
       console.error("Error creating capability:", error);
       alert("Failed to create capability. Please try again.");
@@ -84,14 +66,14 @@ const CreateCapability: React.FC<CombinedProps> = ({
           mb={2}
         >
           <Typography variant="h6" component="h2">
-            Add new Business Capability Information
+            Add new {label} Information
           </Typography>
           <IconButton onClick={onClose}>
             <CloseIcon />
           </IconButton>
         </Box>
         <Typography variant="body2" color="textSecondary" mb={2}>
-          Add new Business Capability Information
+          Add new {label} Information
         </Typography>
         <Typography variant="body2" color="textSecondary" mb={3}>
           Include min. 40 characters to make it more interesting
@@ -99,7 +81,7 @@ const CreateCapability: React.FC<CombinedProps> = ({
         <TextField
           fullWidth
           variant="outlined"
-          label="Add new Business Capability name"
+          label={`Add new ${label} name`}
           color="secondary"
           value={name}
           onChange={(e) => setName(e.target.value)}

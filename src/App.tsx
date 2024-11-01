@@ -132,14 +132,14 @@ function App() {
             {
               name: "templates",
               list: AllCapabilities,
-              show: CapabilityDetails,
+              // show: CapabilityDetails,
               icon: <AssessmentIcon />,
             },
             {
               name: "capability",
-              list: AllCapabilities,
+              list: () => <AllCapabilities isEditable={true}/>,
               // create: CreateCapability,
-              edit: EditCapability,
+              // edit: EditCapability,
               icon: <BusinessCenterIcon />,
             },
             // {

@@ -2,15 +2,14 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import GridItem from "utils/GridItem";
 import IconButton from "@mui/material/IconButton";
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
 import { CustomButton } from "components";
 import CapabilityCard from "./card-capability";
 import CreateCapability from "./create-capability";
 import { useEffect, useState } from "react";
 
-
-function AllCapabilities() {
+function AllCapabilities({ isEditable }: any) {
   const [cabablityList, setCapabilityList] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
 
@@ -28,35 +27,74 @@ function AllCapabilities() {
     fetchCabability(); // Re-fetch to update list if needed
     handleCreateClose(); // Close the modal after saving
   };
+  const handleClick = async (obj:object, callback:any) => {
+    const response = await fetch(
+      process.env.REACT_APP_API_URL + "coreCapability",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(obj),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to create capability: ${response.statusText}`);
+    }
+
+    console.log("Capability created successfully");
+    callback();
+    fetchCabability();
+    handleCreateClose();
+  };
 
   const fetchCabability = async () => {
-    const resp = await fetch(process.env.REACT_APP_API_URL+"coreCapability");
+    const resp = await fetch(process.env.REACT_APP_API_URL + "coreCapability");
     const data = await resp.json();
     setCapabilityList(data);
-  }
+  };
   useEffect(() => {
     fetchCabability();
-  },[]);
+  }, []);
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Box display="flex"  justifyContent="flex-end" alignContent={"center"} alignItems="center" justifyItems={"left"} marginBottom={2} gap={2}>
-      <CustomButton
-        icon={ <AddIcon/>}
-        type="button"
-        title="New Capability"
-        color="white"
-        backgroundColor="#2979ff"
-        handleClick={handleCreateOpen}
-      />
+      <Box
+        display="flex"
+        justifyContent="flex-end"
+        alignContent={"center"}
+        alignItems="center"
+        justifyItems={"left"}
+        marginBottom={2}
+        gap={2}
+      >
+        {isEditable && (
+          <CustomButton
+            icon={<AddIcon />}
+            type="button"
+            title="New Capability"
+            color="white"
+            backgroundColor="#2979ff"
+            handleClick={handleCreateOpen}
+          />
+        )}
       </Box>
       <Grid container spacing={2}>
-        {cabablityList.map((cabablity) =><CapabilityCard key={cabablity.id} name={cabablity.name} id={cabablity.id} fetchCabability={fetchCabability}/>)}
-
+        {cabablityList.map((cabablity) => (
+          <CapabilityCard
+            isEditable={isEditable}
+            key={cabablity.id}
+            name={cabablity.name}
+            id={cabablity.id}
+            fetchCabability={fetchCabability}
+          />
+        ))}
       </Grid>
       <CreateCapability
         open={open}
         onClose={handleCreateClose}
-        onSave={handleSaveCapability}
+        label="Business Capability"
+        clickHandler={handleClick}
       />
     </Box>
   );

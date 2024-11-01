@@ -218,8 +218,13 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
         <DialogTitle id="delete-dialog-title">Confirm Deletion</DialogTitle>
         <DialogContent>
           <DialogContentText id="delete-dialog-description">
-            Are you sure you want to delete the {label} "{capabilityName}"? This
-            action cannot be undone.
+            Are you sure you want to delete the {label} "{capabilityName}"? 
+            <DialogContentText id="delete-dialog-description" sx={{color: "warning.main"}}>
+            All items associated with this will be permanently deleted.
+            </DialogContentText>
+            <DialogContentText id="delete-dialog-description" sx={{color: "red"}}>
+            This action cannot be undone.
+            </DialogContentText>
           </DialogContentText>
         </DialogContent>
         <DialogActions>

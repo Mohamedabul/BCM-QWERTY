@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getRandomColor, handleChange } from "utils/helperFunctions";
 import DomainCardWithMenu from "pages/domain/domaincardwithmenu";
 import CustomMenu from "components/common/CustomMenu";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import {
   Accordion,
   Box,
@@ -13,6 +14,7 @@ import {
 import GridItem from "utils/GridItem";
 import { ShimmerBox } from "utils/ShimmerBox";
 import { objectToQueryString } from "components/common/helper";
+import CreateCapability from "./create-capability";
 
 const CapabilityCard = (props: any) => {
   const [domainList, setDomainList] = useState<any>([]);
@@ -22,12 +24,15 @@ const CapabilityCard = (props: any) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const bgColor = useMemo(() => getRandomColor(), []);
+  const [open, setOpen] = useState(false);
 
   const handleExpand = async () => {
     setLoading(true);
-    const params = {core_id: props.id};
+    const params = { core_id: props.id };
     const queryString = objectToQueryString(params);
-    const resp = await fetch(process.env.REACT_APP_API_URL + `domainByCapability?${queryString}`);
+    const resp = await fetch(
+      process.env.REACT_APP_API_URL + `domainByCapability?${queryString}`
+    );
     const data = await resp.json();
     setDomainList(data);
     setLoading(false);
@@ -75,6 +80,28 @@ const CapabilityCard = (props: any) => {
     }
   };
 
+  const handleClick = async (obj:object, callback:any) => {
+    const response = await fetch(
+      process.env.REACT_APP_API_URL + "domain",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({...obj,core_id: props.id}),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to create capability: ${response.statusText}`);
+    }
+
+    console.log("Capability created successfully");
+    callback();
+    handleExpand();
+    setOpen(false);
+  };
+
   const deleteCapability = async () => {
     try {
       const resp = await fetch(
@@ -85,7 +112,7 @@ const CapabilityCard = (props: any) => {
       );
       if (resp.ok) {
         console.log("Capability deleted successfully");
-        props.fetchCabability()
+        props.fetchCabability();
       } else {
         console.log("Failed to delete capability");
       }
@@ -97,21 +124,23 @@ const CapabilityCard = (props: any) => {
   return (
     <Grid item xs={3}>
       <GridItem sx={{ backgroundColor: bgColor, position: "relative" }}>
-        <CustomMenu
-          anchorEl={anchorEl}
-          onOpen={handleMenuOpen}
-          onClose={handleMenuClose}
-          onEdit={handleEditClick}
-          onDelete={handleDeleteClick}
-          capabilityName={props.name}
-          label="Buissiness Capability"
-          editEndpoint={`${process.env.REACT_APP_API_URL}coreCapability/${props.id}`}
-          deleteEndpoint={`${process.env.REACT_APP_API_URL}coreCapability/${props.id}`}
-          onSave={(newName) => {
-            updateCapabilityName(newName);
-            setIsEditModalOpen(false);
-          }}
-        />
+        {props.isEditable && (
+          <CustomMenu
+            anchorEl={anchorEl}
+            onOpen={handleMenuOpen}
+            onClose={handleMenuClose}
+            onEdit={handleEditClick}
+            onDelete={handleDeleteClick}
+            capabilityName={props.name}
+            label="Buissiness Capability"
+            editEndpoint={`${process.env.REACT_APP_API_URL}coreCapability/${props.id}`}
+            deleteEndpoint={`${process.env.REACT_APP_API_URL}coreCapability/${props.id}`}
+            onSave={(newName) => {
+              updateCapabilityName(newName);
+              setIsEditModalOpen(false);
+            }}
+          />
+        )}
         <Accordion
           sx={{
             minheight: "100",
@@ -174,10 +203,11 @@ const CapabilityCard = (props: any) => {
                 </>
               ) : (
                 domainList.map((domain: any, index: any) => (
-                  <Box key={domain.id}>
+                  <Box key={domain.id} sx={{marginY:"12%", minWidth: "200px"}}>
                     <DomainCardWithMenu
                       name={domain.name}
                       id={domain.id}
+                      isEditable={props.isEditable}
                       onSave={handleExpand}
                     />
                     {index < domainList.length - 1 && (
@@ -192,10 +222,45 @@ const CapabilityCard = (props: any) => {
                   </Box>
                 ))
               )}
+              {props.isEditable && (
+                <>
+                  <div style={{ position: "relative", textAlign: "center", marginTop:'10%' }}>
+                    <hr
+                      style={{
+                        border: "0",
+                        height: "1px",
+                        background: "white",
+                        marginTop: "7%",
+                      }}
+                    />
+                    <AddCircleIcon
+                      onClick={() => {
+                        setOpen(true);
+                      }}
+                      sx={{
+                        color: "black",
+                        backgroundColor: "white",
+                        borderRadius: "50%",
+                        position: "absolute",
+                        top: "-12px",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        cursor: "pointer",
+                      }}
+                    />
+                  </div>
+                </>
+              )}
             </Box>
           </AccordionDetails>
         </Accordion>
       </GridItem>
+      <CreateCapability
+        open={open}
+        onClose={() => setOpen(false)}
+        label="Domain"
+        clickHandler={handleClick}
+      />
     </Grid>
   );
 };
