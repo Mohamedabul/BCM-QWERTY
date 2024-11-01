@@ -17,6 +17,7 @@ import { objectToQueryString } from "components/common/helper";
 import CreateCapability from "./create-capability";
 
 const CapabilityCard = (props: any) => {
+  const { isEditable } = props;
   const [domainList, setDomainList] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -28,15 +29,40 @@ const CapabilityCard = (props: any) => {
 
   const handleExpand = async () => {
     setLoading(true);
+  
+    // Set the endpoint based on the `isEditable` flag
+    const endpoint = `${process.env.REACT_APP_API_URL}${
+      isEditable ? "domainByCapability" : "template/domainByCapability"
+    }`;
+  
     const params = { core_id: props.id };
     const queryString = objectToQueryString(params);
-    const resp = await fetch(
-      process.env.REACT_APP_API_URL + `domainByCapability?${queryString}`
-    );
-    const data = await resp.json();
-    setDomainList(data);
-    setLoading(false);
+  
+    try {
+      const resp = await fetch(`${endpoint}?${queryString}`);
+      if (!resp.ok) {
+        console.error("Error fetching domain by capability:", resp.statusText);
+        return;
+      }
+      const data = await resp.json();
+      setDomainList(data);
+    } catch (error) {
+      console.error("Error fetching domain by capability:", error);
+    } finally {
+      setLoading(false);
+    }
   };
+  // const handleExpand = async () => {
+  //   setLoading(true);
+  //   const params = { core_id: props.id };
+  //   const queryString = objectToQueryString(params);
+  //   const resp = await fetch(
+  //     process.env.REACT_APP_API_URL + `domainByCapability?${queryString}`
+  //   );
+  //   const data = await resp.json();
+  //   setDomainList(data);
+  //   setLoading(false);
+  // };
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -120,7 +146,7 @@ const CapabilityCard = (props: any) => {
       console.log("Error deleting capability:", error);
     }
   };
-
+  
   return (
     <Grid item xs={3}>
       <GridItem sx={{ backgroundColor: bgColor, position: "relative" }}>
@@ -180,7 +206,7 @@ const CapabilityCard = (props: any) => {
           </AccordionSummary>
           <AccordionDetails
             sx={{
-              margin: 1,
+              margin: '',
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
@@ -203,7 +229,7 @@ const CapabilityCard = (props: any) => {
                 </>
               ) : (
                 domainList.map((domain: any, index: any) => (
-                  <Box key={domain.id} sx={{marginY:"12%", minWidth: "200px"}}>
+                  <Box key={domain.id} sx={{ marginY:"14%",minWidth: "100%"}}>
                     <DomainCardWithMenu
                       name={domain.name}
                       id={domain.id}

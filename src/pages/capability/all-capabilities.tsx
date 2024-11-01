@@ -50,9 +50,22 @@ function AllCapabilities({ isEditable }: any) {
   };
 
   const fetchCabability = async () => {
-    const resp = await fetch(process.env.REACT_APP_API_URL + "coreCapability");
-    const data = await resp.json();
-    setCapabilityList(data);
+    const endpoint = `${process.env.REACT_APP_API_URL}${
+      isEditable ? "coreCapability" : "template/coreCapability"
+    }`;
+
+    try {
+      const response = await fetch(endpoint);
+      if (!response.ok) {
+        console.error("Error fetching capabilities:", response.statusText);
+        return;
+      }
+      const data = await response.json();
+      setCapabilityList(data);
+    } catch (error) {
+      console.error("Error fetching capabilities:", error);
+    }
+   
   };
   useEffect(() => {
     fetchCabability();
@@ -87,6 +100,7 @@ function AllCapabilities({ isEditable }: any) {
             name={cabablity.name}
             id={cabablity.id}
             fetchCabability={fetchCabability}
+            
           />
         ))}
       </Grid>

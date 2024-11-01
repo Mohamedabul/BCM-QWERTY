@@ -131,7 +131,7 @@ function App() {
           resources={[
             {
               name: "templates",
-              list: AllCapabilities,
+              list: () => <AllCapabilities isEditable={false} />,
               // show: CapabilityDetails,
               icon: <AssessmentIcon />,
             },

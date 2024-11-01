@@ -14,20 +14,31 @@ import { objectToQueryString } from "components/common/helper";
 import CreateCapability from "pages/capability/create-capability";
 
 const DomainCard = (props: any) => {
+  const { isEditable } = props;
   const [subDomainList, setSubDomainList] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [open, setOpen] = useState(false);
 
   const handleExpand = async () => {
     setLoading(true);
+    const endpoint = `${process.env.REACT_APP_API_URL}${
+      isEditable ? "subdomainBydomain" : "template/subdomainBydomain"
+    }`;
     const params = { domain_id: props.id };
     const queryString = objectToQueryString(params);
-    const resp = await fetch(
-      process.env.REACT_APP_API_URL + `subdomainBydomain?${queryString}`
-    );
-    const data = await resp.json();
-    setSubDomainList(data);
-    setLoading(false);
+    try {
+      const resp = await fetch(`${endpoint}?${queryString}`);
+      if (!resp.ok) {
+        console.error("Error fetching subdomain by domains:", resp.statusText);
+        return;
+      }
+      const data = await resp.json();
+      setSubDomainList(data);
+    } catch (error) {
+      console.error("Error fetching domain by capability:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClick = async (obj: object, callback: any) => {
