@@ -7,7 +7,6 @@ import {
   PieChart,
   PropertyReferrals,
   TotalRevenue,
-  PropertyCard,
 } from "components";
 import CapabilityTable from "components/charts/TableCapability";
 

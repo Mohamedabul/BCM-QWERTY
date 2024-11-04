@@ -6,7 +6,6 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
 import type { ProfileProps, PropertyProps } from "interfaces/common";
-import PropertyCard from "./PropertyCard";
 
 function checkImage(url: any) {
   const img = new Image();
@@ -150,16 +149,6 @@ const Profile = ({ type, name, avatar, email, properties }: ProfileProps) => (
             gap: 2.5,
           }}
         >
-          {properties?.map((property: PropertyProps) => (
-            <PropertyCard
-              key={property._id}
-              id={property._id}
-              title={property.title}
-              location={property.location}
-              price={property.price}
-              photo={property.photo}
-            />
-          ))}
         </Box>
       </Box>
     )}
