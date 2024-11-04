@@ -70,10 +70,10 @@ const CapabilityTable = () => {
         <Table stickyHeader aria-label="dynamic capability table">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Business Capability Names</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Business Capability</TableCell>
               <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Domain</TableCell>
               <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Sub-domain</TableCell>
-              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>No. of Applications</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Applications</TableCell>
               <TableCell />
             </TableRow>
           </TableHead>

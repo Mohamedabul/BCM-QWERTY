@@ -68,25 +68,25 @@ const Home = () => {
 
       <Box mt="20px" display="flex" flexWrap="wrap" gap={4}>
         <PieChart
-          title="Total Business Units"
+          title="Business Capabilities"
           value={dashboardCounts?.coreCapabilityCount ?? 0}
           series={[dashboardCounts?.coreCapabilityCount ?? 0, 100 - (dashboardCounts?.coreCapabilityCount ?? 0)]}
           colors={["#275be8", "#c4e8ef"]}
         />
         <PieChart
-          title="Total Domains"
+          title="Domains"
           value={dashboardCounts?.domainCount ?? 0}
           series={[dashboardCounts?.domainCount ?? 0, 100 - (dashboardCounts?.domainCount ?? 0)]}
           colors={["#275be8", "#c4e8ef"]}
         />
         <PieChart
-          title="Total Sub-domains"
+          title="Sub-domains"
           value={dashboardCounts?.subDomainCount ?? 0}
           series={[dashboardCounts?.subDomainCount ?? 0, 100 - (dashboardCounts?.subDomainCount ?? 0)]}
           colors={["#275be8", "#c4e8ef"]}
         />
         <PieChart
-          title="Total Application"
+          title="Application"
           value={dashboardCounts?.softwareCount ?? 0}
           series={[dashboardCounts?.softwareCount ?? 0, 100 - (dashboardCounts?.softwareCount ?? 0)]}
           colors={["#275be8", "#c4e8ef"]}
