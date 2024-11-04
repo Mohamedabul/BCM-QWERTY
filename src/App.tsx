@@ -4,6 +4,7 @@ import PeopleAltOutlined from "@mui/icons-material/PeopleAltOutlined";
 import StarOutlineRounded from "@mui/icons-material/StarOutlineRounded";
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
+import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
 import CssBaseline from "@mui/material/CssBaseline";
 import GlobalStyles from "@mui/material/GlobalStyles";
 import {
@@ -35,6 +36,7 @@ import {
   EditCapability,
   CapabilityDetails,
 } from "pages";
+import Upload from "pages/Upload";
 
 const axiosInstance = axios.create();
 axiosInstance.interceptors.request.use(
@@ -152,6 +154,18 @@ function App() {
             //   list: Home,
             //   icon: <ChatBubbleOutline />,
             // },
+            {
+              name: "Upload",
+              list: Upload,
+              icon: <InboxOutlinedIcon />,
+              options: {
+                label: "Upload",
+                onClick: () => {
+                  console.log("clicked");
+                },
+              },
+
+            },
             {
               name: "my-profile",
               options: { label: "My Profile " },
