@@ -130,17 +130,18 @@ function App() {
           catchAll={<ErrorComponent />}
           resources={[
             {
-              name: "templates",
+              name: "template",
               list: () => <AllCapabilities isEditable={false} />,
               // show: CapabilityDetails,
               icon: <AssessmentIcon />,
+              options: { label: "Template" }
             },
             {
               name: "capability",
               list: () => <AllCapabilities isEditable={true}/>,
               // create: CreateCapability,
               // edit: EditCapability,
-              icon: <BusinessCenterIcon />,
+              icon: <BusinessCenterIcon />
             },
             // {
             //   name: "reviews",
