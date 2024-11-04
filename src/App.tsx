@@ -31,7 +31,7 @@ import {
   Login,
   MyProfile,
   AllCapabilities,
-  CreateCapability,
+  // CreateCapability,
   EditCapability,
   CapabilityDetails,
 } from "pages";
@@ -130,17 +130,18 @@ function App() {
           catchAll={<ErrorComponent />}
           resources={[
             {
-              name: "analytics",
-              list: AllCapabilities,
-              show: CapabilityDetails,
+              name: "template",
+              list: () => <AllCapabilities isEditable={false} />,
+              // show: CapabilityDetails,
               icon: <AssessmentIcon />,
+              options: { label: "Template" }
             },
             {
               name: "capability",
-              list: AllCapabilities,
-              create: CreateCapability,
-              edit: EditCapability,
-              icon: <BusinessCenterIcon />,
+              list: () => <AllCapabilities isEditable={true}/>,
+              // create: CreateCapability,
+              // edit: EditCapability,
+              icon: <BusinessCenterIcon />
             },
             // {
             //   name: "reviews",

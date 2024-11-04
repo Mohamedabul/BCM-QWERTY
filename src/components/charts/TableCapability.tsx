@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Table,
@@ -18,57 +18,38 @@ import {
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-// Sample data for the table
-const rows = [
-  {
-    businessCapability: "Customer Relationship",
-    domain: "Contact Management",
-    subDomain1: "Classify Demand",
-    noApplication: "3",
-    // details: "Additional information about Customer Relationship",
-  },
-  {
-    businessCapability: "Customer Relationship",
-    domain: "Contact Management",
-    subDomain1: "Contact Interaction",
-    noApplication: "6",
-    // details: "Details for Enterprise Support.",
-  },
-  {
-    businessCapability: "Customer Relationship",
-    domain: "Contact Management",
-    subDomain1: "Inbound Contact",
-    noApplication: "4",
-    // details: "Finance-related details.",
-  },
-  {
-    businessCapability: "Customer Relationship",
-    domain: "Contact Management",
-    subDomain1: "Manage Interaction",
-    noApplication: "1",
-    // details: "Finance-related details.",
-  },
-  {
-    businessCapability: "Customer Relationship",
-    domain: "Contact Management",
-    subDomain1: "Outbound Contact",
-    noApplication: "-",
-    // details: "Finance-related details.",
-  },
-  {
-    businessCapability: "Customer Relationship",
-    domain: "Contact Management",
-    subDomain1: "Route Contact",
-    noApplication: "2",
-    // details: "Finance-related details.",
-  },
-];
 
 const CapabilityTable = () => {
+  const [data, setData] = useState<{ 
+    businessCapability: string; 
+    domain: string; 
+    subDomain: string; 
+    noApplication: number; 
+  }[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const theme = useTheme();
+
+  
+
+  useEffect(() => {
+    const fetchData = async ()=>{
+      try {
+        const response = await fetch(process.env.REACT_APP_API_URL+"getDashboardTableData")
+        const result = await response.json();
+        setData(result.response.map((item: { core_capability: any; domain: any; subdomain: any; noApplication: any; }) => ({
+          businessCapability: item.core_capability,
+          domain: item.domain??'',
+          subDomain: item.subdomain??'',
+          noApplication:item.noApplication??0
+        })));
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -89,15 +70,15 @@ const CapabilityTable = () => {
         <Table stickyHeader aria-label="dynamic capability table">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Business Capability Names</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Business Capability</TableCell>
               <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Domain</TableCell>
               <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Sub-domain</TableCell>
-              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>No. of Applications</TableCell>
+              <TableCell sx={{ fontWeight: 'bold', fontSize: '16px' }}>Applications</TableCell>
               <TableCell />
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
+            {data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
               <React.Fragment key={index}>
                 <TableRow
                   hover
@@ -112,7 +93,7 @@ const CapabilityTable = () => {
                 >
                   <TableCell>{row.businessCapability}</TableCell>
                   <TableCell>{row.domain}</TableCell>
-                  <TableCell>{row.subDomain1}</TableCell>
+                  <TableCell>{row.subDomain}</TableCell>
                   <TableCell>{row.noApplication}</TableCell>
                   {/* <TableCell align="right">
                     <IconButton size="small">
@@ -157,7 +138,7 @@ const CapabilityTable = () => {
         <TablePagination
           rowsPerPageOptions={[10, 25, 50]}
           component="div"
-          count={rows.length}
+          count={data.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
