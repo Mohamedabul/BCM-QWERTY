@@ -11,6 +11,7 @@ const CustomButton = ({
   icon,
   handleClick,
   disabled,
+  sx, 
 }: CustomButtonProps) => {
   return (
     <Button
@@ -29,8 +30,10 @@ const CustomButton = ({
         textTransform: "capitalize",
         "&:hover": {
           opacity: 0.9,
-          backgroundColor,
+          backgroundColor:title === "Cancel" ? "lightgray" : backgroundColor,
+          color: title === "Cancel" ? "black" : color,
         },
+        ...sx,
       }}
       onClick={handleClick}
     >

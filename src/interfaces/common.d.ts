@@ -1,3 +1,5 @@
+import { SxProps } from "@mui/material";
+
 export interface CustomButtonProps {
   type?: string;
   title: string;
@@ -8,6 +10,7 @@ export interface CustomButtonProps {
   disabled?: boolean;
   variant?: string;
   handleClick?: () => void;
+  sx?: SxProps;
 }
 
 export interface ProfileProps {

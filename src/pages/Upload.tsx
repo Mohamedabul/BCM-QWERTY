@@ -61,28 +61,33 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFile(null);
   }
   const handleDownloadTemplate = () => {
-    
-    console.log('Download template clicked');
+    const link = document.createElement('a');
+  link.href = '/example_app_inventory.xlsx'; 
+  link.download = 'example_app_inventory.xlsx';
+  link.click();
   };
   
 
   return (
-    <Box sx={{ padding: 4,
+    <Box sx={{ padding: 2,
         width: '600px',
-        height: '450px',
+        // height: '470px',
         margin: 'auto',
         backgroundColor: '#f4efef',
+        overflow: 'auto', //1
         color: 'black',
         borderRadius: '10px',
-        boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)'
+        boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+        display: 'flex',
+        flexDirection: 'column',
      }}>
         <Box padding={0} sx={{
-          padding:2,
+          padding:'19px',
           backgroundColor: '#e9e2e2', 
           borderRadius: '8px 8px 0 0',
-          marginLeft: '-32px',
-          marginRight: '-32px',
-          marginTop: '-32px',
+          marginLeft: '-14px',
+          marginRight: '-14px',
+          marginTop: '-26px',
         }}>
       <Typography variant="h6" fontWeight="bold" gutterBottom>
         File Upload
@@ -165,16 +170,25 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         Download Sample Template
       </Button>
       </Box>
-      <Box sx={{ marginTop: 3, display: 'flex', justifyContent: 'flex-end',backgroundColor: '#e9e2e2', 
+      <Box sx={{ marginTop: 2,gap: 2, display: 'flex', justifyContent: 'flex-end',backgroundColor: '#e9e2e2', 
           borderRadius: '0 0 8px 8px',
-          marginLeft: '-32px',
-          marginRight: '-32px',
-          padding: 1 }}>
+          marginLeft: '-16px',
+          marginRight: '-16px',
+          padding: '6px' }}>
         <CustomButton
         variant="outlined"
         handleClick={handleClose}
-        title='Cancel' backgroundColor={''}
-        color={'black'} />
+        title='Cancel' backgroundColor={'transparent'}
+        color={'black'} 
+        sx={{
+          border: '1px solid lightgray',
+          "&:hover": {
+            backgroundColor: "black", 
+            color: "white", 
+            opacity: 0.8, 
+          },
+        }}
+        />
            
         
         <CustomButton
