@@ -52,9 +52,30 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     }
   };
   
-  const handleUploadClick = () => {
-    
-    console.log('Upload clicked');
+  const handleUploadClick = async () => {
+    if (!file){
+      alert("Please select a file to upload.");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("file", file);
+    try{
+      // const apiUrl = process.env.React_APP_API_URL;
+      // console.log(apiUrl);
+      const response = await fetch(process.env.React_APP_API_URL+"upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (! response.ok) {
+        throw new Error("file upload failed");
+    }
+    const data = await response.json();
+    console.log('file upload successfully:', data.fileUrl);
+    alert("File uploaded successfully");
+  }catch (error) {
+    console.error("Error during file upload:", error);
+    alert("An error occurred during file upload. Please try again or upload a different file.");
+  }
   };
 
   const handleClose = () => {
@@ -170,7 +191,7 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         Download Sample Template
       </Button>
       </Box>
-      <Box sx={{ marginTop: 2,gap: 2, display: 'flex', justifyContent: 'flex-end',backgroundColor: '#e9e2e2', 
+      <Box sx={{ marginTop: 1,gap: 2, display: 'flex', justifyContent: 'flex-end',backgroundColor: '#e9e2e2', 
           borderRadius: '0 0 8px 8px',
           marginLeft: '-16px',
           marginRight: '-16px',
