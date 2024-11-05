@@ -37,6 +37,7 @@ import {
   CapabilityDetails,
 } from "pages";
 import Upload from "pages/Upload";
+import Report from "pages/Report";
 
 const axiosInstance = axios.create();
 axiosInstance.interceptors.request.use(
@@ -160,6 +161,18 @@ function App() {
               icon: <InboxOutlinedIcon />,
               options: {
                 label: "Upload",
+                onClick: () => {
+                  console.log("clicked");
+                },
+              },
+
+            },
+            {
+              name: "Reports",
+              list: Report,
+              icon: <AssessmentIcon />,
+              options: {
+                label: "Reports",
                 onClick: () => {
                   console.log("clicked");
                 },
