@@ -62,7 +62,7 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     try{
       // const apiUrl = process.env.React_APP_API_URL;
       // console.log(apiUrl);
-      const response = await fetch(process.env.React_APP_API_URL+"upload", {
+      const response = await fetch('http://localhost:5000/api/upload', {
         method: "POST",
         body: formData,
       });
@@ -76,6 +76,7 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.error("Error during file upload:", error);
     alert("An error occurred during file upload. Please try again or upload a different file.");
   }
+  setFile(null);
   };
 
   const handleClose = () => {

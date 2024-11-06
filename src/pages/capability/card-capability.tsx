@@ -210,7 +210,7 @@ const CapabilityCard = (props: any) => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              minWidth: "300px",
+              minWidth: "100%",
             }}
           >
             <Box
