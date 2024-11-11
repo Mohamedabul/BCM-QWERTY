@@ -175,7 +175,7 @@ const CapabilityCard = (props: any) => {
             color: "white",
             margin: 0,
             padding: 0,
-            maxWidth: "100%",
+            minWidth: "100%",
           }}
           onChange={handleChange(handleExpand)}
         >
