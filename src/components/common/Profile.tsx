@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
-import type { ProfileProps, PropertyProps } from "interfaces/common";
+import type { ProfileProps } from "interfaces/common";
 
 function checkImage(url: any) {
   const img = new Image();
@@ -13,7 +13,7 @@ function checkImage(url: any) {
   return img.width !== 0 && img.height !== 0;
 }
 
-const Profile = ({ type, name, avatar, email, properties }: ProfileProps) => (
+const Profile = ({ type, name, avatar, email }: ProfileProps) => (
   <Box>
     <Typography fontSize={25} fontWeight={700} color="#11142D">
       {type} Profile
@@ -135,7 +135,7 @@ const Profile = ({ type, name, avatar, email, properties }: ProfileProps) => (
       </Box>
     </Box>
 
-    {properties.length > 0 && (
+    {/* {properties.length > 0 && (
       <Box mt={2.5} borderRadius="15px" padding="20px" bgcolor="#FCFCFC">
         <Typography fontSize={18} fontWeight={600} color="#11142D">
           {type} Properties
@@ -151,7 +151,7 @@ const Profile = ({ type, name, avatar, email, properties }: ProfileProps) => (
         >
         </Box>
       </Box>
-    )}
+    )} */}
   </Box>
 );
 
