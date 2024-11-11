@@ -4,7 +4,15 @@ import {
   Button,
   Typography,
   Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  CircularProgress
 } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -16,6 +24,13 @@ interface UploadProps extends IResourceComponentsProps<any, any> {}
 const Upload: React.FC<UploadProps> = () => {
 const fileInputRef = useRef<HTMLInputElement>(null); 
 const [file, setFile] = React.useState<File | null>(null);
+const [open, setOpen] = React.useState(false);
+const [openDialog, setOpenDialog] = React.useState(false);
+const [applications, setApplications] = React.useState([]);
+const [mappedApplications, setMappedApplications] = React.useState([]);
+const [orphans, setOrphans] = React.useState([]);
+const [loading, setLoading] = React.useState(false);
+const [showImportButton, setShowImportButton] = React.useState(true);
 
   const handleFileAreaClick = () => {
     if (fileInputRef.current) {
@@ -57,8 +72,11 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       alert("Please select a file to upload.");
       return;
     }
+   
     const formData = new FormData();
     formData.append("file", file);
+    setOpenDialog(true);
+    setLoading(true);
     try{
       // const apiUrl = process.env.React_APP_API_URL;
       // console.log(apiUrl);
@@ -70,31 +88,77 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         throw new Error("file upload failed");
     }
     const data = await response.json();
+    setFile(null);
+    setApplications(data.applications);
+    setMappedApplications(data.mappedAppliactions);
+    setOrphans(data.orphans);
+
     console.log('file upload successfully:', data.fileUrl);
-    alert("File uploaded successfully");
-  }catch (error) {
+   
+    
+    
+    // alert("File uploaded successfully");
+  }
+  
+  catch (error) {
+    setShowImportButton(true);
+    setOpen(false);
     console.error("Error during file upload:", error);
     alert("An error occurred during file upload. Please try again or upload a different file.");
+    setFile(null);
+  }finally {
+    setLoading(false);
   }
-  setFile(null);
+  
+  
   };
 
   const handleClose = () => {
     setFile(null);
+    setOpen(false);
+    setShowImportButton(true);
+  }
+  const handleDialogClose = () => {
+    setFile(null);
+    setOpenDialog(false);
+    console.log("Dialog closed");
+    
   }
   const handleDownloadTemplate = () => {
     const link = document.createElement('a');
   link.href = '/example_app_inventory.xlsx'; 
   link.download = 'example_app_inventory.xlsx';
   link.click();
-  };
+  }
+  const openUpload = () => {
+  setShowImportButton(false);
+  setOpen(true);
+  // setOpenDialog(true);
   
+  }
+  const fixOrphan = () => {}
 
   return (
-    <Box sx={{ padding: 2,
+    <Box className="container">
+       {showImportButton && (
+        <Box className="button-container">
+          <CustomButton
+            title="Import File"
+            backgroundColor="blue"
+            color="white"
+            handleClick={openUpload}
+            variant="contained"
+            icon={<AddIcon />}
+          />
+        </Box>
+      )}
+
+     {open && (   
+     <Box sx={{ padding: 2,
         width: '600px',
         // height: '470px',
         margin: 'auto',
+        // marginTop: '10px',
         backgroundColor: '#f4efef',
         overflow: 'auto', //1
         color: 'black',
@@ -102,7 +166,8 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
         display: 'flex',
         flexDirection: 'column',
-     }}>
+     }}
+    >
         <Box padding={0} sx={{
           padding:'19px',
           backgroundColor: '#e9e2e2', 
@@ -223,7 +288,56 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         
       </Box>
     </Box>
+     )}
+      
+    <Dialog  PaperProps={{
+    className: "dialog-paper",
+  }} open={openDialog} onClose={handleDialogClose}>
+      <DialogTitle className="dialog-title">
+        Upload Status 
+        <IconButton
+          aria-label="close"
+          onClick={handleDialogClose}
+          className="close-button"
+        >
+          <CloseIcon  />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent className="dialog-content">
+      {loading ? (
+            <Box display="flex" justifyContent="center" alignItems="center" p={2}>
+              <CircularProgress />
+              <Typography variant="body1" sx={{ ml: 2, color: "black" }}>
+                Loading...
+              </Typography>
+            </Box>
+          ) : (
+            <>
+      <div className="dialog-row">
+      <Typography className="dialog-typography">Application</Typography>
+      <span className="dialog-value">{applications}</span>
+    </div>
+    <div className="dialog-row">
+      <Typography className="dialog-typography"> Applications Mapped</Typography>
+      <span className="dialog-value">{mappedApplications}</span>
+    </div>
+    <div className="dialog-row">
+      <Typography className="dialog-typography">Application under Orphan</Typography>
+      <span className="dialog-value">{orphans}</span>
+    </div>
+    </>
+    )}
+      </DialogContent>
+      {/* <DialogActions className="dialog-actions"> */}
+          {/* <Divider sx={{ flexGrow: 2, borderColor: "black", mt: 1, mb: 1 }} /> */}
+          {/* <IconButton onClick={handleDialogClose} aria-label="close" sx={{ color: 'black' }}>
+            <CloseIcon />
+          </IconButton> */}
+        {/* </DialogActions> */}
+    </Dialog>
+    </Box>
   );
+
 };
 
 export default Upload;
