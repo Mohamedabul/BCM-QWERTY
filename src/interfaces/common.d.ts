@@ -51,4 +51,6 @@ export interface MenuProps {
   onEdit: () => void;
   onDelete: () => void;
   onOpen: (event: React.MouseEvent<HTMLElement>) => void;
+  useCustomEditDialog?: boolean; 
+  useCustomDeleteDialog?: boolean;
 }

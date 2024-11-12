@@ -4,20 +4,21 @@ import {
   Button,
   Typography,
   Divider,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton,
-  CircularProgress
+  AppBar,
+  Tabs,
+  Tab,
+  CircularProgress,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import ReplayIcon from '@mui/icons-material/Replay';
 import CloseIcon from '@mui/icons-material/Close';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { CustomButton } from 'components';
 import { IResourceComponentsProps } from '@refinedev/core';
+import CustomDialog from 'components/common/CustomDialog';
+import CustomTable from 'components/common/CustomTable';
 
 interface UploadProps extends IResourceComponentsProps<any, any> {}
 
@@ -31,8 +32,58 @@ const [mappedApplications, setMappedApplications] = React.useState([]);
 const [orphans, setOrphans] = React.useState([]);
 const [loading, setLoading] = React.useState(false);
 const [showImportButton, setShowImportButton] = React.useState(true);
+const [selectedTab, setSelectedTab] = React.useState(0); // State to track the selected tab
 
-  const handleFileAreaClick = () => {
+const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  setSelectedTab(newValue);
+};
+
+const sampleData =[
+  {
+    businessCapabilityName: 'Enterprise Resource Planning',
+    domain: 'Back Office',
+    subDomain: 'Accounting',
+    applicationName: 'Accent7',
+  },
+  {
+    businessCapabilityName: 'Enterprise Resource Planning',
+    domain: 'Back Office',
+    subDomain: 'Payroll',
+    applicationName: 'Accent7',
+  },
+  {
+    businessCapabilityName: 'Enterprise Resource Planning',
+    domain: 'Back Office',
+    subDomain: 'Payroll',
+    applicationName: 'Accent7',
+  },
+  {
+    businessCapabilityName: 'Enterprise Resource Planning',
+    domain: 'Back Office',
+    subDomain: 'posting',
+    applicationName: 'Accent7',
+  },
+  {
+    businessCapabilityName: 'Enterprise Resource Planning',
+    domain: 'Back Office',
+    subDomain: 'Purchase workflow & order',
+    applicationName: 'Accent7',
+  },
+  {
+    businessCapabilityName: 'Enterprise Resource Planning',
+    domain: 'Back Office',
+    subDomain: 'Accounts Payable & Receivables',
+    applicationName: 'Accent7',
+  },
+  {
+    businessCapabilityName: 'Enterprise Resource Planning',
+    domain: 'Back Office',
+    subDomain: 'Inventory Control',
+    applicationName: 'Accent7',
+  },
+];
+
+const handleFileAreaClick = () => {
     if (fileInputRef.current) {
         fileInputRef.current.click();
   }
@@ -75,6 +126,8 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
    
     const formData = new FormData();
     formData.append("file", file);
+    setOpen(false);
+    setShowImportButton(true);
     setOpenDialog(true);
     setLoading(true);
     try{
@@ -137,10 +190,11 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   
   }
   const fixOrphan = () => {}
+  const handleAddNew = () => {}
 
   return (
     <Box className="container">
-       {showImportButton && (
+       {/* {showImportButton && (
         <Box className="button-container">
           <CustomButton
             title="Import File"
@@ -151,8 +205,65 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             icon={<AddIcon />}
           />
         </Box>
-      )}
+      )} */}
+      <AppBar position="static" color="default" sx={{ boxShadow: 'none', borderBottom: '1px solid #ddd',backgroundColor: 'white' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 1 }}>
+          {/* Tabs for Mapping and Orphan */}
+          <Tabs value={selectedTab} onChange={handleTabChange} aria-label="Upload Tabs"
+          sx={{
+            '& .MuiTabs-indicator': {
+              backgroundColor: 'gray', 
+            },
+            '& .Mui-selected': {
+              color: 'lightblue', // Change the text color of the selected tab to blue
+            },
+          }}>
+            <Tab label="Mapping" sx={{fontWeight: 'bold',fontSize: '16px',color: 'black'}} />
+            <Tab label="Orphan"  sx={{fontWeight: 'bold',fontSize: '16px',color: 'black'}}/>
+          </Tabs>
 
+          {/* Import File Button */}
+          {showImportButton && (
+            <CustomButton
+              title="Import File"
+              backgroundColor="blue"
+              color="white"
+              handleClick={openUpload}
+              variant="contained"
+              icon={<AddIcon />}
+              sx={{borderRadius: '10px'}}
+            />
+          )}
+        </Box>
+      </AppBar>
+      {selectedTab === 0 && (
+        <Box sx={{ padding: 2,mt: 2,borderradius: '10px',backgroundColor: 'white', overflow: 'auto', color: 'black', boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)'  }}>
+          {/* <Typography variant="h6" gutterBottom={true}>
+            Mapping
+          </Typography> */}
+          <Box sx={{ display: 'flex' ,justifyContent: 'flex-end', gap: 2,mb: 2}}>
+            <CustomButton
+              title="Re-map"
+              handleClick={fixOrphan}
+              backgroundColor="#1E90FF"
+              color="white"
+              variant="contained"
+              icon={<ReplayIcon />}
+              sx={{borderRadius: '10px'}}
+              />
+            <CustomButton
+              title="Add New"
+              handleClick={handleAddNew}
+              backgroundColor="#1E90FF"
+              color="white"
+              variant="contained"
+              icon={<AddIcon />}
+              sx={{borderRadius: '10px'}}
+              />
+          </Box>
+          <CustomTable data={sampleData} /> {/* Render CustomTable for Mapping */}
+        </Box>
+      )}
      {open && (   
      <Box sx={{ padding: 2,
         width: '600px',
@@ -166,6 +277,10 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
         display: 'flex',
         flexDirection: 'column',
+        zIndex: 1300,
+        position: 'fixed',
+        top: '122px',
+        left: '391px',
      }}
     >
         <Box padding={0} sx={{
@@ -290,9 +405,9 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     </Box>
      )}
       
-    <Dialog  PaperProps={{
-    className: "dialog-paper",
-  }} open={openDialog} onClose={handleDialogClose}>
+    {/* <Dialog  PaperProps={{
+      className: "dialog-paper",
+      }} open={openDialog} onClose={handleDialogClose}>
       <DialogTitle className="dialog-title">
         Upload Status 
         <IconButton
@@ -327,14 +442,22 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     </div>
     </>
     )}
-      </DialogContent>
+      </DialogContent> */}
       {/* <DialogActions className="dialog-actions"> */}
           {/* <Divider sx={{ flexGrow: 2, borderColor: "black", mt: 1, mb: 1 }} /> */}
           {/* <IconButton onClick={handleDialogClose} aria-label="close" sx={{ color: 'black' }}>
             <CloseIcon />
           </IconButton> */}
         {/* </DialogActions> */}
-    </Dialog>
+    {/* </Dialog> */}
+    <CustomDialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        loading={loading}
+        applications={applications}
+        mappedApplications={mappedApplications}
+        orphans={orphans}
+      />
     </Box>
   );
 
