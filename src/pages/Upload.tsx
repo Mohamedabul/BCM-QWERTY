@@ -206,18 +206,10 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
           />
         </Box>
       )} */}
-      <AppBar position="static" color="default" sx={{ boxShadow: 'none', borderBottom: '1px solid #ddd',backgroundColor: 'white' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 1 }}>
+      <AppBar position="static" color="default" sx={{ boxShadow: 'none',backgroundColor: 'white', borderRadius: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 1, borderRadius: "50%" }}>
           {/* Tabs for Mapping and Orphan */}
-          <Tabs value={selectedTab} onChange={handleTabChange} aria-label="Upload Tabs"
-          sx={{
-            '& .MuiTabs-indicator': {
-              backgroundColor: 'gray', 
-            },
-            '& .Mui-selected': {
-              color: 'lightblue', // Change the text color of the selected tab to blue
-            },
-          }}>
+          <Tabs value={selectedTab} onChange={handleTabChange} aria-label="Upload Tabs">
             <Tab label="Mapping" sx={{fontWeight: 'bold',fontSize: '16px',color: 'black'}} />
             <Tab label="Orphan"  sx={{fontWeight: 'bold',fontSize: '16px',color: 'black'}}/>
           </Tabs>
@@ -228,7 +220,7 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
               title="Import File"
               backgroundColor="blue"
               color="white"
-              handleClick={openUpload}
+              handleClick={() => {openUpload();setSelectedTab(-1)}}
               variant="contained"
               icon={<AddIcon />}
               sx={{borderRadius: '10px'}}
@@ -237,7 +229,7 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         </Box>
       </AppBar>
       {selectedTab === 0 && (
-        <Box sx={{ padding: 2,mt: 2,borderradius: '10px',backgroundColor: 'white', overflow: 'auto', color: 'black', boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)'  }}>
+        <Box sx={{ padding: 1.5,mt: 2,backgroundColor: 'white', overflow: 'auto', color: 'black', borderRadius: 1, boxShadow: 2  }}>
           {/* <Typography variant="h6" gutterBottom={true}>
             Mapping
           </Typography> */}
@@ -245,7 +237,7 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             <CustomButton
               title="Re-map"
               handleClick={fixOrphan}
-              backgroundColor="#1E90FF"
+              backgroundColor="blue"
               color="white"
               variant="contained"
               icon={<ReplayIcon />}
@@ -254,14 +246,14 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             <CustomButton
               title="Add New"
               handleClick={handleAddNew}
-              backgroundColor="#1E90FF"
+              backgroundColor="blue"
               color="white"
               variant="contained"
               icon={<AddIcon />}
               sx={{borderRadius: '10px'}}
               />
           </Box>
-          <CustomTable data={sampleData} /> {/* Render CustomTable for Mapping */}
+          <CustomTable data={sampleData} />
         </Box>
       )}
      {open && (   
@@ -379,7 +371,7 @@ const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
           padding: '6px' }}>
         <CustomButton
         variant="outlined"
-        handleClick={handleClose}
+        handleClick={() => {handleClose();setSelectedTab(0)}}
         title='Cancel' backgroundColor={'transparent'}
         color={'black'} 
         sx={{

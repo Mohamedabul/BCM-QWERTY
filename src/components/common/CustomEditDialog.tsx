@@ -31,7 +31,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
           justifyContent: 'space-between',
         }}
       >
-        <DialogTitle margin={-2} sx={{ fontWeight: 'bold', color: 'black' }}>Edit Business Capability Information</DialogTitle>
+        <DialogTitle margin={-2} sx={{ fontWeight: 'bold', color: 'black' }}>Edit</DialogTitle>
         <IconButton onClick={onClose} sx={{ color: 'black' }}>
           <CloseIcon />
         </IconButton>
@@ -52,7 +52,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
                 '& fieldset': { borderColor: 'transparent' },
                 '&.Mui-focused fieldset': { borderColor: '#b0bec5' },
               },
-              '& .MuiInputBase-input': { color: '#a0a8b1' },
+              '& .MuiInputBase-input': { color: 'black' },
             }}
           />
           <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Edit Domain Name<span style={{ color: 'red' }}>*</span></Typography>
@@ -69,7 +69,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
                 '& fieldset': { borderColor: 'transparent' },
                 '&.Mui-focused fieldset': { borderColor: '#b0bec5' },
               },
-              '& .MuiInputBase-input': { color: '#a0a8b1' },
+              '& .MuiInputBase-input': { color: 'black' },
             }}
           />
           <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Edit Sub-domain Name<span style={{ color: 'red' }}>*</span></Typography>
@@ -86,7 +86,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
                 '& fieldset': { borderColor: 'transparent' },
                 '&.Mui-focused fieldset': { borderColor: '#b0bec5' },
               },
-              '& .MuiInputBase-input': { color: '#a0a8b1' },
+              '& .MuiInputBase-input': { color: 'black' },
             }}
           />
         </Box>
