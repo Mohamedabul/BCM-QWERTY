@@ -61,7 +61,7 @@ function App() {
         main: "#0000ff",
       },
       secondary: {
-        main: "#ff4081",
+        main: "#000000",
       },
     },
   });

@@ -175,7 +175,7 @@ const CapabilityCard = (props: any) => {
             color: "white",
             margin: 0,
             padding: 0,
-            maxWidth: "100%",
+            minWidth: "100%",
           }}
           onChange={handleChange(handleExpand)}
         >
@@ -190,7 +190,7 @@ const CapabilityCard = (props: any) => {
               height: "60px",
               margin: 0,
               padding: 0,
-              maxWidth: "100%",
+              minWidth: "100%",
             }}
           >
             <Typography
@@ -236,7 +236,7 @@ const CapabilityCard = (props: any) => {
                       isEditable={props.isEditable}
                       onSave={handleExpand}
                     />
-                    {index < domainList.length - 1 && (
+                    {/* {index < domainList.length - 1 && (
                       <hr
                         style={{
                           border: "0",
@@ -244,7 +244,7 @@ const CapabilityCard = (props: any) => {
                           background: "black",
                         }}
                       />
-                    )}
+                    )} */}
                   </Box>
                 ))
               )}
