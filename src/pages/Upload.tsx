@@ -19,6 +19,7 @@ import { CustomButton } from 'components';
 import { IResourceComponentsProps } from '@refinedev/core';
 import CustomDialog from 'components/common/CustomDialog';
 import CustomTable from 'components/common/CustomTable';
+import CustomAddDialog from 'components/common/CustomAddDialog';
 
 interface UploadProps extends IResourceComponentsProps<any, any> {}
 
@@ -32,7 +33,14 @@ const [mappedApplications, setMappedApplications] = React.useState([]);
 const [orphans, setOrphans] = React.useState([]);
 const [loading, setLoading] = React.useState(false);
 const [showImportButton, setShowImportButton] = React.useState(true);
-const [selectedTab, setSelectedTab] = React.useState(0); // State to track the selected tab
+const [selectedTab, setSelectedTab] = React.useState(0); 
+const [openAddDialog, setOpenAddDialog] = React.useState(false);
+  const [data, setData] = React.useState({
+    businessCapabilityName: "",
+    domain: "",
+    subDomain: "",
+    applicationName: "",
+  }); 
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
@@ -188,7 +196,24 @@ const [selectedTab, setSelectedTab] = React.useState(0); // State to track the s
   
   }
   const fixOrphan = () => {}
-  const handleAddNew = () => {}
+  const handleAddNew = () => {
+    setOpenAddDialog(true);
+  }
+  const handleAddDialogClose = () => {
+    setOpenAddDialog(false);
+  }
+  const handleSave = () => {
+    // Save logic for the new item
+    console.log("Saving new item:", data);
+    setOpenAddDialog(false);
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setData((prevData) => ({
+      ...prevData,
+      [field]: value,
+    }));
+  };
 
   return (
     <Box className="container">
@@ -256,15 +281,6 @@ const [selectedTab, setSelectedTab] = React.useState(0); // State to track the s
           </Typography> */}
           <Box sx={{ display: 'flex' ,justifyContent: 'flex-end', gap: 2,mb: 2}}>
             <CustomButton
-              title="Re-map"
-              handleClick={fixOrphan}
-              backgroundColor="blue"
-              color="white"
-              variant="contained"
-              icon={<ReplayIcon />}
-              sx={{borderRadius: '10px'}}
-              />
-            <CustomButton
               title="Add New"
               handleClick={handleAddNew}
               backgroundColor="blue"
@@ -273,6 +289,42 @@ const [selectedTab, setSelectedTab] = React.useState(0); // State to track the s
               icon={<AddIcon />}
               sx={{ borderRadius: "10px" }}
             />
+          </Box>
+          <CustomTable data={sampleData} />
+        </Box>
+      )}
+      <CustomAddDialog
+        open={openAddDialog}
+        onClose={handleAddDialogClose}
+        onSave={handleSave}
+        data={data}
+        onChange={handleInputChange}
+      />
+      {selectedTab === 1 && (
+        <Box
+          sx={{
+            padding: 1.5,
+            mt: 2,
+            backgroundColor: "white",
+            overflow: "auto",
+            color: "black",
+            borderRadius: 1,
+            boxShadow: 2,
+          }}
+        >
+          {/* <Typography variant="h6" gutterBottom={true}>
+            Mapping
+          </Typography> */}
+          <Box sx={{ display: 'flex' ,justifyContent: 'flex-end', gap: 2,mb: 2}}>
+            <CustomButton
+              title="Re-map"
+              handleClick={fixOrphan}
+              backgroundColor="blue"
+              color="white"
+              variant="contained"
+              icon={<ReplayIcon />}
+              sx={{borderRadius: '10px'}}
+              />
           </Box>
           <CustomTable data={sampleData} />
         </Box>
