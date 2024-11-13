@@ -173,7 +173,7 @@ function App() {
                   list: Upload,
                   icon: <InboxOutlinedIcon />,
                   options: {
-                    label: "Inventory",
+                    label: "Mapping",
                     onClick: () => {
                       console.log("clicked");
                     },

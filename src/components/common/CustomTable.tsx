@@ -117,7 +117,7 @@ const CustomTable: React.FC<CustomTableProps> = ({ data }) => {
                 fontWeight="bold"
                 fontSize={16}
               >
-                Business Capability names
+                Business Capability
               </Typography>
             </TableCell>
             <TableCell sx={{ borderBottom: "none" }}>
@@ -147,7 +147,7 @@ const CustomTable: React.FC<CustomTableProps> = ({ data }) => {
                 fontWeight="bold"
                 fontSize={16}
               >
-                Application Name
+                Application
               </Typography>
             </TableCell>
             <TableCell sx={{ borderBottom: "none" }} />
