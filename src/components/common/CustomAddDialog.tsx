@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Box, Typography, IconButton } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Select, MenuItem, Box, Typography, IconButton, TextField } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CustomButton from './CustomButton';
 
@@ -14,9 +14,15 @@ interface CustomAddDialogProps {
     applicationName: string;
   };
   onChange: (field: string, value: string) => void;
+  options: {
+    businessCapabilities: { id: string; name: string }[];
+    domains: { id: string; name: string }[];
+    subDomains: { id: string; name: string }[];
+  };
 }
 
-const CustomAddDialog: React.FC<CustomAddDialogProps> = ({ open, onClose, onSave, data, onChange }) => {
+const CustomAddDialog: React.FC<CustomAddDialogProps> = ({ open, onClose, onSave, data, onChange, options }) => {
+  console.log(options);
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <Box
@@ -37,12 +43,12 @@ const CustomAddDialog: React.FC<CustomAddDialogProps> = ({ open, onClose, onSave
       <DialogContent dividers sx={{ backgroundColor: 'white', color: 'black' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Business Capability<span style={{ color: 'red' }}>*</span></Typography>
-          <TextField
+          <Select
             fullWidth
             variant="outlined"
             value={data.businessCapabilityName}
-            onChange={(e) => onChange('businessCapabilityName', e.target.value)}
-            placeholder="Add Bussiness Capability"
+            // onChange={(e) => onChange('businessCapabilityName', e.target.value as string)}
+            displayEmpty
             sx={{
               backgroundColor: '#f0f2f5',
               borderRadius: 1,
@@ -52,14 +58,21 @@ const CustomAddDialog: React.FC<CustomAddDialogProps> = ({ open, onClose, onSave
               },
               '& .MuiInputBase-input': { color: 'black' },
             }}
-          />
+          >
+             {/* {options.businessCapabilities.map((corecapability) => (
+              <MenuItem key={corecapability.id} value={corecapability.id}>
+                {corecapability.name}
+              </MenuItem>
+            ))} */}
+          </Select>
+
           <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Domain <span style={{ color: 'red' }}>*</span></Typography>
-          <TextField
+          <Select
             fullWidth
             variant="outlined"
             value={data.domain}
-            onChange={(e) => onChange('domain', e.target.value)}
-            placeholder="Add Domain"
+            onChange={(e) => onChange('domain', e.target.value as string)}
+            displayEmpty
             sx={{
               backgroundColor: '#f0f2f5',
               borderRadius: 1,
@@ -69,14 +82,21 @@ const CustomAddDialog: React.FC<CustomAddDialogProps> = ({ open, onClose, onSave
               },
               '& .MuiInputBase-input': { color: 'black' },
             }}
-          />
+          >
+            {options.domains.map((domain) => (
+              <MenuItem key={domain.id} value={domain.id}>
+                {domain.name}
+              </MenuItem>
+            ))}
+          </Select>
+
           <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Sub-domain <span style={{ color: 'red' }}>*</span></Typography>
-          <TextField
+          <Select
             fullWidth
             variant="outlined"
             value={data.subDomain}
-            onChange={(e) => onChange('subDomain', e.target.value)}
-            placeholder="Add Subdomain"
+            onChange={(e) => onChange('subDomain', e.target.value as string)}
+            displayEmpty
             sx={{
               backgroundColor: '#f0f2f5',
               borderRadius: 1,
@@ -86,13 +106,20 @@ const CustomAddDialog: React.FC<CustomAddDialogProps> = ({ open, onClose, onSave
               },
               '& .MuiInputBase-input': { color: 'black' },
             }}
-          />
+          >
+            {options.subDomains.map((subDomain) => (
+              <MenuItem key={subDomain.id} value={subDomain.id}>
+                {subDomain.name}
+              </MenuItem>
+            ))}
+          </Select>
+
           <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Application<span style={{ color: 'red' }}>*</span></Typography>
           <TextField
             fullWidth
             variant="outlined"
             value={data.applicationName}
-            onChange={(e) => onChange('applicationName', e.target.value)}
+            onChange={(e: { target: { value: string; }; }) => onChange('applicationName', e.target.value)}
             placeholder="Add Application"
             sx={{
               backgroundColor: '#f0f2f5',
@@ -146,3 +173,4 @@ const CustomAddDialog: React.FC<CustomAddDialogProps> = ({ open, onClose, onSave
 };
 
 export default CustomAddDialog;
+

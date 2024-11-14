@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Box, Typography, IconButton } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Select, MenuItem, Box, Typography, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CustomButton from './CustomButton';
 
@@ -13,12 +13,9 @@ interface CustomEditDialogProps {
     subDomain: string;
   };
   onChange: (field: string, value: string) => void;
-
 }
 
-const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSave, data, onChange,
-  
- }) => {
+const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSave, data, onChange }) => {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <Box
@@ -39,12 +36,11 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
       <DialogContent dividers sx={{ backgroundColor: 'white', color: 'black' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Edit Business Capability Name<span style={{ color: 'red' }}>*</span></Typography>
-          <TextField
+          <Select
             fullWidth
-            variant="outlined"
             value={data.businessCapabilityName}
-            onChange={(e) => onChange('businessCapabilityName', e.target.value)}
-            placeholder="Enterprise Resource Planning"
+            onChange={(e) => onChange('businessCapabilityName', e.target.value as string)}
+            displayEmpty
             sx={{
               backgroundColor: '#f0f2f5',
               borderRadius: 1,
@@ -54,14 +50,18 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
               },
               '& .MuiInputBase-input': { color: 'black' },
             }}
-          />
+          >
+            <MenuItem value="" disabled>Select Business Capability</MenuItem>
+            <MenuItem value="Enterprise Resource Planning">Enterprise Resource Planning</MenuItem>
+            <MenuItem value="Customer Relationship Management">Customer Relationship Management</MenuItem>
+          </Select>
+
           <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Edit Domain Name<span style={{ color: 'red' }}>*</span></Typography>
-          <TextField
+          <Select
             fullWidth
-            variant="outlined"
             value={data.domain}
-            onChange={(e) => onChange('domain', e.target.value)}
-            placeholder="Bank Office"
+            onChange={(e) => onChange('domain', e.target.value as string)}
+            displayEmpty
             sx={{
               backgroundColor: '#f0f2f5',
               borderRadius: 1,
@@ -71,14 +71,18 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
               },
               '& .MuiInputBase-input': { color: 'black' },
             }}
-          />
+          >
+            <MenuItem value="" disabled>Select Domain</MenuItem>
+            <MenuItem value="Bank Office">Bank Office</MenuItem>
+            <MenuItem value="Front Office">Front Office</MenuItem>
+          </Select>
+
           <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Edit Sub-domain Name<span style={{ color: 'red' }}>*</span></Typography>
-          <TextField
+          <Select
             fullWidth
-            variant="outlined"
             value={data.subDomain}
-            onChange={(e) => onChange('subDomain', e.target.value)}
-            placeholder="Accounting"
+            onChange={(e) => onChange('subDomain', e.target.value as string)}
+            displayEmpty
             sx={{
               backgroundColor: '#f0f2f5',
               borderRadius: 1,
@@ -88,10 +92,14 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
               },
               '& .MuiInputBase-input': { color: 'black' },
             }}
-          />
+          >
+            <MenuItem value="" disabled>Select Sub-domain</MenuItem>
+            <MenuItem value="Accounting">Accounting</MenuItem>
+            <MenuItem value="Payroll">Payroll</MenuItem>
+          </Select>
         </Box>
       </DialogContent>
-      <DialogActions sx={{ backgroundColor: 'white', padding: '16px',justifyContent: 'space-between' }}>
+      <DialogActions sx={{ backgroundColor: 'white', padding: '16px', justifyContent: 'space-between' }}>
         <CustomButton
           title="Cancel"
           backgroundColor="white"
@@ -105,7 +113,6 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
             textTransform: 'none',
             borderRadius: '8px',
             width: '45%',
-            
           }}
         />
         <CustomButton
@@ -128,7 +135,6 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
         />
       </DialogActions>
     </Dialog>
-
   );
 };
 

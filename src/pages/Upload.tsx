@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef,useEffect } from "react";
 import {
   Box,
   Button,
@@ -35,61 +35,114 @@ const [loading, setLoading] = React.useState(false);
 const [showImportButton, setShowImportButton] = React.useState(true);
 const [selectedTab, setSelectedTab] = React.useState(0); 
 const [openAddDialog, setOpenAddDialog] = React.useState(false);
+const [mappedData, setMappedData] = React.useState([]);
+const [orphanData, setOrphanData] = React.useState([]);
   const [data, setData] = React.useState({
     businessCapabilityName: "",
     domain: "",
     subDomain: "",
     applicationName: "",
   }); 
+  const [businessCapabilities, setBusinessCapabilities] = React.useState<string[]>([]);
+  const [domains, setDomains] = React.useState<string[]>([]);
+  const [subDomains, setSubDomains] = React.useState<string[]>([]);
+  const [filteredDomains, setFilteredDomains] =  React.useState<any[]>([]);
+  const [filteredSubDomains, setFilteredSubDomains] =  React.useState<any[]>([]);
+
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
   };
 
-  const sampleData = [
-    {
-      businessCapabilityName: "Enterprise Resource Planning",
-      domain: "Back Office",
-      subDomain: "Accounting",
-      applicationName: "Accent7",
-    },
-    {
-      businessCapabilityName: "Enterprise Resource Planning",
-      domain: "Back Office",
-      subDomain: "Payroll",
-      applicationName: "Accent7",
-    },
-    {
-      businessCapabilityName: "Enterprise Resource Planning",
-      domain: "Back Office",
-      subDomain: "Payroll",
-      applicationName: "Accent7",
-    },
-    {
-      businessCapabilityName: "Enterprise Resource Planning",
-      domain: "Back Office",
-      subDomain: "posting",
-      applicationName: "Accent7",
-    },
-    {
-      businessCapabilityName: "Enterprise Resource Planning",
-      domain: "Back Office",
-      subDomain: "Purchase workflow & order",
-      applicationName: "Accent7",
-    },
-    {
-      businessCapabilityName: "Enterprise Resource Planning",
-      domain: "Back Office",
-      subDomain: "Accounts Payable & Receivables",
-      applicationName: "Accent7",
-    },
-    {
-      businessCapabilityName: "Enterprise Resource Planning",
-      domain: "Back Office",
-      subDomain: "Inventory Control",
-      applicationName: "Accent7",
-    },
-  ];
+  useEffect(() => {
+    if (selectedTab === 0) {
+      fetchMappedApplications();
+    } else if (selectedTab === 1) {
+      fetchOrphans();
+    }
+  }, [selectedTab]);
+
+  useEffect(() => {
+    fetchBusinessCapabilities();
+    fetchDomains();
+    fetchSubDomains();
+  }, []);
+
+  const fetchBusinessCapabilities = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/coreCapability");
+      const result = await response.json();
+      setBusinessCapabilities(result); 
+    } catch (error) {
+      console.error("Error fetching business capabilities:", error);
+    }
+  };
+
+  const fetchDomains = async ()=>{
+    try {
+      const response = await fetch("http://localhost:5000/api/domain");
+      const result = await response.json();
+      setDomains(result); 
+    } catch (error) {
+      console.error("Error fetching domains:", error);
+    }
+  };
+
+  const fetchSubDomains = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/subdomain");
+      const result = await response.json();
+      setSubDomains(result); // assuming result is an array of subdomain names
+    } catch (error) {
+      console.error("Error fetching subdomains:", error);
+    }
+  };
+
+  const fetchMappedApplications = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:5000/api/getMappedApplications");
+      if (!response.ok) throw new Error("Failed to fetch mapped applications");
+
+      const result = await response.json();
+      const mappedData = result.response.map((item: any) => ({
+        id:item.software_id,
+        businessCapabilityName: item.capability,
+        domain: item.domain,
+        subDomain: item.subdomain,
+        applicationName: item.software_name,
+      }));
+      setMappedData(mappedData);
+    } catch (error) {
+      console.error("Error fetching mapped applications:", error);
+      alert("Failed to fetch mapped applications. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchOrphans = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:5000/api/getOrphans");
+      if (!response.ok) throw new Error("Failed to fetch orphans");
+
+      const result = await response.json();
+      const orphanData = result.response.map((item: any) => ({
+        businessCapabilityName: item.capability,
+        domain: item.domain,
+        subDomain: item.subdomain,
+        applicationName: item.software_name,
+      }));
+      setOrphanData(orphanData);
+    } catch (error) {
+      console.error("Error fetching orphans:", error);
+      alert("Failed to fetch orphans. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const handleFileAreaClick = () => {
     if (fileInputRef.current) {
@@ -203,17 +256,55 @@ const [openAddDialog, setOpenAddDialog] = React.useState(false);
   const handleAddDialogClose = () => {
     setOpenAddDialog(false);
   }
-  const handleSave = () => {
-    // Save logic for the new item
-    console.log("Saving new item:", data);
-    setOpenAddDialog(false);
-  };
-
+  const handleSave = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/application", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to add new application");
+      }
+  
+      const result = await response.json();
+      console.log("New item added successfully:", result);
+  
+      setData({
+        businessCapabilityName: "",
+        domain: "",
+        subDomain: "",
+        applicationName: "",
+      });
+      setOpenAddDialog(false);
+      await fetchMappedApplications();
+    } catch (error) {
+      console.error("Error adding new item:", error);
+      alert("An error occurred while adding the new item. Please try again.");
+    }
+  }; 
   const handleInputChange = (field: string, value: string) => {
+    console.log("Field:", field, "Value:", value);
     setData((prevData) => ({
       ...prevData,
       [field]: value,
     }));
+    
+    
+    if (field === "businessCapabilityName") {
+      setFilteredDomains(
+        domains.filter((domain:any) => domain.core_id === value)
+      );
+      setData((prevData) => ({ ...prevData, domain: "", subDomain: "" })); 
+    } else if (field === "domain") {
+      setFilteredSubDomains(
+        subDomains.filter((subDomain:any) => subDomain.domain_id === value)
+      );
+      setData((prevData) => ({ ...prevData, subDomain: "" })); 
+    }
   };
 
   return (
@@ -291,7 +382,7 @@ const [openAddDialog, setOpenAddDialog] = React.useState(false);
               sx={{ borderRadius: "10px" }}
             />
           </Box>
-          <CustomTable data={sampleData} />
+          <CustomTable data={mappedData} loading={loading}/>
         </Box>
       )}
       <CustomAddDialog
@@ -300,6 +391,11 @@ const [openAddDialog, setOpenAddDialog] = React.useState(false);
         onSave={handleSave}
         data={data}
         onChange={handleInputChange}
+        options={{
+          businessCapabilities: businessCapabilities.map((capability) => ({ id: capability, name: capability })),
+          domains: filteredDomains,
+          subDomains: filteredSubDomains,
+        }}
       />
       {selectedTab === 1 && (
         <Box
@@ -327,7 +423,7 @@ const [openAddDialog, setOpenAddDialog] = React.useState(false);
               sx={{borderRadius: '10px'}}
               />
           </Box>
-          <CustomTable data={sampleData} />
+          <CustomTable data={orphanData} loading={loading} />
         </Box>
       )}
      {open && (

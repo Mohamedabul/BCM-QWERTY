@@ -21,6 +21,7 @@ import CustomEditDialog from "./CustomEditDialog";
 import CustomDeleteDialog from "./CustomDeleteDialog";
 
 interface TableData {
+  id: string;
   businessCapabilityName: string;
   domain: string;
   subDomain: string;
@@ -30,6 +31,7 @@ interface TableData {
 
 interface CustomTableProps {
   data: TableData[];
+  loading: boolean;
 }
 
 const CustomTable: React.FC<CustomTableProps> = ({ data }) => {
@@ -45,11 +47,12 @@ const CustomTable: React.FC<CustomTableProps> = ({ data }) => {
   ) => {
     setAnchorEl(event.currentTarget);
     setSelectedRow(row);
+    console.log("Selected row for deletion/edit:", row);
   };
 
   const handleCloseMenu = () => {
     setAnchorEl(null);
-    setSelectedRow(null);
+    // setSelectedRow(null);
   };
 
   const handleEditClick = (row: TableData) => {
@@ -61,9 +64,43 @@ const CustomTable: React.FC<CustomTableProps> = ({ data }) => {
     setEditDialogOpen(false);
     setEditData(null);
   };
-  const handleEditSave = () => {
-    console.log("Saved data:", editData);
-    setEditDialogOpen(false);
+  const handleEditSave = async () => {
+    if (!editData) return;
+  
+    try {
+      const response = await fetch(`http://localhost:5000/api/application/${editData.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          businessCapabilityName: editData.businessCapabilityName,
+          domain: editData.domain,
+          subDomain: editData.subDomain,
+          applicationName: editData.applicationName,
+          applicationVersion: editData.applicationVersion,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to update the application");
+      }
+  
+      const result = await response.json();
+      console.log("Edit saved successfully:", result);
+  
+      // Close the dialog after successful edit
+      setEditDialogOpen(false);
+      setEditData(null);
+  
+      // Optionally, refresh the data to reflect the edited item
+      // Assuming fetchMappedApplications is available in scope
+      // fetchMappedApplications();
+  
+    } catch (error) {
+      console.error("Error saving edit:", error);
+      alert("An error occurred while saving the edit. Please try again.");
+    }
   };
 
   const handleEditChange = (field: string, value: string) => {
@@ -75,11 +112,36 @@ const CustomTable: React.FC<CustomTableProps> = ({ data }) => {
     setDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
-    // Handle deletion logic here
-    console.log("Deleted data:", selectedRow);
-    setDeleteDialogOpen(false);
-    setSelectedRow(null);
+  const handleDeleteConfirm = async () => {
+    if (!selectedRow) {
+      console.error("No selected row to delete");
+      return;
+    }
+    console.log("Deleting application with ID:", selectedRow.id);
+    console.log(`Attempting to delete: http://localhost:5000/api/application/${selectedRow.id}`);
+    try {
+      const response = await fetch(`http://localhost:5000/api/application/${selectedRow.id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("Response status:", response.status);
+      if (!response.ok) {
+        console.error("Failed to delete application. Status code:", response.status);
+        throw new Error("Failed to delete the application");
+      }
+  
+      console.log("Deleted data:", selectedRow);
+
+      setDeleteDialogOpen(false);
+      setSelectedRow(null);
+  
+      
+    } catch (error) {
+      console.error("Error deleting application:", error);
+      alert("An error occurred while deleting the application. Please try again.");
+    }
   };
 
   const handleDeleteDialogClose = () => {
