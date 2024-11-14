@@ -1,4 +1,4 @@
-import React, { useRef,useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import {
   Box,
   Button,
@@ -8,47 +8,48 @@ import {
   Tabs,
   Tab,
   CircularProgress,
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import ReplayIcon from '@mui/icons-material/Replay';
-import CloseIcon from '@mui/icons-material/Close';
-import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import { CustomButton } from 'components';
-import { IResourceComponentsProps } from '@refinedev/core';
-import CustomDialog from 'components/common/CustomDialog';
-import CustomTable from 'components/common/CustomTable';
-import CustomAddDialog from 'components/common/CustomAddDialog';
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import ReplayIcon from "@mui/icons-material/Replay";
+import CloseIcon from "@mui/icons-material/Close";
+import CloudUploadOutlinedIcon from "@mui/icons-material/CloudUploadOutlined";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import { CustomButton } from "components";
+import { IResourceComponentsProps } from "@refinedev/core";
+import CustomDialog from "components/common/CustomDialog";
+import CustomTable from "components/common/CustomTable";
+import CustomAddDialog from "components/common/CustomAddDialog";
 
 interface UploadProps extends IResourceComponentsProps<any, any> {}
 
 const Upload: React.FC<UploadProps> = () => {
-const fileInputRef = useRef<HTMLInputElement>(null); 
-const [file, setFile] = React.useState<File | null>(null);
-const [open, setOpen] = React.useState(false);
-const [openDialog, setOpenDialog] = React.useState(false);
-const [applications, setApplications] = React.useState([]);
-const [mappedApplications, setMappedApplications] = React.useState([]);
-const [orphans, setOrphans] = React.useState([]);
-const [loading, setLoading] = React.useState(false);
-const [showImportButton, setShowImportButton] = React.useState(true);
-const [selectedTab, setSelectedTab] = React.useState(0); 
-const [openAddDialog, setOpenAddDialog] = React.useState(false);
-const [mappedData, setMappedData] = React.useState([]);
-const [orphanData, setOrphanData] = React.useState([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [file, setFile] = React.useState<File | null>(null);
+  const [open, setOpen] = React.useState(false);
+  const [openDialog, setOpenDialog] = React.useState(false);
+  const [applications, setApplications] = React.useState([]);
+  const [mappedApplications, setMappedApplications] = React.useState([]);
+  const [orphans, setOrphans] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+  const [showImportButton, setShowImportButton] = React.useState(true);
+  const [selectedTab, setSelectedTab] = React.useState(0);
+  const [openAddDialog, setOpenAddDialog] = React.useState(false);
+  const [mappedData, setMappedData] = React.useState([]);
+  const [orphanData, setOrphanData] = React.useState([]);
   const [data, setData] = React.useState({
     businessCapabilityName: "",
     domain: "",
     subDomain: "",
     applicationName: "",
-  }); 
-  const [businessCapabilities, setBusinessCapabilities] = React.useState<string[]>([]);
+  });
+  const [businessCapabilities, setBusinessCapabilities] = React.useState<
+    string[]
+  >([]);
   const [domains, setDomains] = React.useState<string[]>([]);
   const [subDomains, setSubDomains] = React.useState<string[]>([]);
-  const [filteredDomains, setFilteredDomains] =  React.useState<any[]>([]);
-  const [filteredSubDomains, setFilteredSubDomains] =  React.useState<any[]>([]);
-
+  const [filteredDomains, setFilteredDomains] = React.useState<any[]>([]);
+  const [filteredSubDomains, setFilteredSubDomains] = React.useState<any[]>([]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
@@ -72,17 +73,17 @@ const [orphanData, setOrphanData] = React.useState([]);
     try {
       const response = await fetch("http://localhost:5000/api/coreCapability");
       const result = await response.json();
-      setBusinessCapabilities(result); 
+      setBusinessCapabilities(result);
     } catch (error) {
       console.error("Error fetching business capabilities:", error);
     }
   };
 
-  const fetchDomains = async ()=>{
+  const fetchDomains = async () => {
     try {
       const response = await fetch("http://localhost:5000/api/domain");
       const result = await response.json();
-      setDomains(result); 
+      setDomains(result);
     } catch (error) {
       console.error("Error fetching domains:", error);
     }
@@ -101,12 +102,14 @@ const [orphanData, setOrphanData] = React.useState([]);
   const fetchMappedApplications = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/getMappedApplications");
+      const response = await fetch(
+        "http://localhost:5000/api/getMappedApplications"
+      );
       if (!response.ok) throw new Error("Failed to fetch mapped applications");
 
       const result = await response.json();
       const mappedData = result.response.map((item: any) => ({
-        id:item.software_id,
+        id: item.software_id,
         businessCapabilityName: item.capability,
         domain: item.domain,
         subDomain: item.subdomain,
@@ -142,7 +145,6 @@ const [orphanData, setOrphanData] = React.useState([]);
       setLoading(false);
     }
   };
-
 
   const handleFileAreaClick = () => {
     if (fileInputRef.current) {
@@ -244,18 +246,17 @@ const [orphanData, setOrphanData] = React.useState([]);
     link.click();
   };
   const openUpload = () => {
-  setShowImportButton(false);
-  setOpen(true);
-  // setOpenDialog(true);
-  
-  }
-  const fixOrphan = () => {}
+    setShowImportButton(false);
+    setOpen(true);
+    // setOpenDialog(true);
+  };
+  const fixOrphan = () => {};
   const handleAddNew = () => {
     setOpenAddDialog(true);
-  }
+  };
   const handleAddDialogClose = () => {
     setOpenAddDialog(false);
-  }
+  };
   const handleSave = async () => {
     try {
       const response = await fetch("http://localhost:5000/api/application", {
@@ -265,14 +266,14 @@ const [orphanData, setOrphanData] = React.useState([]);
         },
         body: JSON.stringify(data),
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to add new application");
       }
-  
+
       const result = await response.json();
       console.log("New item added successfully:", result);
-  
+
       setData({
         businessCapabilityName: "",
         domain: "",
@@ -285,31 +286,30 @@ const [orphanData, setOrphanData] = React.useState([]);
       console.error("Error adding new item:", error);
       alert("An error occurred while adding the new item. Please try again.");
     }
-  }; 
+  };
   const handleInputChange = (field: string, value: string) => {
     console.log("Field:", field, "Value:", value);
     setData((prevData) => ({
       ...prevData,
       [field]: value,
     }));
-    
-    
+
     if (field === "businessCapabilityName") {
       setFilteredDomains(
-        domains.filter((domain:any) => domain.core_id === value)
+        domains.filter((domain: any) => domain.core_id === value)
       );
-      setData((prevData) => ({ ...prevData, domain: "", subDomain: "" })); 
+      setData((prevData) => ({ ...prevData, domain: "", subDomain: "" }));
     } else if (field === "domain") {
       setFilteredSubDomains(
-        subDomains.filter((subDomain:any) => subDomain.domain_id === value)
+        subDomains.filter((subDomain: any) => subDomain.domain_id === value)
       );
-      setData((prevData) => ({ ...prevData, subDomain: "" })); 
+      setData((prevData) => ({ ...prevData, subDomain: "" }));
     }
   };
 
   return (
     <Box className="container">
-       {/* {showImportButton && (
+      {/* {showImportButton && (
         <Box className="button-container">
           <CustomButton
             title="Import File"
@@ -321,8 +321,20 @@ const [orphanData, setOrphanData] = React.useState([]);
           />
         </Box>
       )} */}
-      <AppBar position="static" color="default" sx={{ boxShadow: 'none',backgroundColor: 'white', borderRadius: 1 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 1, borderRadius: "50%" }}>
+      <AppBar
+        position="static"
+        color="default"
+        sx={{ boxShadow: "none", backgroundColor: "white", borderRadius: 1 }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: 1,
+            borderRadius: "50%",
+          }}
+        >
           {/* Tabs for Mapping and Orphan */}
           <Tabs
             value={selectedTab}
@@ -351,7 +363,8 @@ const [orphanData, setOrphanData] = React.useState([]);
               }}
               variant="contained"
               icon={<AddIcon />}
-              sx={{ borderRadius: "10px" }}
+              sx={{ borderRadius: "10px", margin: 0 }}
+              
             />
           )}
         </Box>
@@ -371,7 +384,7 @@ const [orphanData, setOrphanData] = React.useState([]);
           {/* <Typography variant="h6" gutterBottom={true}>
             Mapping
           </Typography> */}
-          <Box sx={{ display: 'flex' ,justifyContent: 'flex-end', gap: 2,mb: 2}}>
+          {/* <Box sx={{ display: 'flex' ,justifyContent: 'flex-end', gap: 2,mb: 2}}>
             <CustomButton
               title="Add New"
               handleClick={handleAddNew}
@@ -381,8 +394,22 @@ const [orphanData, setOrphanData] = React.useState([]);
               icon={<AddIcon />}
               sx={{ borderRadius: "10px" }}
             />
-          </Box>
-          <CustomTable data={mappedData} loading={loading}/>
+          </Box> */}
+          <CustomTable
+            data={mappedData}
+            loading={loading}
+            actionButton={
+              <CustomButton
+                title="Add New"
+                handleClick={handleAddNew}
+                backgroundColor="blue"
+                color="white"
+                variant="contained"
+                icon={<AddIcon />}
+                sx={{ borderRadius: "10px" }}
+              />
+            }
+          />
         </Box>
       )}
       <CustomAddDialog
@@ -392,7 +419,10 @@ const [orphanData, setOrphanData] = React.useState([]);
         data={data}
         onChange={handleInputChange}
         options={{
-          businessCapabilities: businessCapabilities.map((capability) => ({ id: capability, name: capability })),
+          businessCapabilities: businessCapabilities.map((capability) => ({
+            id: capability,
+            name: capability,
+          })),
           domains: filteredDomains,
           subDomains: filteredSubDomains,
         }}
@@ -412,7 +442,9 @@ const [orphanData, setOrphanData] = React.useState([]);
           {/* <Typography variant="h6" gutterBottom={true}>
             Mapping
           </Typography> */}
-          <Box sx={{ display: 'flex' ,justifyContent: 'flex-end', gap: 2,mb: 2}}>
+          {/* <Box
+            sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mb: 2 }}
+          >
             <CustomButton
               title="Re-map"
               handleClick={fixOrphan}
@@ -420,152 +452,192 @@ const [orphanData, setOrphanData] = React.useState([]);
               color="white"
               variant="contained"
               icon={<ReplayIcon />}
-              sx={{borderRadius: '10px'}}
+              sx={{ borderRadius: "10px" }}
+            />
+          </Box> */}
+          <CustomTable
+            data={orphanData}
+            loading={loading}
+            actionButton={
+              <CustomButton
+                title="Re-map"
+                handleClick={fixOrphan}
+                backgroundColor="blue"
+                color="white"
+                variant="contained"
+                icon={<ReplayIcon />}
+                sx={{ borderRadius: "10px" }}
               />
-          </Box>
-          <CustomTable data={orphanData} loading={loading} />
+            }
+          />
         </Box>
       )}
-     {open && (
-      <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-     <Box sx={{ padding: 2,
-        width: '600px',
-        // height: '470px',
-        margin: 'auto',
-        // marginTop: '10px',
-        backgroundColor: '#f4efef',
-        overflow: 'auto', //1
-        color: 'black',
-        borderRadius: '10px',
-        boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-        display: 'flex',
-        flexDirection: 'column'
-     }}
-    >
-        <Box padding={0} sx={{
-          padding:'19px',
-          backgroundColor: '#e9e2e2', 
-          borderRadius: '8px 8px 0 0',
-          marginLeft: '-14px',
-          marginRight: '-14px',
-          marginTop: '-26px',
-        }}>
-      <Typography variant="h6" fontWeight="bold" gutterBottom>
-        File Upload
-      </Typography>
-      </Box>
-      <Box
-        onClick={handleFileAreaClick}
-        sx={{
-          border: '2px dashed #ccc',
-          borderRadius: '8px',
-          padding: 3,
-          textAlign: 'center',
-          color: '#777',
-          cursor: 'pointer',
-          position: 'relative',
-          width: '80%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          margin: 'auto',
-          marginTop: 2,
-          backgroundColor: 'white',
-        }}
-      >
-         {file ? (
-          <>
-            <CheckCircleOutlineIcon fontSize="large" color="success" />
-            <Typography variant="body1" color="black" sx={{ mt: 1 }}>
-              {file.name} uploaded successfully
-            </Typography>
-          </>
-            ) : (
-           <> 
-        <CloudUploadOutlinedIcon fontSize="large"  />
-        <Typography variant="body1" color="black">
-          Click or drag file to this area to upload
-        </Typography>
-        </>
-        )}
-        <input
-          type="file"
-          accept=".csv, .xlsx, .xls"
-          onChange={handleFileChange}
+      {open && (
+        <div
           style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            opacity: 0,
-            cursor: 'pointer'
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
           }}
-        />
-        </Box>
-        <Box sx={{ textAlign: 'left', mt:2,ml:7 ,width:'80%' }}> 
-      <Typography variant="body2" color="#A9A9A9" textAlign="left">
-        Formats accepted are .csv and .xlsx or .xls
-      </Typography>
-      <Divider sx={{  borderColor: '#ccc', my: 2 }} />
-      <Typography variant="body2" color="#696969" textAlign="left" sx={{ marginBottom: 1 }}>
-        If you do not have a file you can use the sample below:
-      </Typography>
-      <Button
-        variant="contained"
-        startIcon={<DescriptionOutlinedIcon color='success'/>}
-        onClick={handleDownloadTemplate}
-        sx={{
-          backgroundColor: 'white',
-          mt: 1,
-          color: '#808080',
-          boxShadow: 'none',
-          border: '1px solid #ccc',
-          textTransform: 'none',
-          '&:hover': {
-            backgroundColor: '#b2ebf2',
-          },
-        }}
-      >
-        Download Sample Template
-      </Button>
-      </Box>
-      <Box sx={{ marginTop: 1,gap: 2, display: 'flex', justifyContent: 'flex-end',backgroundColor: '#e9e2e2', 
-          borderRadius: '0 0 8px 8px',
-          marginLeft: '-16px',
-          marginRight: '-16px',
-          padding: '6px' }}>
-        <CustomButton
-        variant="outlined"
-        handleClick={() => {handleClose();setSelectedTab(0)}}
-        title='Cancel' backgroundColor={'transparent'}
-        color={'black'} 
-        sx={{
-          border: '1px solid lightgray',
-          "&:hover": {
-            backgroundColor: "black", 
-            color: "white", 
-            opacity: 0.8, 
-          },
-        }}
-        />
-           
-        
-        <CustomButton
-         handleClick={handleUploadClick} 
-         variant="contained"  
-         title='Upload' 
-         backgroundColor={'blue'} 
-         color={'white'} 
-         />
-        
-      </Box>
-    </Box>
-    </div>
-     )}
-      
-    {/* <Dialog  PaperProps={{
+        >
+          <Box
+            sx={{
+              padding: 2,
+              width: "600px",
+              // height: '470px',
+              margin: "auto",
+              // marginTop: '10px',
+              backgroundColor: "#f4efef",
+              overflow: "auto", //1
+              color: "black",
+              borderRadius: "10px",
+              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Box
+              padding={0}
+              sx={{
+                padding: "19px",
+                backgroundColor: "#e9e2e2",
+                borderRadius: "8px 8px 0 0",
+                marginLeft: "-14px",
+                marginRight: "-14px",
+                marginTop: "-26px",
+              }}
+            >
+              <Typography variant="h6" fontWeight="bold" gutterBottom>
+                File Upload
+              </Typography>
+            </Box>
+            <Box
+              onClick={handleFileAreaClick}
+              sx={{
+                border: "2px dashed #ccc",
+                borderRadius: "8px",
+                padding: 3,
+                textAlign: "center",
+                color: "#777",
+                cursor: "pointer",
+                position: "relative",
+                width: "80%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "auto",
+                marginTop: 2,
+                backgroundColor: "white",
+              }}
+            >
+              {file ? (
+                <>
+                  <CheckCircleOutlineIcon fontSize="large" color="success" />
+                  <Typography variant="body1" color="black" sx={{ mt: 1 }}>
+                    {file.name} uploaded successfully
+                  </Typography>
+                </>
+              ) : (
+                <>
+                  <CloudUploadOutlinedIcon fontSize="large" />
+                  <Typography variant="body1" color="black">
+                    Click or drag file to this area to upload
+                  </Typography>
+                </>
+              )}
+              <input
+                type="file"
+                accept=".csv, .xlsx, .xls"
+                onChange={handleFileChange}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  opacity: 0,
+                  cursor: "pointer",
+                }}
+              />
+            </Box>
+            <Box sx={{ textAlign: "left", mt: 2, ml: 7, width: "80%" }}>
+              <Typography variant="body2" color="#A9A9A9" textAlign="left">
+                Formats accepted are .csv and .xlsx or .xls
+              </Typography>
+              <Divider sx={{ borderColor: "#ccc", my: 2 }} />
+              <Typography
+                variant="body2"
+                color="#696969"
+                textAlign="left"
+                sx={{ marginBottom: 1 }}
+              >
+                If you do not have a file you can use the sample below:
+              </Typography>
+              <Button
+                variant="contained"
+                startIcon={<DescriptionOutlinedIcon color="success" />}
+                onClick={handleDownloadTemplate}
+                sx={{
+                  backgroundColor: "white",
+                  mt: 1,
+                  color: "#808080",
+                  boxShadow: "none",
+                  border: "1px solid #ccc",
+                  textTransform: "none",
+                  "&:hover": {
+                    backgroundColor: "#b2ebf2",
+                  },
+                }}
+              >
+                Download Sample Template
+              </Button>
+            </Box>
+            <Box
+              sx={{
+                marginTop: 1,
+                gap: 2,
+                display: "flex",
+                justifyContent: "flex-end",
+                backgroundColor: "#e9e2e2",
+                borderRadius: "0 0 8px 8px",
+                marginLeft: "-16px",
+                marginRight: "-16px",
+                padding: "6px",
+              }}
+            >
+              <CustomButton
+                variant="outlined"
+                handleClick={() => {
+                  handleClose();
+                  setSelectedTab(0);
+                }}
+                title="Cancel"
+                backgroundColor={"transparent"}
+                color={"black"}
+                sx={{
+                  border: "1px solid lightgray",
+                  "&:hover": {
+                    backgroundColor: "black",
+                    color: "white",
+                    opacity: 0.8,
+                  },
+                }}
+              />
+
+              <CustomButton
+                handleClick={handleUploadClick}
+                variant="contained"
+                title="Upload"
+                backgroundColor={"blue"}
+                color={"white"}
+              />
+            </Box>
+          </Box>
+        </div>
+      )}
+
+      {/* <Dialog  PaperProps={{
       className: "dialog-paper",
       }} open={openDialog} onClose={handleDialogClose}>
       <DialogTitle className="dialog-title">

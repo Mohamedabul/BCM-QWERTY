@@ -56,18 +56,18 @@ const CustomDialog: React.FC<CustomDialogProps> = ({
         ) : (
           <>
             <div className="dialog-row">
-              <Typography className="dialog-typography">Application</Typography>
+              <Typography className="dialog-typography">Total Number of Applications present</Typography>
               <span className="dialog-value">{applications}</span>
             </div>
             <div className="dialog-row">
               <Typography className="dialog-typography">
-                Applications Mapped
+              Total Number of Applications Mapped
               </Typography>
               <span className="dialog-value">{mappedApplications}</span>
             </div>
             <div className="dialog-row">
               <Typography className="dialog-typography">
-                Application under Orphan
+              Total Number of Applications under Orphan
               </Typography>
               <span className="dialog-value">{orphans}</span>
             </div>
