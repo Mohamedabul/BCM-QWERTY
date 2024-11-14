@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Box,
   Dialog,
@@ -6,9 +6,9 @@ import {
   DialogContent,
   IconButton,
   Typography,
-  CircularProgress
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+  CircularProgress,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 interface CustomDialogProps {
   open: boolean;
@@ -25,7 +25,7 @@ const CustomDialog: React.FC<CustomDialogProps> = ({
   loading,
   applications,
   mappedApplications,
-  orphans
+  orphans,
 }) => {
   return (
     <Dialog
@@ -37,7 +37,11 @@ const CustomDialog: React.FC<CustomDialogProps> = ({
     >
       <DialogTitle className="dialog-title">
         Upload Status
-        <IconButton aria-label="close" onClick={onClose} className="close-button">
+        <IconButton
+          aria-label="close"
+          onClick={onClose}
+          className="close-button"
+        >
           <CloseIcon />
         </IconButton>
       </DialogTitle>
@@ -46,22 +50,26 @@ const CustomDialog: React.FC<CustomDialogProps> = ({
           <Box display="flex" justifyContent="center" alignItems="center" p={2}>
             <CircularProgress />
             <Typography variant="body1" sx={{ ml: 2, color: "black" }}>
-              Loading...
+              Uploading in Progress...
             </Typography>
           </Box>
         ) : (
           <>
             <div className="dialog-row">
               <Typography className="dialog-typography">Application</Typography>
-              <span className="dialog-value">{applications.length}</span>
+              <span className="dialog-value">{applications}</span>
             </div>
             <div className="dialog-row">
-              <Typography className="dialog-typography">Applications Mapped</Typography>
-              <span className="dialog-value">{mappedApplications.length}</span>
+              <Typography className="dialog-typography">
+                Applications Mapped
+              </Typography>
+              <span className="dialog-value">{mappedApplications}</span>
             </div>
             <div className="dialog-row">
-              <Typography className="dialog-typography">Application under Orphan</Typography>
-              <span className="dialog-value">{orphans.length}</span>
+              <Typography className="dialog-typography">
+                Application under Orphan
+              </Typography>
+              <span className="dialog-value">{orphans}</span>
             </div>
           </>
         )}

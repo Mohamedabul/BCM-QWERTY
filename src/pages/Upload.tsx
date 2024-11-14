@@ -181,6 +181,7 @@ const [openAddDialog, setOpenAddDialog] = React.useState(false);
   const handleDialogClose = () => {
     setFile(null);
     setOpenDialog(false);
+    setSelectedTab(0);
     console.log("Dialog closed");
   };
   const handleDownloadTemplate = () => {
@@ -251,7 +252,7 @@ const [openAddDialog, setOpenAddDialog] = React.useState(false);
           {showImportButton && selectedTab === 0 && (
             <CustomButton
               title="Import File"
-              backgroundColor="blue"
+              backgroundColor="black"
               color="white"
               handleClick={() => {
                 openUpload();
@@ -329,7 +330,8 @@ const [openAddDialog, setOpenAddDialog] = React.useState(false);
           <CustomTable data={sampleData} />
         </Box>
       )}
-     {open && (   
+     {open && (
+      <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
      <Box sx={{ padding: 2,
         width: '600px',
         // height: '470px',
@@ -341,11 +343,7 @@ const [openAddDialog, setOpenAddDialog] = React.useState(false);
         borderRadius: '10px',
         boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
         display: 'flex',
-        flexDirection: 'column',
-        zIndex: 1300,
-        position: 'fixed',
-        top: '122px',
-        left: '391px',
+        flexDirection: 'column'
      }}
     >
         <Box padding={0} sx={{
@@ -468,6 +466,7 @@ const [openAddDialog, setOpenAddDialog] = React.useState(false);
         
       </Box>
     </Box>
+    </div>
      )}
       
     {/* <Dialog  PaperProps={{
