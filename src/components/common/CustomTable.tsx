@@ -14,6 +14,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  TablePagination,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -34,10 +35,25 @@ interface TableData {
 interface CustomTableProps {
   data: TableData[];
   loading: boolean;
-  actionButton:any;
+  actionButton: any;
+  page: any;
+  setPage: any;
+  totalCount: any;
+  setTotalCount: any;
+  pageSize: any;
+  setPageSize: any;
 }
 
-const CustomTable: React.FC<CustomTableProps> = ({ data, actionButton }) => {
+const CustomTable: React.FC<CustomTableProps> = ({
+  data,
+  actionButton,
+  page,
+  setPage,
+  totalCount,
+  setTotalCount,
+  pageSize,
+  setPageSize,
+}) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedRow, setSelectedRow] = React.useState<TableData | null>(null);
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
@@ -117,6 +133,10 @@ const CustomTable: React.FC<CustomTableProps> = ({ data, actionButton }) => {
     setDeleteDialogOpen(true);
   };
 
+  const handleChangePage = (event:any, newPage:any) => {
+    setPage(newPage+1);
+  };
+
   const handleDeleteConfirm = async () => {
     if (!selectedRow) {
       console.error("No selected row to delete");
@@ -165,7 +185,7 @@ const CustomTable: React.FC<CustomTableProps> = ({ data, actionButton }) => {
     <TableContainer
       sx={{
         borderRadius: "12px",
-        maxHeight: 500,
+        maxHeight: 600,
         overflowY: "auto",
         "&::-webkit-scrollbar": {
           width: "8px",
@@ -185,7 +205,7 @@ const CustomTable: React.FC<CustomTableProps> = ({ data, actionButton }) => {
       <Table stickyHeader>
         <TableHead>
           <TableRow sx={{ "& th": { backgroundColor: "#e2e2e2" } }}>
-            <TableCell align="left" sx={{ borderBottom: "none" }}>
+            <TableCell align="center" sx={{ borderBottom: "none" }}>
               <Typography
                 variant="subtitle2"
                 color="black"
@@ -195,7 +215,7 @@ const CustomTable: React.FC<CustomTableProps> = ({ data, actionButton }) => {
                 Business Capability
               </Typography>
             </TableCell>
-            <TableCell align="left" sx={{ borderBottom: "none" }}>
+            <TableCell align="center" sx={{ borderBottom: "none" }}>
               <Typography
                 variant="subtitle2"
                 color="black"
@@ -205,7 +225,7 @@ const CustomTable: React.FC<CustomTableProps> = ({ data, actionButton }) => {
                 Domain
               </Typography>
             </TableCell>
-            <TableCell align="left" sx={{ borderBottom: "none" }}>
+            <TableCell align="center" sx={{ borderBottom: "none" }}>
               <Typography
                 variant="subtitle2"
                 color="black"
@@ -215,7 +235,7 @@ const CustomTable: React.FC<CustomTableProps> = ({ data, actionButton }) => {
                 Sub-domain
               </Typography>
             </TableCell>
-            <TableCell align="left" sx={{ borderBottom: "none" }}>
+            <TableCell align="center" sx={{ borderBottom: "none" }}>
               <Typography
                 variant="subtitle2"
                 color="black"
@@ -233,38 +253,28 @@ const CustomTable: React.FC<CustomTableProps> = ({ data, actionButton }) => {
         <TableBody>
           {data.map((row, index) => (
             <TableRow key={index} hover>
-              <TableCell sx={{ borderBottom: "none" }}>
+              <TableCell align="center" sx={{ borderBottom: "none" }}>
                 <Typography variant="body2" color="black">
-                  {row.businessCapabilityName}
+                  {row.businessCapabilityName || "-"}
                 </Typography>
               </TableCell>
-              <TableCell sx={{ borderBottom: "none" }}>
+              <TableCell align="center" sx={{ borderBottom: "none" }}>
                 <Typography variant="body2" color="black">
-                  {row.domain}
+                  {row.domain || "-"}
                 </Typography>
               </TableCell>
-              <TableCell sx={{ borderBottom: "none" }}>
+              <TableCell align="center" sx={{ borderBottom: "none" }}>
                 <Typography
                   variant="body2"
                   color="black"
                   //   sx={{ color: row.subDomain === 'Accounting' ? '#FF69B4' : 'inherit' }}
                 >
-                  {row.subDomain}
+                  {row.subDomain || "-"}
                 </Typography>
               </TableCell>
-              <TableCell sx={{ borderBottom: "none" }}>
+              <TableCell align="center" sx={{ borderBottom: "none" }}>
                 <Typography variant="body2" color="black">
-                  {row.applicationName}
-                  {row.applicationVersion && (
-                    <Typography
-                      variant="caption"
-                      color="textSecondary"
-                      component="span"
-                    >
-                      {" "}
-                      {row.applicationVersion}
-                    </Typography>
-                  )}
+                  {row.applicationName || "-"}
                 </Typography>
               </TableCell>
               <TableCell align="right" sx={{ borderBottom: "none" }}>
@@ -306,6 +316,24 @@ const CustomTable: React.FC<CustomTableProps> = ({ data, actionButton }) => {
         onClose={handleDeleteDialogClose}
         onConfirm={handleDeleteConfirm}
         title={`Delete ${selectedRow?.businessCapabilityName}`}
+      />
+      <TablePagination
+        component="div"
+        count={totalCount}
+        page={page - 1}
+        onPageChange={handleChangePage}
+        rowsPerPage={pageSize}
+        onRowsPerPageChange={(event) => {
+          setPageSize(parseInt(event.target.value, 10));
+          setPage(1);
+        }}
+        rowsPerPageOptions={[10, 50, 100]}
+        sx={{
+          position: "sticky",
+          bottom: 0,
+          backgroundColor: "white",
+          zIndex: 1,
+        }}
       />
     </TableContainer>
   );

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -50,6 +50,9 @@ const Upload: React.FC<UploadProps> = () => {
   const [subDomains, setSubDomains] = React.useState<string[]>([]);
   const [filteredDomains, setFilteredDomains] = React.useState<any[]>([]);
   const [filteredSubDomains, setFilteredSubDomains] = React.useState<any[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
@@ -61,7 +64,7 @@ const Upload: React.FC<UploadProps> = () => {
     } else if (selectedTab === 1) {
       fetchOrphans();
     }
-  }, [selectedTab]);
+  }, [selectedTab, page, pageSize]);
 
   useEffect(() => {
     fetchBusinessCapabilities();
@@ -102,12 +105,16 @@ const Upload: React.FC<UploadProps> = () => {
   const fetchMappedApplications = async () => {
     setLoading(true);
     try {
+      const params:any = {page: page, limit: pageSize};
+      const queryString = new URLSearchParams(params).toString();
       const response = await fetch(
-        "http://localhost:5000/api/getMappedApplications"
+        `http://localhost:5000/api/getMappedApplications?${queryString}`
       );
       if (!response.ok) throw new Error("Failed to fetch mapped applications");
 
       const result = await response.json();
+      const { totalCount } = result;
+      setTotalCount(totalCount);
       const mappedData = result.response.map((item: any) => ({
         id: item.software_id,
         businessCapabilityName: item.capability,
@@ -116,6 +123,10 @@ const Upload: React.FC<UploadProps> = () => {
         applicationName: item.software_name,
       }));
       setMappedData(mappedData);
+      if(mappedData.length === 0){
+        openUpload();
+        setSelectedTab(-1);
+      }
     } catch (error) {
       console.error("Error fetching mapped applications:", error);
       alert("Failed to fetch mapped applications. Please try again later.");
@@ -127,10 +138,14 @@ const Upload: React.FC<UploadProps> = () => {
   const fetchOrphans = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/getOrphans");
+      const params:any = {page: page, limit: pageSize};
+      const queryString = new URLSearchParams(params).toString();
+      const response = await fetch(`http://localhost:5000/api/getOrphans?${queryString}`);
       if (!response.ok) throw new Error("Failed to fetch orphans");
 
       const result = await response.json();
+      const { totalCount } = result;
+      setTotalCount(totalCount);
       const orphanData = result.response.map((item: any) => ({
         businessCapabilityName: item.capability,
         domain: item.domain,
@@ -309,18 +324,6 @@ const Upload: React.FC<UploadProps> = () => {
 
   return (
     <Box className="container">
-      {/* {showImportButton && (
-        <Box className="button-container">
-          <CustomButton
-            title="Import File"
-            backgroundColor="blue"
-            color="white"
-            handleClick={openUpload}
-            variant="contained"
-            icon={<AddIcon />}
-          />
-        </Box>
-      )} */}
       <AppBar
         position="static"
         color="default"
@@ -336,7 +339,7 @@ const Upload: React.FC<UploadProps> = () => {
           }}
         >
           {/* Tabs for Mapping and Orphan */}
-          <Tabs
+          {selectedTab !== -1 && <Tabs
             value={selectedTab}
             onChange={handleTabChange}
             aria-label="Upload Tabs"
@@ -349,7 +352,7 @@ const Upload: React.FC<UploadProps> = () => {
               label="Orphan"
               sx={{ fontWeight: "bold", fontSize: "16px", color: "black" }}
             />
-          </Tabs>
+          </Tabs>}
 
           {/* Import File Button */}
           {showImportButton && selectedTab === 0 && (
@@ -364,7 +367,6 @@ const Upload: React.FC<UploadProps> = () => {
               variant="contained"
               icon={<AddIcon />}
               sx={{ borderRadius: "10px", margin: 0 }}
-              
             />
           )}
         </Box>
@@ -372,7 +374,7 @@ const Upload: React.FC<UploadProps> = () => {
       {selectedTab === 0 && (
         <Box
           sx={{
-            padding: 1.5,
+            padding: 3,
             mt: 2,
             backgroundColor: "white",
             overflow: "auto",
@@ -381,20 +383,6 @@ const Upload: React.FC<UploadProps> = () => {
             boxShadow: 2,
           }}
         >
-          {/* <Typography variant="h6" gutterBottom={true}>
-            Mapping
-          </Typography> */}
-          {/* <Box sx={{ display: 'flex' ,justifyContent: 'flex-end', gap: 2,mb: 2}}>
-            <CustomButton
-              title="Add New"
-              handleClick={handleAddNew}
-              backgroundColor="blue"
-              color="white"
-              variant="contained"
-              icon={<AddIcon />}
-              sx={{ borderRadius: "10px" }}
-            />
-          </Box> */}
           <CustomTable
             data={mappedData}
             loading={loading}
@@ -409,6 +397,12 @@ const Upload: React.FC<UploadProps> = () => {
                 sx={{ borderRadius: "10px" }}
               />
             }
+            page={page}
+            setPage={setPage}
+            totalCount={totalCount}
+            setTotalCount={setTotalCount}
+            pageSize={pageSize}
+            setPageSize={setPageSize}
           />
         </Box>
       )}
@@ -439,22 +433,6 @@ const Upload: React.FC<UploadProps> = () => {
             boxShadow: 2,
           }}
         >
-          {/* <Typography variant="h6" gutterBottom={true}>
-            Mapping
-          </Typography> */}
-          {/* <Box
-            sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mb: 2 }}
-          >
-            <CustomButton
-              title="Re-map"
-              handleClick={fixOrphan}
-              backgroundColor="blue"
-              color="white"
-              variant="contained"
-              icon={<ReplayIcon />}
-              sx={{ borderRadius: "10px" }}
-            />
-          </Box> */}
           <CustomTable
             data={orphanData}
             loading={loading}
@@ -469,6 +447,12 @@ const Upload: React.FC<UploadProps> = () => {
                 sx={{ borderRadius: "10px" }}
               />
             }
+            page={page}
+            setPage={setPage}
+            totalCount={totalCount}
+            setTotalCount={setTotalCount}
+            pageSize={pageSize}
+            setPageSize={setPageSize}
           />
         </Box>
       )}
@@ -636,52 +620,6 @@ const Upload: React.FC<UploadProps> = () => {
           </Box>
         </div>
       )}
-
-      {/* <Dialog  PaperProps={{
-      className: "dialog-paper",
-      }} open={openDialog} onClose={handleDialogClose}>
-      <DialogTitle className="dialog-title">
-        Upload Status 
-        <IconButton
-          aria-label="close"
-          onClick={handleDialogClose}
-          className="close-button"
-        >
-          <CloseIcon  />
-        </IconButton>
-      </DialogTitle>
-      <DialogContent className="dialog-content">
-      {loading ? (
-            <Box display="flex" justifyContent="center" alignItems="center" p={2}>
-              <CircularProgress />
-              <Typography variant="body1" sx={{ ml: 2, color: "black" }}>
-                Loading...
-              </Typography>
-            </Box>
-          ) : (
-            <>
-      <div className="dialog-row">
-      <Typography className="dialog-typography">Application</Typography>
-      <span className="dialog-value">{applications}</span>
-    </div>
-    <div className="dialog-row">
-      <Typography className="dialog-typography"> Applications Mapped</Typography>
-      <span className="dialog-value">{mappedApplications}</span>
-    </div>
-    <div className="dialog-row">
-      <Typography className="dialog-typography">Application under Orphan</Typography>
-      <span className="dialog-value">{orphans}</span>
-    </div>
-    </>
-    )}
-      </DialogContent> */}
-      {/* <DialogActions className="dialog-actions"> */}
-      {/* <Divider sx={{ flexGrow: 2, borderColor: "black", mt: 1, mb: 1 }} /> */}
-      {/* <IconButton onClick={handleDialogClose} aria-label="close" sx={{ color: 'black' }}>
-            <CloseIcon />
-          </IconButton> */}
-      {/* </DialogActions> */}
-      {/* </Dialog> */}
       <CustomDialog
         open={openDialog}
         onClose={handleDialogClose}
