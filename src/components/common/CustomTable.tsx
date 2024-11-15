@@ -30,6 +30,9 @@ interface TableData {
   subDomain: string;
   applicationName: string;
   applicationVersion?: string;
+  core_id: string;
+  domain_id: string;
+  subdomain_id: string;
 }
 
 interface CustomTableProps {
@@ -75,7 +78,12 @@ const CustomTable: React.FC<CustomTableProps> = ({
   };
 
   const handleEditClick = (row: TableData) => {
-    setEditData(row);
+    setEditData({
+      ...row,
+      core_id: row.core_id || "",
+      domain_id: row.domain_id || "",
+      subdomain_id: row.subdomain_id || "",
+    });
     setEditDialogOpen(true);
   };
 
@@ -87,6 +95,14 @@ const CustomTable: React.FC<CustomTableProps> = ({
     if (!editData) return;
 
     try {
+      const payload = {
+        core_id: editData.core_id,
+        domain_id: editData.domain_id,
+        subdomain_id: editData.subdomain_id,
+        name: editData.applicationName,
+        applicationVersion: editData.applicationVersion,
+      };
+
       const response = await fetch(
         `http://localhost:5000/api/application/${editData.id}`,
         {
@@ -94,13 +110,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            businessCapabilityName: editData.businessCapabilityName,
-            domain: editData.domain,
-            subDomain: editData.subDomain,
-            applicationName: editData.applicationName,
-            applicationVersion: editData.applicationVersion,
-          }),
+          body: JSON.stringify(payload),
         }
       );
 
@@ -115,9 +125,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
       setEditDialogOpen(false);
       setEditData(null);
 
-      // Optionally, refresh the data to reflect the edited item
-      // Assuming fetchMappedApplications is available in scope
-      // fetchMappedApplications();
+      // Refresh the data (fetch the updated data here if needed)
     } catch (error) {
       console.error("Error saving edit:", error);
       alert("An error occurred while saving the edit. Please try again.");

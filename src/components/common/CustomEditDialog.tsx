@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Select, MenuItem, Box, Typography, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CustomButton from './CustomButton';
@@ -8,14 +8,85 @@ interface CustomEditDialogProps {
   onClose: () => void;
   onSave: () => void;
   data: {
-    businessCapabilityName: string;
-    domain: string;
-    subDomain: string;
+    core_id: string;
+    domain_id: string;
+    subdomain_id: string;
   };
   onChange: (field: string, value: string) => void;
 }
+interface Capability {
+  id: string;
+  name: string;
+}
+interface Domain {
+  id: string;
+  name: string;
+  core_id: string;
+}
+interface SubDomain {
+  id: string;
+  name: string;
+  domain_id: string;
+}
 
 const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSave, data, onChange }) => {
+  const [capabilities, setCapabilities] = React.useState<Capability[]>([]);
+  const [domains, setDomains] = React.useState<Domain[]>([]);
+  const [subDomains, setSubDomains] = React.useState<SubDomain[]>([]);
+  const [filteredDomains, setFilteredDomains] = React.useState<Domain[]>([]);
+  const [filteredSubDomains, setFilteredSubDomains] = React.useState<SubDomain[]>([]);
+
+  useEffect(() => {
+    const fetchCapabilities = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/corecapability');
+        const result = await response.json();
+        setCapabilities(result);
+      } catch (error) {
+        console.error("Error fetching capabilities:", error);
+      }
+    };
+    const fetchDomains = async () => {
+      try {
+        const domainResponse = await fetch('http://localhost:5000/api/domain');
+        const domainResult = await domainResponse.json();
+        setDomains(domainResult);
+      } catch (error) {
+        console.error("Error fetching domains:", error);
+      }
+    };
+
+    const fetchSubDomains = async () => {
+      try {
+        const subDomainResponse = await fetch('http://localhost:5000/api/subdomain');
+        const subDomainResult = await subDomainResponse.json();
+        setSubDomains(subDomainResult);
+      } catch (error) {
+        console.error("Error fetching subdomains:", error);
+      }
+    };
+
+    fetchCapabilities();
+    fetchDomains();
+    fetchSubDomains();
+  }, []);
+
+    useEffect(() => {
+    const capabilityId = data.core_id;
+    setFilteredDomains(domains.filter((domain) => domain.core_id === capabilityId));
+    
+    
+  }, [data.core_id, domains, onChange]);
+
+  
+  useEffect(() => {
+    const domainId = data.domain_id;
+    setFilteredSubDomains(subDomains.filter((subDomain) => subDomain.domain_id === domainId));
+    
+  }, [data.domain_id, subDomains, onChange]);
+
+
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <Box
@@ -38,8 +109,8 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
           <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Edit Business Capability Name<span style={{ color: 'red' }}>*</span></Typography>
           <Select
             fullWidth
-            value={data.businessCapabilityName}
-            onChange={(e) => onChange('businessCapabilityName', e.target.value as string)}
+            value={data.core_id}
+            onChange={(e) => onChange('core_id', e.target.value as string)}
             displayEmpty
             sx={{
               backgroundColor: '#f0f2f5',
@@ -52,16 +123,20 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
             }}
           >
             <MenuItem value="" disabled>Select Business Capability</MenuItem>
-            <MenuItem value="Enterprise Resource Planning">Enterprise Resource Planning</MenuItem>
-            <MenuItem value="Customer Relationship Management">Customer Relationship Management</MenuItem>
+            {capabilities.map((capability) => (
+              <MenuItem key={capability.id} value={capability.id}>
+                {capability.name}
+              </MenuItem>
+            ))}
           </Select>
 
           <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Edit Domain Name<span style={{ color: 'red' }}>*</span></Typography>
           <Select
             fullWidth
-            value={data.domain}
-            onChange={(e) => onChange('domain', e.target.value as string)}
+            value={data.domain_id}
+            onChange={(e) => onChange('domain_id', e.target.value as string)}
             displayEmpty
+            disabled={!data.core_id}
             sx={{
               backgroundColor: '#f0f2f5',
               borderRadius: 1,
@@ -73,16 +148,20 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
             }}
           >
             <MenuItem value="" disabled>Select Domain</MenuItem>
-            <MenuItem value="Bank Office">Bank Office</MenuItem>
-            <MenuItem value="Front Office">Front Office</MenuItem>
+            {filteredDomains.map((domain) => (
+              <MenuItem key={domain.id} value={domain.id}>
+                {domain.name}
+              </MenuItem>
+            ))}
           </Select>
 
           <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Edit Sub-domain Name<span style={{ color: 'red' }}>*</span></Typography>
           <Select
             fullWidth
-            value={data.subDomain}
-            onChange={(e) => onChange('subDomain', e.target.value as string)}
+            value={data.subdomain_id}
+            onChange={(e) => onChange('subdomain_id', e.target.value as string)}
             displayEmpty
+            disabled={!data.domain_id}
             sx={{
               backgroundColor: '#f0f2f5',
               borderRadius: 1,
@@ -94,8 +173,11 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
             }}
           >
             <MenuItem value="" disabled>Select Sub-domain</MenuItem>
-            <MenuItem value="Accounting">Accounting</MenuItem>
-            <MenuItem value="Payroll">Payroll</MenuItem>
+            {filteredSubDomains.map((subDomain) => (
+              <MenuItem key={subDomain.id} value={subDomain.id}>
+                {subDomain.name}
+              </MenuItem>
+            ))}
           </Select>
         </Box>
       </DialogContent>

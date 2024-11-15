@@ -39,9 +39,13 @@ const Upload: React.FC<UploadProps> = () => {
   const [orphanData, setOrphanData] = React.useState([]);
   const [data, setData] = React.useState({
     businessCapabilityName: "",
-    domain: "",
-    subDomain: "",
-    applicationName: "",
+  domain: "",
+  subDomain: "",
+  applicationName: "",
+  core_id: "",
+  domain_id: "",
+  subdomain_id: "",
+  name: "",
   });
   const [businessCapabilities, setBusinessCapabilities] = React.useState<
     string[]
@@ -66,41 +70,41 @@ const Upload: React.FC<UploadProps> = () => {
     }
   }, [selectedTab, page, pageSize]);
 
-  useEffect(() => {
-    fetchBusinessCapabilities();
-    fetchDomains();
-    fetchSubDomains();
-  }, []);
+  // useEffect(() => {
+  //   fetchBusinessCapabilities();
+  //   fetchDomains();
+  //   fetchSubDomains();
+  // }, []);
 
-  const fetchBusinessCapabilities = async () => {
-    try {
-      const response = await fetch("http://localhost:5000/api/coreCapability");
-      const result = await response.json();
-      setBusinessCapabilities(result);
-    } catch (error) {
-      console.error("Error fetching business capabilities:", error);
-    }
-  };
+  // const fetchBusinessCapabilities = async () => {
+  //   try {
+  //     const response = await fetch("http://localhost:5000/api/coreCapability");
+  //     const result = await response.json();
+  //     setBusinessCapabilities(result);
+  //   } catch (error) {
+  //     console.error("Error fetching business capabilities:", error);
+  //   }
+  // };
 
-  const fetchDomains = async () => {
-    try {
-      const response = await fetch("http://localhost:5000/api/domain");
-      const result = await response.json();
-      setDomains(result);
-    } catch (error) {
-      console.error("Error fetching domains:", error);
-    }
-  };
+  // const fetchDomains = async () => {
+  //   try {
+  //     const response = await fetch("http://localhost:5000/api/domain");
+  //     const result = await response.json();
+  //     setDomains(result);
+  //   } catch (error) {
+  //     console.error("Error fetching domains:", error);
+  //   }
+  // };
 
-  const fetchSubDomains = async () => {
-    try {
-      const response = await fetch("http://localhost:5000/api/subdomain");
-      const result = await response.json();
-      setSubDomains(result); // assuming result is an array of subdomain names
-    } catch (error) {
-      console.error("Error fetching subdomains:", error);
-    }
-  };
+  // const fetchSubDomains = async () => {
+  //   try {
+  //     const response = await fetch("http://localhost:5000/api/subdomain");
+  //     const result = await response.json();
+  //     setSubDomains(result); // assuming result is an array of subdomain names
+  //   } catch (error) {
+  //     console.error("Error fetching subdomains:", error);
+  //   }
+  // };
 
   const fetchMappedApplications = async () => {
     setLoading(true);
@@ -274,6 +278,14 @@ const Upload: React.FC<UploadProps> = () => {
   };
   const handleSave = async () => {
     try {
+      const payload = {
+        core_id: data.businessCapabilityName,
+        domain_id: data.domain,
+        subdomain_id: data.subDomain,
+        name: data.applicationName,
+      };
+      
+  
       const response = await fetch("http://localhost:5000/api/application", {
         method: "POST",
         headers: {
@@ -291,9 +303,13 @@ const Upload: React.FC<UploadProps> = () => {
 
       setData({
         businessCapabilityName: "",
-        domain: "",
-        subDomain: "",
-        applicationName: "",
+      domain: "",
+      subDomain: "",
+      applicationName: "",
+      core_id: "",
+      domain_id: "",
+      subdomain_id: "",
+      name: "",
       });
       setOpenAddDialog(false);
       await fetchMappedApplications();
@@ -303,23 +319,21 @@ const Upload: React.FC<UploadProps> = () => {
     }
   };
   const handleInputChange = (field: string, value: string) => {
-    console.log("Field:", field, "Value:", value);
-    setData((prevData) => ({
-      ...prevData,
-      [field]: value,
-    }));
-
-    if (field === "businessCapabilityName") {
-      setFilteredDomains(
-        domains.filter((domain: any) => domain.core_id === value)
-      );
-      setData((prevData) => ({ ...prevData, domain: "", subDomain: "" }));
-    } else if (field === "domain") {
-      setFilteredSubDomains(
-        subDomains.filter((subDomain: any) => subDomain.domain_id === value)
-      );
-      setData((prevData) => ({ ...prevData, subDomain: "" }));
-    }
+    setData((prevData) => {
+      const updatedData = { ...prevData, [field]: value };
+  
+      if (field === "businessCapabilityName") {
+        updatedData.core_id = value; // Map businessCapabilityName to core_id
+      } else if (field === "domain") {
+        updatedData.domain_id = value; // Map domain to domain_id
+      } else if (field === "subDomain") {
+        updatedData.subdomain_id = value; // Map subDomain to subdomain_id
+      } else if (field === "applicationName") {
+        updatedData.name = value; // Map applicationName to name
+      }
+  
+      return updatedData;
+    });
   };
 
   return (
@@ -412,14 +426,14 @@ const Upload: React.FC<UploadProps> = () => {
         onSave={handleSave}
         data={data}
         onChange={handleInputChange}
-        options={{
-          businessCapabilities: businessCapabilities.map((capability) => ({
-            id: capability,
-            name: capability,
-          })),
-          domains: filteredDomains,
-          subDomains: filteredSubDomains,
-        }}
+        // options={{
+        //   businessCapabilities: businessCapabilities.map((capability) => ({
+        //     id: capability,
+        //     name: capability,
+        //   })),
+        //   domains: filteredDomains,
+        //   subDomains: filteredSubDomains,
+        // }}
       />
       {selectedTab === 1 && (
         <Box
