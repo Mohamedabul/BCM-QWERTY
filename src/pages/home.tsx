@@ -16,6 +16,8 @@ type DashboardCounts = {
   domainCount: number;
   subDomainCount: number;
   softwareCount: number;
+  mappedCount: number;
+  orphanCount: number;
 };
 
 const Home = () => {
@@ -44,6 +46,8 @@ const Home = () => {
           domainCount: Number(data.domainCount),
           subDomainCount: Number(data.subDomainCount),
           softwareCount: Number(data.softwareCount),
+          mappedCount: Number(data.mappedCount),
+          orphanCount:Number(data.orphanCount)
         });
         setIsLoading(false);
       } catch (error) {
@@ -85,10 +89,22 @@ const Home = () => {
           // colors={["#275be8", "#c4e8ef"]}
         />
         <PieChart
-          title="Application"
+          title="Applications"
           value={dashboardCounts?.softwareCount ?? 0}
           // series={[dashboardCounts?.softwareCount ?? 0, 100 - (dashboardCounts?.softwareCount ?? 0)]}
           // colors={["#275be8", "#c4e8ef"]}
+        />
+        <PieChart
+          title="Applications Mapped"
+          value={dashboardCounts?.mappedCount ?? 0}
+          series={[dashboardCounts?.mappedCount ?? 0, 100 - (dashboardCounts?.mappedCount ?? 0)]}
+          colors={["#275be8", "#c4e8ef"]}
+        />
+        <PieChart
+          title="Application under Orphans"
+          value={dashboardCounts?.orphanCount ?? 0}
+          series={[dashboardCounts?.orphanCount ?? 0, 100 - (dashboardCounts?.orphanCount ?? 0)]}
+          colors={["#275be8", "#c4e8ef"]}
         />
       </Box>
 
@@ -98,7 +114,7 @@ const Home = () => {
         direction={{ xs: "column", lg: "row" }}
         gap={4}
       >
-        <CapabilityTable/>
+        {/* <CapabilityTable/> */}
       </Stack>
 
     </Box>
