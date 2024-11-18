@@ -18,6 +18,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CloseIcon from "@mui/icons-material/Close";
 import { CustomButton } from "components";
 import { MenuProps } from "interfaces/common";
+import { patchEndpoint, deleteEndpoint } from "apis";
 
 const modalStyle = {
   position: "absolute" as "absolute",
@@ -84,14 +85,7 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
       return;
     }
     try {
-      const response = await fetch(editEndpoint ?? "", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name }),
-      });
-
+      const response = await patchEndpoint(editEndpoint ?? "",JSON.stringify({ name }))
       if (!response.ok) {
         throw new Error(`Failed to edit ${label}: ${response.statusText}`);
       }
@@ -110,12 +104,7 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
       return;
     }
     try {
-      const response = await fetch(deleteEndpoint ?? "", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await deleteEndpoint(deleteEndpoint ?? "")
 
       if (!response.ok) {
         throw new Error(`Failed to delete ${label}: ${response.statusText}`);
