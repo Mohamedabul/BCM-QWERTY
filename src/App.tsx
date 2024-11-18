@@ -2,8 +2,9 @@ import AccountCircleOutlined from "@mui/icons-material/AccountCircleOutlined";
 import ChatBubbleOutline from "@mui/icons-material/ChatBubbleOutline";
 import PeopleAltOutlined from "@mui/icons-material/PeopleAltOutlined";
 import StarOutlineRounded from "@mui/icons-material/StarOutlineRounded";
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
+import AssessmentIcon from "@mui/icons-material/Assessment";
+import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
+import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined";
 import CssBaseline from "@mui/material/CssBaseline";
 import GlobalStyles from "@mui/material/GlobalStyles";
 import {
@@ -25,16 +26,19 @@ import { Header, Layout, Sider, Title } from "components/layout";
 import { ColorModeContextProvider } from "contexts";
 import type { CredentialResponse } from "interfaces/google";
 import { parseJwt } from "utils/parse-jwt";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 import {
   Home,
   Login,
   MyProfile,
   AllCapabilities,
-  CreateCapability,
+  // CreateCapability,
   EditCapability,
   CapabilityDetails,
 } from "pages";
+import Upload from "pages/Upload";
+import Report from "pages/Report";
 
 const axiosInstance = axios.create();
 axiosInstance.interceptors.request.use(
@@ -47,10 +51,20 @@ axiosInstance.interceptors.request.use(
 
     return config;
   },
-  (error) => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 
 function App() {
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: "#0000ff",
+      },
+      secondary: {
+        main: "#000000",
+      },
+    },
+  });
   // const authProvider: AuthProvider = {
   //   login: async ({ credential }: CredentialResponse) => {
   //     const profileObj = credential ? parseJwt(credential) : null;
@@ -120,55 +134,81 @@ function App() {
 
   return (
     <ColorModeContextProvider>
-      <CssBaseline />
-      <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto" } }} />
-      <RefineSnackbarProvider>
-        <Refine
-          dataProvider={dataProvider("")}
-          notificationProvider={useNotificationProvider}
-          ReadyPage={ReadyPage}
-          catchAll={<ErrorComponent />}
-          resources={[
-            {
-              name: "analytics",
-              list: AllCapabilities,
-              show: CapabilityDetails,
-              icon: <AssessmentIcon />,
-            },
-            {
-              name: "capability",
-              list: AllCapabilities,
-              create: CreateCapability,
-              edit: EditCapability,
-              icon: <BusinessCenterIcon />,
-            },
-            // {
-            //   name: "reviews",
-            //   list: Home,
-            //   icon: <StarOutlineRounded />,
-            // },
-            // {
-            //   name: "messages",
-            //   list: Home,
-            //   icon: <ChatBubbleOutline />,
-            // },
-            {
-              name: "my-profile",
-              options: { label: "My Profile " },
-              list: MyProfile,
-              icon: <AccountCircleOutlined />,
-            },
-          ]}
-          Title={Title}
-          Sider={Sider}
-          Layout={Layout}
-          Header={Header}
-          legacyRouterProvider={routerProvider}
-          // legacyAuthProvider={authProvider}
-          LoginPage={Login}
-          DashboardPage={Home}
-        />
-      </RefineSnackbarProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline>
+          <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto" } }} />
+          <RefineSnackbarProvider>
+            <Refine
+              dataProvider={dataProvider("")}
+              notificationProvider={useNotificationProvider}
+              ReadyPage={ReadyPage}
+              catchAll={<ErrorComponent />}
+              resources={[
+                {
+                  name: "template",
+                  list: () => <AllCapabilities isEditable={false} />,
+                  // show: CapabilityDetails,
+                  icon: <AssessmentIcon />,
+                  options: { label: "Template" },
+                },
+                {
+                  name: "capability",
+                  list: () => <AllCapabilities isEditable={true} />,
+                  // create: CreateCapability,
+                  // edit: EditCapability,
+                  icon: <BusinessCenterIcon />,
+                },
+                // {
+                //   name: "reviews",
+                //   list: Home,
+                //   icon: <StarOutlineRounded />,
+                // },
+                // {
+                //   name: "messages",
+                //   list: Home,
+                //   icon: <ChatBubbleOutline />,
+                // },
+                {
+                  name: "Inventory",
+                  list: Upload,
+                  icon: <InboxOutlinedIcon />,
+                  options: {
+                    label: "Mapping",
+                    onClick: () => {
+                      console.log("clicked");
+                    },
+                  },
+                },
+                {
+                  name: "Reports",
+                  list: Report,
+                  icon: <AssessmentIcon />,
+                  options: {
+                    label: "Reports",
+                    onClick: () => {
+                      console.log("clicked");
+                    },
+                  },
+                },
+                {
+                  name: "my-profile",
+                  options: { label: "My Profile " },
+                  list: MyProfile,
+                  icon: <AccountCircleOutlined />,
+                },
+              ]}
+              Title={Title}
+              Sider={Sider}
+              Layout={Layout}
+              Header={Header}
+              legacyRouterProvider={routerProvider}
+              // legacyAuthProvider={authProvider}
+              LoginPage={Login}
+              DashboardPage={Home}
+            />
+          </RefineSnackbarProvider>
+        </CssBaseline>
+      </ThemeProvider>
     </ColorModeContextProvider>
   );
 }

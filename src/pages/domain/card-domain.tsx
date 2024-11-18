@@ -1,22 +1,63 @@
 import { useState } from "react";
 import { handleChange } from "utils/helperFunctions";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
   Typography,
+  Box,
 } from "@mui/material";
-import accordionHelper from "utils/accordionHelper";
-import SubDomainCard from "pages/sub-domain/card-sub-domain";
+import SubDomainCardWithMenu from "pages/sub-domain/subdomaincardwithmenu";
 import { ShimmerBox } from "utils/ShimmerBox";
+import { objectToQueryString } from "components/common/helper";
+import CreateCapability from "pages/capability/create-capability";
 
 const DomainCard = (props: any) => {
+  const { isEditable } = props;
   const [subDomainList, setSubDomainList] = useState<any>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [open, setOpen] = useState(false);
 
   const handleExpand = async () => {
-    const resp = await fetch(process.env.REACT_APP_API_URL+"subdomain");
-    const data = await resp.json();
-    setSubDomainList(data);
+    setLoading(true);
+    const endpoint = `${process.env.REACT_APP_API_URL}${
+      isEditable ? "subdomainBydomain" : "template/subdomainBydomain"
+    }`;
+    const params = { domain_id: props.id };
+    const queryString = objectToQueryString(params);
+    try {
+      const resp = await fetch(`${endpoint}?${queryString}`);
+      if (!resp.ok) {
+        console.error("Error fetching subdomain by domains:", resp.statusText);
+        return;
+      }
+      const data = await resp.json();
+      setSubDomainList(data);
+    } catch (error) {
+      console.error("Error fetching domain by capability:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClick = async (obj: object, callback: any) => {
+    const response = await fetch(process.env.REACT_APP_API_URL + "subdomain", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ...obj, domain_id: props.id }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to create capability: ${response.statusText}`);
+    }
+
+    console.log("Capability created successfully");
+    callback();
+    handleExpand();
+    setOpen(false);
   };
 
   return (
@@ -27,7 +68,7 @@ const DomainCard = (props: any) => {
         boxShadow: "none",
         color: "black",
         padding: 0,
-        borderRadius: "8px"
+        borderRadius: "8px",
       }}
       onChange={handleChange(handleExpand)}
     >
@@ -41,15 +82,17 @@ const DomainCard = (props: any) => {
           alignItems: "center",
           backgroundColor: "#f0f0f0",
           height: "100%",
-          borderRadius: "8px"
+          borderRadius: "8px",
         }}
       >
-        <Typography sx={{ textAlign: "center", width: "100%" }}>
+        <Typography
+          sx={{ textAlign: "center", width: "100%", fontWeight: "bold" }}
+        >
           {props.name}
         </Typography>
       </AccordionSummary>
       <AccordionDetails>
-        {subDomainList.length === 0 ? (
+        {loading ? (
           <>
             <ShimmerBox sx={{ height: "100px" }} />
             <ShimmerBox sx={{ height: "100px" }} />
@@ -57,8 +100,13 @@ const DomainCard = (props: any) => {
           </>
         ) : (
           subDomainList.map((subDomain: any, index: any) => (
-            <>
-              <SubDomainCard key={subDomain.id} name={subDomain.name} />
+            <Box key={subDomain.id}>
+              <SubDomainCardWithMenu
+                name={subDomain.name}
+                onSave={handleExpand}
+                isEditable={props.isEditable}
+                id={subDomain.id}
+              />
               {index < subDomainList.length - 1 && (
                 <hr
                   style={{
@@ -68,10 +116,51 @@ const DomainCard = (props: any) => {
                   }}
                 />
               )}
-            </>
+            </Box>
           ))
         )}
+        {props.isEditable && (
+          <>
+            <div
+              style={{
+                position: "relative",
+                textAlign: "center",
+                marginTop: "10%",
+              }}
+            >
+              <hr
+                style={{
+                  border: "0",
+                  height: "1.5px",
+                  background: "black",
+                  marginTop: "7%",
+                }}
+              />
+              <AddCircleIcon
+                onClick={() => {
+                  setOpen(true);
+                }}
+                sx={{
+                  color: "black",
+                  backgroundColor: "white",
+                  borderRadius: "50%",
+                  position: "absolute",
+                  top: "-12px",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  cursor: "pointer",
+                }}
+              />
+            </div>
+          </>
+        )}
       </AccordionDetails>
+      <CreateCapability
+        open={open}
+        onClose={() => setOpen(false)}
+        label="subdomain"
+        clickHandler={handleClick}
+      />
     </Accordion>
   );
 };
