@@ -55,14 +55,23 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
   editEndpoint,
   deleteEndpoint,
   menuStyle,
+  useCustomEditDialog = false,
+  useCustomDeleteDialog = false,
 }) => {
   const [isEditOpen, setEditOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [name, setName] = useState<string>(capabilityName ?? "");
 
   const handleEditOpen = () => {
-    setEditOpen(true);
-    onClose();
+    if (useCustomEditDialog) {
+      // If custom dialog is requested, call onEdit directly and skip the internal modal
+      onEdit();
+      onClose();
+    } else {
+      // Otherwise, use the internal edit modal
+      setEditOpen(true);
+      onClose();
+    }
   };
 
   const handleEditClose = () => {
@@ -120,8 +129,15 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
     }
   };
   const handleDeleteOpen = () => {
-    setIsDeleteDialogOpen(true);
-    onClose();
+    if (useCustomDeleteDialog) {
+      // If custom delete dialog is requested, call onDelete directly and skip the internal delete dialog
+      onDelete();
+      onClose();
+    } else {
+      // Otherwise, open the internal delete dialog
+      setIsDeleteDialogOpen(true);
+      onClose();
+    }
   };
   const handleDeleteClose = () => {
     setIsDeleteDialogOpen(false);

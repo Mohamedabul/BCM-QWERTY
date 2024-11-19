@@ -2,9 +2,9 @@ import AccountCircleOutlined from "@mui/icons-material/AccountCircleOutlined";
 import ChatBubbleOutline from "@mui/icons-material/ChatBubbleOutline";
 import PeopleAltOutlined from "@mui/icons-material/PeopleAltOutlined";
 import StarOutlineRounded from "@mui/icons-material/StarOutlineRounded";
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
-import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
+import AssessmentIcon from "@mui/icons-material/Assessment";
+import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
+import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined";
 import CssBaseline from "@mui/material/CssBaseline";
 import GlobalStyles from "@mui/material/GlobalStyles";
 import {
@@ -26,6 +26,7 @@ import { Header, Layout, Sider, Title } from "components/layout";
 import { ColorModeContextProvider } from "contexts";
 import type { CredentialResponse } from "interfaces/google";
 import { parseJwt } from "utils/parse-jwt";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 import {
   Home,
@@ -53,10 +54,20 @@ axiosInstance.interceptors.request.use(
 
     return config;
   },
-  (error) => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 
 function App() {
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: "#0000ff",
+      },
+      secondary: {
+        main: "#000000",
+      },
+    },
+  });
   // const authProvider: AuthProvider = {
   //   login: async ({ credential }: CredentialResponse) => {
   //     const profileObj = credential ? parseJwt(credential) : null;
@@ -126,107 +137,81 @@ function App() {
 
   return (
     <ColorModeContextProvider>
-      <CssBaseline />
-      <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto" } }} />
-      <RefineSnackbarProvider>
-        <Refine
-          dataProvider={dataProvider("")}
-          notificationProvider={useNotificationProvider}
-          ReadyPage={ReadyPage}
-          catchAll={<ErrorComponent />}
-          resources={[
-            {
-              name: "template",
-              list: () => <AllCapabilities isEditable={false} />,
-              // show: CapabilityDetails,
-              icon: <AssessmentIcon />,
-              options: { label: "Template" }
-            },
-            {
-              name: "capability",
-              list: () => <AllCapabilities isEditable={true}/>,
-              // create: CreateCapability,
-              // edit: EditCapability,
-              icon: <BusinessCenterIcon />
-            },
-            // {
-            //   name: "reviews",
-            //   list: Home,
-            //   icon: <StarOutlineRounded />,
-            // },
-            // {
-            //   name: "messages",
-            //   list: Home,
-            //   icon: <ChatBubbleOutline />,
-            // },
-            {
-              name: "Upload",
-              list: Upload,
-              icon: <InboxOutlinedIcon />,
-              options: {
-                label: "Upload",
-                onClick: () => {
-                  console.log("clicked");
+      <ThemeProvider theme={theme}>
+        <CssBaseline>
+          <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto" } }} />
+          <RefineSnackbarProvider>
+            <Refine
+              dataProvider={dataProvider("")}
+              notificationProvider={useNotificationProvider}
+              ReadyPage={ReadyPage}
+              catchAll={<ErrorComponent />}
+              resources={[
+                {
+                  name: "template",
+                  list: () => <AllCapabilities isEditable={false} />,
+                  // show: CapabilityDetails,
+                  icon: <AssessmentIcon />,
+                  options: { label: "Template" },
                 },
-              },
-
-            },
-            // {
-            //   name: "Reports",
-            //   list: Report,
-            //   icon: <AssessmentIcon />,
-            //   options: {
-            //     label: "Reports",
-            //     onClick: () => {
-            //       console.log("clicked");
-            //     },
-            //   },
-
-            // },
-
-            {
-              name: "Reports",
-              list: Report,
-              icon: <AssessmentIcon />,
-              options: {
-                label: "Reports",
-                children: [
-                  {
-                    name: "regional",
-                    list: Regional,
-                    options: { label: "Regional Report" },
+                {
+                  name: "capability",
+                  list: () => <AllCapabilities isEditable={true} />,
+                  // create: CreateCapability,
+                  // edit: EditCapability,
+                  icon: <BusinessCenterIcon />,
+                },
+                // {
+                //   name: "reviews",
+                //   list: Home,
+                //   icon: <StarOutlineRounded />,
+                // },
+                // {
+                //   name: "messages",
+                //   list: Home,
+                //   icon: <ChatBubbleOutline />,
+                // },
+                {
+                  name: "Inventory",
+                  list: Upload,
+                  icon: <InboxOutlinedIcon />,
+                  options: {
+                    label: "Mapping",
+                    onClick: () => {
+                      console.log("clicked");
+                    },
                   },
-                  {
-                    name: "global",
-                    list: Global,
-                    options: { label: "Global Report" },
+                },
+                {
+                  name: "Reports",
+                  list: Report,
+                  icon: <AssessmentIcon />,
+                  options: {
+                    label: "Reports",
+                    onClick: () => {
+                      console.log("clicked");
+                    },
                   },
-                  {
-                    name: "country",
-                    list: Country,
-                    options: { label: "Country Report" },
-                  },
-                ],
-              },
-            },
-
-            {
-              name: "my-profile",
-              options: { label: "My Profile " },
-              list: MyProfile,
-              icon: <AccountCircleOutlined />,
-            },
-          ]}
-          Title={Title}
-          Sider={Sider}
-          Layout={Layout}
-          Header={Header}
-          legacyRouterProvider={routerProvider}
-          // legacyAuthProvider={authProvider}
-          LoginPage={Login}
-          DashboardPage={Home}
-        />
-      </RefineSnackbarProvider>
+                },
+                {
+                  name: "my-profile",
+                  options: { label: "My Profile " },
+                  list: MyProfile,
+                  icon: <AccountCircleOutlined />,
+                },
+              ]}
+              Title={Title}
+              Sider={Sider}
+              Layout={Layout}
+              Header={Header}
+              legacyRouterProvider={routerProvider}
+              // legacyAuthProvider={authProvider}
+              LoginPage={Login}
+              DashboardPage={Home}
+            />
+          </RefineSnackbarProvider>
+        </CssBaseline>
+      </ThemeProvider>
     </ColorModeContextProvider>
   );
 }
