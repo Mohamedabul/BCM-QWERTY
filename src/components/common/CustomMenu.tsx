@@ -39,7 +39,7 @@ type EditCapabilityProps = {
   onSave?: (name: string) => void;
   color?: string;
   editEndpoint?: string;
-  deleteEndpoint?: string;
+  deleteEndpointCall?: string;
   menuStyle?: object;
 };
 
@@ -54,7 +54,7 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
   label,
   color,
   editEndpoint,
-  deleteEndpoint,
+  deleteEndpointCall,
   menuStyle,
   useCustomEditDialog = false,
   useCustomDeleteDialog = false,
@@ -99,12 +99,12 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
   };
 
   const confirmDelete = async () => {
-    if (!deleteEndpoint) {
+    if (!deleteEndpointCall) {
       console.error("Delete endpoint is missing");
       return;
     }
     try {
-      const response = await deleteEndpoint(deleteEndpoint ?? "")
+      const response = await deleteEndpoint(deleteEndpointCall ?? "")
 
       if (!response.ok) {
         throw new Error(`Failed to delete ${label}: ${response.statusText}`);

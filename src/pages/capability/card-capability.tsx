@@ -37,9 +37,9 @@ const CapabilityCard = (props: any) => {
     try {
       let data;
       if(isEditable){
-        data = fetchDomainByCapability(queryString);
+        data = await fetchDomainByCapability(queryString);
       }else{
-        data = fetchTemplateDomainByCapability(queryString);
+        data = await fetchTemplateDomainByCapability(queryString);
       }
       setDomainList(data);
     } catch (error) {
@@ -107,7 +107,7 @@ const CapabilityCard = (props: any) => {
             capabilityName={props.name}
             label="Buissiness Capability"
             editEndpoint={`${process.env.REACT_APP_API_URL}coreCapability/${props.id}`}
-            deleteEndpoint={`${process.env.REACT_APP_API_URL}coreCapability/${props.id}`}
+            deleteEndpointCall={`${process.env.REACT_APP_API_URL}coreCapability/${props.id}`}
             onSave={(newName) => {
               updateCapabilityName(newName);
               setIsEditModalOpen(false);

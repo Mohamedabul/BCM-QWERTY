@@ -198,3 +198,14 @@ export const fetchTemplateSubdomainByDomain = async (queryString: string) => {
   const result = await response.json();
   return result;
 };
+
+
+export const callRemap = async () => {
+  const response = await fetch(baseUrl + "remap", {
+    method: "POST",
+    headers: baseHeader,
+  });
+  const result = await response.json();
+
+  return result;
+}

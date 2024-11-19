@@ -30,9 +30,9 @@ const DomainCard = (props: any) => {
     try {
       let data;
       if(isEditable){
-        data = fetchSubdomainByDomain(queryString);
+        data = await fetchSubdomainByDomain(queryString);
       }else{
-        data = fetchTemplateSubdomainByDomain(queryString);
+        data = await fetchTemplateSubdomainByDomain(queryString);
       }
       setSubDomainList(data);
     } catch (error) {

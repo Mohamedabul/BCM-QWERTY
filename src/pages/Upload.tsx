@@ -20,7 +20,7 @@ import { IResourceComponentsProps } from "@refinedev/core";
 import CustomDialog from "components/common/CustomDialog";
 import CustomTable from "components/common/CustomTable";
 import CustomAddDialog from "components/common/CustomAddDialog";
-import { createApplication, getMappedApplications, getOrphans, uploadFile } from "apis";
+import { callRemap, createApplication, getMappedApplications, getOrphans, uploadFile } from "apis";
 
 interface UploadProps extends IResourceComponentsProps<any, any> {}
 
@@ -87,10 +87,10 @@ const Upload: React.FC<UploadProps> = () => {
         applicationName: item.software_name,
       }));
       setMappedData(mappedData);
-      if(mappedData.length === 0){
-        openUpload();
-        setSelectedTab(-1);
-      }
+      // if(mappedData.length === 0){
+      //   openUpload();
+      //   setSelectedTab(-1);
+      // }
     } catch (error) {
       console.error("Error fetching mapped applications:", error);
       alert("Failed to fetch mapped applications. Please try again later.");
@@ -160,6 +160,19 @@ const Upload: React.FC<UploadProps> = () => {
     }
   };
 
+  const handleRemap = async () => {
+    setOpenDialog(true);
+    setLoading(true);
+    try{
+      const data = await callRemap();
+      setApplications(data.applications);
+      setMappedApplications(data.mappedAppliactions);
+      setOrphans(data.orphans);
+    }finally{
+      setLoading(false);
+    }
+  }
+
   const handleUploadClick = async () => {
     if (!file) {
       alert("Please select a file to upload.");
@@ -219,7 +232,6 @@ const Upload: React.FC<UploadProps> = () => {
     setOpen(true);
     // setOpenDialog(true);
   };
-  const fixOrphan = () => {};
   const handleAddNew = () => {
     setOpenAddDialog(true);
   };
@@ -389,8 +401,8 @@ const Upload: React.FC<UploadProps> = () => {
             loading={loading}
             actionButton={
               <CustomButton
-                title="Re-map"
-                handleClick={fixOrphan}
+                title="Remap"
+                handleClick={handleRemap}
                 backgroundColor="blue"
                 color="white"
                 variant="contained"
