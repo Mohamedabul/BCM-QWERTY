@@ -7,7 +7,6 @@ import {
   PieChart,
   PropertyReferrals,
   TotalRevenue,
-  PropertyCard,
 } from "components";
 import CapabilityTable from "components/charts/TableCapability";
 import { getDashBoardCounts } from "apis";
@@ -22,14 +21,14 @@ type DashboardCounts = {
 };
 
 const Home = () => {
-  const { data,  } = useList({
-        resource: "properties",
-        config: {
-          pagination: {
-            pageSize: 4,
-          },
-        },
-      });
+  // const { data,  } = useList({
+  //       resource: "properties",
+  //       config: {
+  //         pagination: {
+  //           pageSize: 4,
+  //         },
+  //       },
+  //     });
   const [dashboardCounts, setDashboardCounts] = useState<DashboardCounts | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -70,26 +69,26 @@ const Home = () => {
         <PieChart
           title="Business Capabilities"
           value={dashboardCounts?.coreCapabilityCount ?? 0}
-          series={[dashboardCounts?.coreCapabilityCount ?? 0, 100 - (dashboardCounts?.coreCapabilityCount ?? 0)]}
-          colors={["#275be8", "#c4e8ef"]}
+          // series={[dashboardCounts?.coreCapabilityCount ?? 0, 100 - (dashboardCounts?.coreCapabilityCount ?? 0)]}
+          // colors={["#275be8", "#c4e8ef"]}
         />
         <PieChart
           title="Domains"
           value={dashboardCounts?.domainCount ?? 0}
-          series={[dashboardCounts?.domainCount ?? 0, 100 - (dashboardCounts?.domainCount ?? 0)]}
-          colors={["#275be8", "#c4e8ef"]}
+          // series={[dashboardCounts?.domainCount ?? 0, 100 - (dashboardCounts?.domainCount ?? 0)]}
+          // colors={["#275be8", "#c4e8ef"]}
         />
         <PieChart
           title="Sub-domains"
           value={dashboardCounts?.subDomainCount ?? 0}
-          series={[dashboardCounts?.subDomainCount ?? 0, 100 - (dashboardCounts?.subDomainCount ?? 0)]}
-          colors={["#275be8", "#c4e8ef"]}
+          // series={[dashboardCounts?.subDomainCount ?? 0, 100 - (dashboardCounts?.subDomainCount ?? 0)]}
+          // colors={["#275be8", "#c4e8ef"]}
         />
         <PieChart
           title="Applications"
           value={dashboardCounts?.softwareCount ?? 0}
-          series={[dashboardCounts?.softwareCount ?? 0, 100 - (dashboardCounts?.softwareCount ?? 0)]}
-          colors={["#275be8", "#c4e8ef"]}
+          // series={[dashboardCounts?.softwareCount ?? 0, 100 - (dashboardCounts?.softwareCount ?? 0)]}
+          // colors={["#275be8", "#c4e8ef"]}
         />
         <PieChart
           title="Applications Mapped"

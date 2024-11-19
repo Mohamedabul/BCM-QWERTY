@@ -30,7 +30,6 @@ const AgentCard = ({
   name,
   email,
   avatar,
-  noOfProperties,
 }: AgentCardProp) => {
   const { data: currentUser } = useGetIdentity({
     v3LegacyAuthProviderCompatible: true,
@@ -97,10 +96,6 @@ const AgentCard = ({
           <InfoBar
             icon={<Phone sx={{ color: "#808191" }} />}
             name="+502-3231-4141"
-          />
-          <InfoBar
-            icon={<LocationCity sx={{ color: "#808191" }} />}
-            name={`${noOfProperties} Properties`}
           />
         </Stack>
       </Stack>
