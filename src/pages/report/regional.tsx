@@ -5,7 +5,6 @@ import { DownOutlined } from '@ant-design/icons';
 import { saveAs } from 'file-saver';
 
 interface DataItem {
-  type: string; // New field for Select Type filter
   regional: string;
   businessCapability: string;
   domain: string;
@@ -13,8 +12,7 @@ interface DataItem {
   application: string;
 }
 
-const Report: React.FC = () => {
-  const [selectType, setSelectType] = useState<string>(''); // New state for Select Type filter
+const Regional: React.FC = () => {
   const [region, setRegion] = useState<string>('');
   const [filterType, setFilterType] = useState<string>(''); // New state for filter type
   const [search, setSearch] = useState<string>(''); // Search term for the selected filter type
@@ -22,7 +20,6 @@ const Report: React.FC = () => {
   const [pageSize, setPageSize] = useState<number>(5); // Page size state
 
   const columns = [
-    { title: 'Type', dataIndex: 'type', key: 'type' }, // Added Type column
     { title: 'Regional', dataIndex: 'regional', key: 'regional' },
     { title: 'Business Capability Name', dataIndex: 'businessCapability', key: 'businessCapability' },
     { title: 'Domain', dataIndex: 'domain', key: 'domain' },
@@ -31,18 +28,17 @@ const Report: React.FC = () => {
   ];
 
   const data: DataItem[] = [
-    { type: 'Regional', regional: 'EMEA', businessCapability: 'Finance', domain: 'Payroll', subDomain: 'Payroll Hungary', application: 'Adamentes' },
-    { type: 'Global', regional: 'APAC', businessCapability: 'Enterprise Resource Planning', domain: 'Back Office', subDomain: 'Accounting', application: 'Accent7' },
-    { type: 'Country', regional: 'APAC', businessCapability: 'Enterprise Resource Planning', domain: 'Back Office', subDomain: 'Purchase workflow & order', application: 'Accpac' },
-    { type: 'Regional', regional: 'EMEA', businessCapability: 'Finance', domain: 'Payroll', subDomain: 'Payroll Hungary', application: 'ADP Payroll' },
-    { type: 'Global', regional: 'EMEA', businessCapability: 'Enterprise Resource Planning', domain: 'Back Office', subDomain: 'Inventory control', application: 'Sage 300 ERP' },
-    { type: 'Country', regional: 'AMERICAS', businessCapability: 'Finance', domain: 'Accounts', subDomain: 'Accounts Payable', application: 'QuickBooks' },
+    { regional: 'EMEA', businessCapability: 'Finance', domain: 'Payroll', subDomain: 'Payroll Hungary', application: 'Adamentes' },
+    { regional: 'APAC', businessCapability: 'Enterprise Resource Planning', domain: 'Back Office', subDomain: 'Accounting', application: 'Accent7' },
+    { regional: 'APAC', businessCapability: 'Enterprise Resource Planning', domain: 'Back Office', subDomain: 'Purchase workflow & order', application: 'Accpac' },
+    { regional: 'EMEA', businessCapability: 'Finance', domain: 'Payroll', subDomain: 'Payroll Hungary', application: 'ADP Payroll' },
+    { regional: 'EMEA', businessCapability: 'Enterprise Resource Planning', domain: 'Back Office', subDomain: 'Inventory control', application: 'Sage 300 ERP' },
+    { regional: 'AMERICAS', businessCapability: 'Finance', domain: 'Accounts', subDomain: 'Accounts Payable', application: 'QuickBooks' },
     // Add more data as needed...
   ];
 
   const filteredData = data.filter((item) => {
     return (
-      (selectType ? item.type === selectType : true) &&
       (region ? item.regional === region : true) &&
       (search && filterType ? (item[filterType as keyof DataItem] as string).toLowerCase().includes(search.toLowerCase()) : true)
     );
@@ -80,37 +76,16 @@ const Report: React.FC = () => {
   return (
     <div className="regional-report">
       <h1>Regional Report</h1>
-      <p>Detailed information about Regional Report</p>
+      <p>Detailed information about <b>Regional Report</b></p>
 
       <div className="filters" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
-        <Select
-          placeholder="Select Type"
-          onChange={(value: string) => setSelectType(value)}
-          allowClear
-          style={{ flex: 1, maxWidth: '300px', height: '45px' }}
-        >
-          <Select.Option value="Regional">Regional</Select.Option>
-          <Select.Option value="Global">Global</Select.Option>
-          <Select.Option value="Country">Country</Select.Option>
-        </Select>
-
-        <Select
-          placeholder="Regional"
-          onChange={(value: string) => setRegion(value)}
-          allowClear
-          style={{ flex: 1, maxWidth: '300px', height: '45px' }}
-        >
+        <Select placeholder="Regional" onChange={(value: string) => setRegion(value)} allowClear style={{ flex: 1, maxWidth: '400px', height: '45px' }}>
           <Select.Option value="AMERICAS">AMERICAS</Select.Option>
           <Select.Option value="APAC">APAC</Select.Option>
           <Select.Option value="EMEA">EMEA</Select.Option>
         </Select>
 
-        <Select
-          placeholder="Filter By"
-          onChange={(value: string) => setFilterType(value)}
-          allowClear
-          style={{ flex: 1, maxWidth: '300px', height: '45px' }}
-        >
+        <Select placeholder="Filter By" onChange={(value: string) => setFilterType(value)} allowClear style={{ flex: 1, maxWidth: '400px', height: '45px' }}>
           <Select.Option value="businessCapability">Business Capability</Select.Option>
           <Select.Option value="domain">Domain</Select.Option>
           <Select.Option value="subDomain">Sub-domain</Select.Option>
@@ -136,14 +111,17 @@ const Report: React.FC = () => {
         pagination={false}
         rowKey="application"
       />
-
+      
       <div className="pagination-control" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px' }}>
         <Dropdown overlay={pageSizeMenu}>
-          <Button>
-            Show rows: {pageSize} <DownOutlined />
+          <div>
+            Show rows: 
+            <Button>
+            {pageSize} items <DownOutlined />
           </Button>
+          </div>
         </Dropdown>
-
+        
         <Pagination
           current={currentPage}
           total={filteredData.length}
@@ -157,4 +135,4 @@ const Report: React.FC = () => {
   );
 };
 
-export default Report;
+export default Regional;

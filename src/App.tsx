@@ -38,6 +38,9 @@ import {
 } from "pages";
 import Upload from "pages/Upload";
 import Report from "pages/Report";
+import Regional from "pages/report/regional";
+import Country from "pages/report/country";
+import Global from "pages/report/global";
 
 const axiosInstance = axios.create();
 axiosInstance.interceptors.request.use(
@@ -168,18 +171,45 @@ function App() {
               },
 
             },
+            // {
+            //   name: "Reports",
+            //   list: Report,
+            //   icon: <AssessmentIcon />,
+            //   options: {
+            //     label: "Reports",
+            //     onClick: () => {
+            //       console.log("clicked");
+            //     },
+            //   },
+
+            // },
+
             {
               name: "Reports",
               list: Report,
               icon: <AssessmentIcon />,
               options: {
                 label: "Reports",
-                onClick: () => {
-                  console.log("clicked");
-                },
+                children: [
+                  {
+                    name: "regional",
+                    list: Regional,
+                    options: { label: "Regional Report" },
+                  },
+                  {
+                    name: "global",
+                    list: Global,
+                    options: { label: "Global Report" },
+                  },
+                  {
+                    name: "country",
+                    list: Country,
+                    options: { label: "Country Report" },
+                  },
+                ],
               },
-
             },
+
             {
               name: "my-profile",
               options: { label: "My Profile " },
