@@ -39,6 +39,9 @@ import {
 } from "pages";
 import Upload from "pages/Upload";
 import Report from "pages/Report";
+import Regional from "pages/report/regional";
+import Country from "pages/report/country";
+import Global from "pages/report/global";
 
 const axiosInstance = axios.create();
 axiosInstance.interceptors.request.use(
