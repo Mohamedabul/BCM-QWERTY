@@ -97,14 +97,14 @@ const Home = () => {
         <PieChart
           title="Applications Mapped"
           value={dashboardCounts?.mappedCount ?? 0}
-          series={[dashboardCounts?.mappedCount ?? 0, 100 - (dashboardCounts?.mappedCount ?? 0)]}
-          colors={["#275be8", "#c4e8ef"]}
+          // series={[dashboardCounts?.mappedCount ?? 0, 100 - (dashboardCounts?.mappedCount ?? 0)]}
+          // colors={["#275be8", "#c4e8ef"]}
         />
         <PieChart
           title="Application under Orphans"
           value={dashboardCounts?.orphanCount ?? 0}
-          series={[dashboardCounts?.orphanCount ?? 0, 100 - (dashboardCounts?.orphanCount ?? 0)]}
-          colors={["#275be8", "#c4e8ef"]}
+          // series={[dashboardCounts?.orphanCount ?? 0, 100 - (dashboardCounts?.orphanCount ?? 0)]}
+          // colors={["#275be8", "#c4e8ef"]}
         />
       </Box>
 
