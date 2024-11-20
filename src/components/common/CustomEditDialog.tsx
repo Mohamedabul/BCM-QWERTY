@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Select, MenuItem, Box, Typography, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CustomButton from './CustomButton';
+import { fetchCorecapability, fetchDomain, fetchSubdomain } from 'apis';
+import { Capability, Domain, SubDomain } from 'apis/interfaces';
 
 interface CustomEditDialogProps {
   open: boolean;
@@ -14,20 +16,7 @@ interface CustomEditDialogProps {
   };
   onChange: (field: string, value: string) => void;
 }
-interface Capability {
-  id: string;
-  name: string;
-}
-interface Domain {
-  id: string;
-  name: string;
-  core_id: string;
-}
-interface SubDomain {
-  id: string;
-  name: string;
-  domain_id: string;
-}
+
 
 const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSave, data, onChange }) => {
   const [capabilities, setCapabilities] = React.useState<Capability[]>([]);
@@ -39,8 +28,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
   useEffect(() => {
     const fetchCapabilities = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/corecapability');
-        const result = await response.json();
+        const result = await fetchCorecapability();
         setCapabilities(result);
       } catch (error) {
         console.error("Error fetching capabilities:", error);
@@ -48,8 +36,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
     };
     const fetchDomains = async () => {
       try {
-        const domainResponse = await fetch('http://localhost:5000/api/domain');
-        const domainResult = await domainResponse.json();
+        const domainResult = await fetchDomain();
         setDomains(domainResult);
       } catch (error) {
         console.error("Error fetching domains:", error);
@@ -58,8 +45,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
 
     const fetchSubDomains = async () => {
       try {
-        const subDomainResponse = await fetch('http://localhost:5000/api/subdomain');
-        const subDomainResult = await subDomainResponse.json();
+        const subDomainResult = await fetchSubdomain();
         setSubDomains(subDomainResult);
       } catch (error) {
         console.error("Error fetching subdomains:", error);

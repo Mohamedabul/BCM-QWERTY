@@ -21,7 +21,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CustomMenu from "./CustomMenu";
 import CustomEditDialog from "./CustomEditDialog";
 import CustomDeleteDialog from "./CustomDeleteDialog";
-import CustomButton from "./CustomButton";
+import { deleteApplication, patchApplication } from "apis";
 
 interface TableData {
   id: string;
@@ -103,17 +103,10 @@ const CustomTable: React.FC<CustomTableProps> = ({
         applicationVersion: editData.applicationVersion,
       };
 
-      const response = await fetch(
-        `http://localhost:5000/api/application/${editData.id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
+      const response = await patchApplication(
+        editData.id,
+        JSON.stringify(payload)
       );
-
       if (!response.ok) {
         throw new Error("Failed to update the application");
       }
@@ -141,8 +134,8 @@ const CustomTable: React.FC<CustomTableProps> = ({
     setDeleteDialogOpen(true);
   };
 
-  const handleChangePage = (event:any, newPage:any) => {
-    setPage(newPage+1);
+  const handleChangePage = (event: any, newPage: any) => {
+    setPage(newPage + 1);
   };
 
   const handleDeleteConfirm = async () => {
@@ -151,19 +144,8 @@ const CustomTable: React.FC<CustomTableProps> = ({
       return;
     }
     console.log("Deleting application with ID:", selectedRow.id);
-    console.log(
-      `Attempting to delete: http://localhost:5000/api/application/${selectedRow.id}`
-    );
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/application/${selectedRow.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await deleteApplication(selectedRow.id);
       console.log("Response status:", response.status);
       if (!response.ok) {
         console.error(

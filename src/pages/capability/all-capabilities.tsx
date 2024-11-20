@@ -8,6 +8,7 @@ import { CustomButton } from "components";
 import CapabilityCard from "./card-capability";
 import CreateCapability from "./create-capability";
 import { useEffect, useState } from "react";
+import { createCorecapability, fetchTemplateCorecapability, fetchCorecapability } from "apis";
 
 function AllCapabilities({ isEditable }: any) {
   const [cabablityList, setCapabilityList] = useState<any[]>([]);
@@ -28,20 +29,7 @@ function AllCapabilities({ isEditable }: any) {
     handleCreateClose(); // Close the modal after saving
   };
   const handleClick = async (obj:object, callback:any) => {
-    const response = await fetch(
-      process.env.REACT_APP_API_URL + "coreCapability",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(obj),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to create capability: ${response.statusText}`);
-    }
+    const response = await createCorecapability(JSON.stringify(obj));
 
     console.log("Capability created successfully");
     callback();
@@ -50,17 +38,14 @@ function AllCapabilities({ isEditable }: any) {
   };
 
   const fetchCabability = async () => {
-    const endpoint = `${process.env.REACT_APP_API_URL}${
-      isEditable ? "coreCapability" : "template/coreCapability"
-    }`;
-
     try {
-      const response = await fetch(endpoint);
-      if (!response.ok) {
-        console.error("Error fetching capabilities:", response.statusText);
-        return;
+      let data;
+      if (isEditable){
+        data = await fetchCorecapability();
+      }else{
+        data = await fetchTemplateCorecapability();
       }
-      const data = await response.json();
+      
       setCapabilityList(data);
     } catch (error) {
       console.error("Error fetching capabilities:", error);
