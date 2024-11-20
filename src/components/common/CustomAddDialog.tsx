@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CustomButton from './CustomButton';
+import { fetchCorecapability, fetchDomain, fetchSubdomain } from 'apis';
 
 interface CustomAddDialogProps {
   open: boolean;
@@ -54,8 +55,8 @@ const CustomAddDialog: React.FC<CustomAddDialogProps> = ({ open, onClose, onSave
   useEffect(() => {
     const fetchCapabilities = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/corecapability');
-        const result = await response.json();
+        
+        const result = await fetchCorecapability();
         setCapabilities(result);
       } catch (error) {
         console.error('Error fetching capabilities:', error);
@@ -64,8 +65,7 @@ const CustomAddDialog: React.FC<CustomAddDialogProps> = ({ open, onClose, onSave
 
     const fetchDomains = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/domain');
-        const result = await response.json();
+        const result = await fetchDomain();
         setDomains(result);
       } catch (error) {
         console.error('Error fetching domains:', error);
@@ -75,8 +75,7 @@ const CustomAddDialog: React.FC<CustomAddDialogProps> = ({ open, onClose, onSave
 
     const fetchSubDomains = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/subdomain');
-        const result = await response.json();
+        const result = await fetchSubdomain();
         setSubDomains(result);
       } catch (error) {
         console.error('Error fetching subdomains:', error);

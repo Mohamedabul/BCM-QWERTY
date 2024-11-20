@@ -15,8 +15,7 @@ import {
   Fade,
   useTheme,
 } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { fetchDashboardTableData } from 'apis';
 
 
 const CapabilityTable = () => {
@@ -36,8 +35,7 @@ const CapabilityTable = () => {
   useEffect(() => {
     const fetchData = async ()=>{
       try {
-        const response = await fetch(process.env.REACT_APP_API_URL+"getDashboardTableData")
-        const result = await response.json();
+        const result = await fetchDashboardTableData();
         setData(result.response.map((item: { core_capability: any; domain: any; subdomain: any; noApplication: any; }) => ({
           businessCapability: item.core_capability,
           domain: item.domain??'',
