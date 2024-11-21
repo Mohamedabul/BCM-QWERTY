@@ -20,6 +20,7 @@ import { IResourceComponentsProps } from "@refinedev/core";
 import CustomDialog from "components/common/CustomDialog";
 import CustomTable from "components/common/CustomTable";
 import CustomAddDialog from "components/common/CustomAddDialog";
+import { callRemap, createApplication, getMappedApplications, getOrphans, uploadFile } from "apis";
 
 interface UploadProps extends IResourceComponentsProps<any, any> {}
 
@@ -70,53 +71,12 @@ const Upload: React.FC<UploadProps> = () => {
     }
   }, [selectedTab, page, pageSize]);
 
-  // useEffect(() => {
-  //   fetchBusinessCapabilities();
-  //   fetchDomains();
-  //   fetchSubDomains();
-  // }, []);
-
-  // const fetchBusinessCapabilities = async () => {
-  //   try {
-  //     const response = await fetch("http://localhost:5000/api/coreCapability");
-  //     const result = await response.json();
-  //     setBusinessCapabilities(result);
-  //   } catch (error) {
-  //     console.error("Error fetching business capabilities:", error);
-  //   }
-  // };
-
-  // const fetchDomains = async () => {
-  //   try {
-  //     const response = await fetch("http://localhost:5000/api/domain");
-  //     const result = await response.json();
-  //     setDomains(result);
-  //   } catch (error) {
-  //     console.error("Error fetching domains:", error);
-  //   }
-  // };
-
-  // const fetchSubDomains = async () => {
-  //   try {
-  //     const response = await fetch("http://localhost:5000/api/subdomain");
-  //     const result = await response.json();
-  //     setSubDomains(result); // assuming result is an array of subdomain names
-  //   } catch (error) {
-  //     console.error("Error fetching subdomains:", error);
-  //   }
-  // };
-
   const fetchMappedApplications = async () => {
     setLoading(true);
     try {
       const params:any = {page: page, limit: pageSize};
       const queryString = new URLSearchParams(params).toString();
-      const response = await fetch(
-        `http://localhost:5000/api/getMappedApplications?${queryString}`
-      );
-      if (!response.ok) throw new Error("Failed to fetch mapped applications");
-
-      const result = await response.json();
+      const result = await getMappedApplications(queryString);
       const { totalCount } = result;
       setTotalCount(totalCount);
       const mappedData = result.response.map((item: any) => ({
@@ -127,10 +87,10 @@ const Upload: React.FC<UploadProps> = () => {
         applicationName: item.software_name,
       }));
       setMappedData(mappedData);
-      if(mappedData.length === 0){
-        openUpload();
-        setSelectedTab(-1);
-      }
+      // if(mappedData.length === 0){
+      //   openUpload();
+      //   setSelectedTab(-1);
+      // }
     } catch (error) {
       console.error("Error fetching mapped applications:", error);
       alert("Failed to fetch mapped applications. Please try again later.");
@@ -144,10 +104,7 @@ const Upload: React.FC<UploadProps> = () => {
     try {
       const params:any = {page: page, limit: pageSize};
       const queryString = new URLSearchParams(params).toString();
-      const response = await fetch(`http://localhost:5000/api/getOrphans?${queryString}`);
-      if (!response.ok) throw new Error("Failed to fetch orphans");
-
-      const result = await response.json();
+      const result = await getOrphans(queryString);
       const { totalCount } = result;
       setTotalCount(totalCount);
       const orphanData = result.response.map((item: any) => ({
@@ -203,6 +160,19 @@ const Upload: React.FC<UploadProps> = () => {
     }
   };
 
+  const handleRemap = async () => {
+    setOpenDialog(true);
+    setLoading(true);
+    try{
+      const data = await callRemap();
+      setApplications(data.applications);
+      setMappedApplications(data.mappedAppliactions);
+      setOrphans(data.orphans);
+    }finally{
+      setLoading(false);
+    }
+  }
+
   const handleUploadClick = async () => {
     if (!file) {
       alert("Please select a file to upload.");
@@ -218,14 +188,7 @@ const Upload: React.FC<UploadProps> = () => {
     try {
       // const apiUrl = process.env.React_APP_API_URL;
       // console.log(apiUrl);
-      const response = await fetch("http://localhost:5000/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      if (!response.ok) {
-        throw new Error("file upload failed");
-      }
-      const data = await response.json();
+      const data = await uploadFile(formData);
       setFile(null);
       setApplications(data.applications);
       setMappedApplications(data.mappedAppliactions);
@@ -269,7 +232,6 @@ const Upload: React.FC<UploadProps> = () => {
     setOpen(true);
     // setOpenDialog(true);
   };
-  const fixOrphan = () => {};
   const handleAddNew = () => {
     setOpenAddDialog(true);
   };
@@ -285,20 +247,7 @@ const Upload: React.FC<UploadProps> = () => {
         name: data.applicationName,
       };
       
-  
-      const response = await fetch("http://localhost:5000/api/application", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to add new application");
-      }
-
-      const result = await response.json();
+      const result = await createApplication(JSON.stringify(data));
       console.log("New item added successfully:", result);
 
       setData({
@@ -453,8 +402,8 @@ const Upload: React.FC<UploadProps> = () => {
             loading={loading}
             actionButton={
               <CustomButton
-                title="Re-map"
-                handleClick={fixOrphan}
+                title="Remap"
+                handleClick={handleRemap}
                 backgroundColor="blue"
                 color="white"
                 variant="contained"
