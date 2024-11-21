@@ -45,6 +45,7 @@ interface CustomTableProps {
   setTotalCount: any;
   pageSize: any;
   setPageSize: any;
+  editCallback: any;
 }
 
 const CustomTable: React.FC<CustomTableProps> = ({
@@ -56,6 +57,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
   setTotalCount,
   pageSize,
   setPageSize,
+  editCallback
 }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedRow, setSelectedRow] = React.useState<TableData | null>(null);
@@ -124,6 +126,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
       // Close the dialog after successful edit
       setEditDialogOpen(false);
       setEditData(null);
+      await editCallback();
 
       // Refresh the data (fetch the updated data here if needed)
     } catch (error) {
@@ -174,9 +177,10 @@ const CustomTable: React.FC<CustomTableProps> = ({
       }
 
       console.log("Deleted data:", selectedRow);
-
+      
       setDeleteDialogOpen(false);
       setSelectedRow(null);
+      await editCallback();
     } catch (error) {
       console.error("Error deleting application:", error);
       alert(

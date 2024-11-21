@@ -417,6 +417,7 @@ const Upload: React.FC<UploadProps> = () => {
             setTotalCount={setTotalCount}
             pageSize={pageSize}
             setPageSize={setPageSize}
+            editCallback={fetchMappedApplications}
           />
         </Box>
       )}
@@ -467,6 +468,7 @@ const Upload: React.FC<UploadProps> = () => {
             setTotalCount={setTotalCount}
             pageSize={pageSize}
             setPageSize={setPageSize}
+            editCallback={fetchOrphans}
           />
         </Box>
       )}

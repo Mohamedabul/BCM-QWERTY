@@ -1,61 +1,73 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, Input, Button, Select, Pagination, Dropdown, Menu } from 'antd';
 import { DownloadOutlined } from '@mui/icons-material';
 import { DownOutlined } from '@ant-design/icons';
 import { saveAs } from 'file-saver';
 
 interface DataItem {
-  type: string; // New field for Select Type filter
-  regional: string;
-  businessCapability: string;
+  country: string; // New field for Select Type filter
+  region: string;
+  cap: string;
   domain: string;
-  subDomain: string;
-  application: string;
+  subdomain: string;
+  name: string;
+  business_owner: string;
 }
 
 const Report: React.FC = () => {
-  const [selectType, setSelectType] = useState<string>(''); // New state for Select Type filter
+  const [selectType, setSelectType] = useState<string>('global'); // New state for Select Type filter
   const [region, setRegion] = useState<string>('');
   const [filterType, setFilterType] = useState<string>(''); // New state for filter type
   const [search, setSearch] = useState<string>(''); // Search term for the selected filter type
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(5); // Page size state
+  const [data, setData] = useState<any>([]);
 
   const columns = [
-    { title: 'Type', dataIndex: 'type', key: 'type' }, // Added Type column
-    { title: 'Regional', dataIndex: 'regional', key: 'regional' },
-    { title: 'Business Capability Name', dataIndex: 'businessCapability', key: 'businessCapability' },
+    { title: 'Type', dataIndex: 'country', key: 'type' }, // Added Type column
+    { title: 'Region', dataIndex: 'region', key: 'regional' },
+    { title: 'Business Capability Name', dataIndex: 'cap', key: 'businessCapability' },
     { title: 'Domain', dataIndex: 'domain', key: 'domain' },
-    { title: 'Sub-domain', dataIndex: 'subDomain', key: 'subDomain' },
-    { title: 'Application Name', dataIndex: 'application', key: 'application' },
+    { title: 'Sub-domain', dataIndex: 'subdomain', key: 'subDomain' },
+    { title: 'Application Name', dataIndex: 'name', key: 'application' },
+    // { title: 'Business Owner', dataIndex: 'business_owner', key: 'business_owner'}
   ];
 
-  const data: DataItem[] = [
-    { type: 'Regional', regional: 'EMEA', businessCapability: 'Finance', domain: 'Payroll', subDomain: 'Payroll Hungary', application: 'Adamentes' },
-    { type: 'Global', regional: 'APAC', businessCapability: 'Enterprise Resource Planning', domain: 'Back Office', subDomain: 'Accounting', application: 'Accent7' },
-    { type: 'Country', regional: 'APAC', businessCapability: 'Enterprise Resource Planning', domain: 'Back Office', subDomain: 'Purchase workflow & order', application: 'Accpac' },
-    { type: 'Regional', regional: 'EMEA', businessCapability: 'Finance', domain: 'Payroll', subDomain: 'Payroll Hungary', application: 'ADP Payroll' },
-    { type: 'Global', regional: 'EMEA', businessCapability: 'Enterprise Resource Planning', domain: 'Back Office', subDomain: 'Inventory control', application: 'Sage 300 ERP' },
-    { type: 'Country', regional: 'AMERICAS', businessCapability: 'Finance', domain: 'Accounts', subDomain: 'Accounts Payable', application: 'QuickBooks' },
-    // Add more data as needed...
-  ];
-
-  const filteredData = data.filter((item) => {
-    return (
-      (selectType ? item.type === selectType : true) &&
-      (region ? item.regional === region : true) &&
-      (search && filterType ? (item[filterType as keyof DataItem] as string).toLowerCase().includes(search.toLowerCase()) : true)
-    );
-  });
+  const fetchData  = async (body:any) => {
+    const raw = JSON.stringify(body);
+    const response = await fetch(process.env.REACT_APP_API_URL+"getReport",{
+      method: "POST",
+      headers: {
+        "Content-Type":"application/json"
+      },
+      body: raw
+    });
+    const data = await response.json();
+    setData(data?.response);
+  }
+  useEffect(() => {
+    fetchData({
+      "filter": {
+        "reportType": selectType
+      }
+    });
+  },[]);
 
   const handleApply = () => {
-    setCurrentPage(1);
+    console.log(selectType, region, filterType, search);
+    fetchData({
+      "filter":{
+        "reportType": selectType,
+        "region":region,
+        [filterType]:search
+      }
+    });
   };
 
   const handleExport = () => {
     const csvContent = [
       columns.map(col => col.title).join(','), // Headers
-      ...filteredData.map(row =>
+      ...data.map((row:any) =>
         columns.map(col => row[col.dataIndex as keyof DataItem] || '').join(',') // Row values
       )
     ].join('\n');
@@ -71,16 +83,16 @@ const Report: React.FC = () => {
 
   const pageSizeMenu = (
     <Menu onClick={(e) => handlePageSizeChange(parseInt(e.key))}>
-      <Menu.Item key="5">5 items</Menu.Item>
       <Menu.Item key="10">10 items</Menu.Item>
-      <Menu.Item key="20">20 items</Menu.Item>
+      <Menu.Item key="50">50 items</Menu.Item>
+      <Menu.Item key="100">100 items</Menu.Item>
     </Menu>
   );
 
   return (
     <div className="regional-report">
-      <h1>Regional Report</h1>
-      <p>Detailed information about Regional Report</p>
+      <h1>Report</h1>
+      <p>Detailed information about Report</p>
 
       <div className="filters" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
         <Select
@@ -88,13 +100,14 @@ const Report: React.FC = () => {
           onChange={(value: string) => setSelectType(value)}
           allowClear
           style={{ flex: 1, maxWidth: '300px', height: '45px' }}
+          value={selectType}
         >
           <Select.Option value="Regional">Regional</Select.Option>
-          <Select.Option value="Global">Global</Select.Option>
+          <Select.Option value="global">Global</Select.Option>
           <Select.Option value="Country">Country</Select.Option>
         </Select>
 
-        <Select
+        {selectType === "global" &&<Select
           placeholder="Regional"
           onChange={(value: string) => setRegion(value)}
           allowClear
@@ -103,7 +116,7 @@ const Report: React.FC = () => {
           <Select.Option value="AMERICAS">AMERICAS</Select.Option>
           <Select.Option value="APAC">APAC</Select.Option>
           <Select.Option value="EMEA">EMEA</Select.Option>
-        </Select>
+        </Select>}
 
         <Select
           placeholder="Filter By"
@@ -111,10 +124,7 @@ const Report: React.FC = () => {
           allowClear
           style={{ flex: 1, maxWidth: '300px', height: '45px' }}
         >
-          <Select.Option value="businessCapability">Business Capability</Select.Option>
-          <Select.Option value="domain">Domain</Select.Option>
-          <Select.Option value="subDomain">Sub-domain</Select.Option>
-          <Select.Option value="application">Application Name</Select.Option>
+          {columns.map((col) => <Select.Option key={col.dataIndex} value={col.dataIndex}>{col.title}</Select.Option>)}
         </Select>
 
         <Input
@@ -132,7 +142,7 @@ const Report: React.FC = () => {
 
       <Table
         columns={columns}
-        dataSource={filteredData.slice((currentPage - 1) * pageSize, currentPage * pageSize)}
+        dataSource={data.slice((currentPage - 1) * pageSize, currentPage * pageSize)}
         pagination={false}
         rowKey="application"
       />
@@ -146,7 +156,7 @@ const Report: React.FC = () => {
 
         <Pagination
           current={currentPage}
-          total={filteredData.length}
+          total={data.length}
           pageSize={pageSize}
           onChange={(page: number) => setCurrentPage(page)}
           showSizeChanger={false}
