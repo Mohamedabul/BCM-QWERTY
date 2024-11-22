@@ -369,6 +369,7 @@ const Upload: React.FC<UploadProps> = () => {
           </Tabs>}
 
           {/* Import File Button */}
+          <Box sx={{ display: "flex", gap: 2 }}>
           {showImportButton && selectedTab === 0 && (
             <CustomButton
               title="Import File"
@@ -381,8 +382,30 @@ const Upload: React.FC<UploadProps> = () => {
               variant="contained"
               icon={<AddIcon />}
               sx={{ borderRadius: "10px", margin: 0 }}
-            />
+            />)}
+            {selectedTab === 0 && (
+              <CustomButton
+                title="Add New"
+                backgroundColor="blue"
+                color="white"
+                handleClick={handleAddNew}
+                variant="contained"
+                icon={<AddIcon />}
+                sx={{ borderRadius: "10px", margin: 0 }}
+              />
           )}
+          {selectedTab === 1 && (
+              <CustomButton
+                title="Re-map"
+                backgroundColor="blue"
+                color="white"
+                handleClick={fixOrphan}
+                variant="contained"
+                icon={<ReplayIcon />}
+                sx={{ borderRadius: "10px", margin: 0 }}
+              />
+          )}
+          </Box>
         </Box>
       </AppBar>
       {selectedTab === 0 && (
@@ -400,17 +423,6 @@ const Upload: React.FC<UploadProps> = () => {
           <CustomTable
             data={mappedData}
             loading={loading}
-            actionButton={
-              <CustomButton
-                title="Add New"
-                handleClick={handleAddNew}
-                backgroundColor="blue"
-                color="white"
-                variant="contained"
-                icon={<AddIcon />}
-                sx={{ borderRadius: "10px" }}
-              />
-            }
             page={page}
             setPage={setPage}
             totalCount={totalCount}
@@ -450,17 +462,17 @@ const Upload: React.FC<UploadProps> = () => {
           <CustomTable
             data={orphanData}
             loading={loading}
-            actionButton={
-              <CustomButton
-                title="Re-map"
-                handleClick={fixOrphan}
-                backgroundColor="blue"
-                color="white"
-                variant="contained"
-                icon={<ReplayIcon />}
-                sx={{ borderRadius: "10px" }}
-              />
-            }
+            // actionButton={
+            //   <CustomButton
+            //     title="Re-map"
+            //     handleClick={fixOrphan}
+            //     backgroundColor="blue"
+            //     color="white"
+            //     variant="contained"
+            //     icon={<ReplayIcon />}
+            //     sx={{ borderRadius: "10px" }}
+            //   />
+            // }
             page={page}
             setPage={setPage}
             totalCount={totalCount}
