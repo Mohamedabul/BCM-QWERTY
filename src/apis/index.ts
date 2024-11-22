@@ -222,6 +222,27 @@ export const getReportData = async (body:string) => {
   return result;
 }
 
+export const getRegions = async () => {
+  const response = await fetch(baseUrl + "getRegions",{
+    method: "POST",
+    headers: baseHeader,
+    
+   
+  });
+  const result = await response.json();
+  return result;
+}
+
+export const getCountrys = async () => {
+  const response = await fetch(baseUrl + "getCountries",{
+    method: "POST",
+    headers: baseHeader,
+    
+  });
+  const result = await response.json();
+  return result;
+}
+
 
 
 export const getReportExport = async (body:string) => {
