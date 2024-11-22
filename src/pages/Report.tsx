@@ -112,7 +112,7 @@ const Report: React.FC = () => {
           <Select.Option value="Country">Country</Select.Option>
         </Select>
 
-        {/* {selectType !== "global" && (
+        {selectType !== "global" && (
           <Select
             placeholder="Regional"
             onChange={(value: string) => setRegion(value)}
@@ -123,7 +123,7 @@ const Report: React.FC = () => {
             <Select.Option value="APAC">APAC</Select.Option>
             <Select.Option value="EMEA">EMEA</Select.Option>
           </Select>
-        )} */}
+        )}
 
         <Select
           placeholder="Filter By"
