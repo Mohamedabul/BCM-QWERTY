@@ -69,38 +69,27 @@ const Home = () => {
         <PieChart
           title="Business Capabilities"
           value={dashboardCounts?.coreCapabilityCount ?? 0}
-          // series={[dashboardCounts?.coreCapabilityCount ?? 0, 100 - (dashboardCounts?.coreCapabilityCount ?? 0)]}
-          // colors={["#275be8", "#c4e8ef"]}
         />
         <PieChart
           title="Domains"
           value={dashboardCounts?.domainCount ?? 0}
-          // series={[dashboardCounts?.domainCount ?? 0, 100 - (dashboardCounts?.domainCount ?? 0)]}
-          // colors={["#275be8", "#c4e8ef"]}
         />
         <PieChart
           title="Sub-domains"
           value={dashboardCounts?.subDomainCount ?? 0}
-          // series={[dashboardCounts?.subDomainCount ?? 0, 100 - (dashboardCounts?.subDomainCount ?? 0)]}
-          // colors={["#275be8", "#c4e8ef"]}
+
         />
         <PieChart
           title="Applications"
           value={dashboardCounts?.softwareCount ?? 0}
-          // series={[dashboardCounts?.softwareCount ?? 0, 100 - (dashboardCounts?.softwareCount ?? 0)]}
-          // colors={["#275be8", "#c4e8ef"]}
         />
         <PieChart
           title="Applications Mapped"
           value={dashboardCounts?.mappedCount ?? 0}
-          series={[dashboardCounts?.mappedCount ?? 0, 100 - (dashboardCounts?.mappedCount ?? 0)]}
-          colors={["#275be8", "#c4e8ef"]}
         />
         <PieChart
-          title="Application under Orphans"
+          title="Orphans"
           value={dashboardCounts?.orphanCount ?? 0}
-          series={[dashboardCounts?.orphanCount ?? 0, 100 - (dashboardCounts?.orphanCount ?? 0)]}
-          colors={["#275be8", "#c4e8ef"]}
         />
       </Box>
 
@@ -110,7 +99,6 @@ const Home = () => {
         direction={{ xs: "column", lg: "row" }}
         gap={4}
       >
-        {/* <CapabilityTable/> */}
       </Stack>
 
     </Box>
