@@ -85,14 +85,14 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
           justifyContent: 'space-between',
         }}
       >
-        <DialogTitle margin={-2} sx={{ fontWeight: 'bold', color: 'black' }}>Edit</DialogTitle>
+        <DialogTitle margin={-2} sx={{ fontWeight: 'bold', color: 'black' }}>Change Mapping</DialogTitle>
         <IconButton onClick={onClose} sx={{ color: 'black' }}>
           <CloseIcon />
         </IconButton>
       </Box>
       <DialogContent dividers sx={{ backgroundColor: 'white', color: 'black' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Edit Business Capability Name<span style={{ color: 'red' }}>*</span></Typography>
+          <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Select Business Capability Name<span style={{ color: 'red' }}>*</span></Typography>
           <Select
             fullWidth
             value={data.core_id}
@@ -116,7 +116,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
             ))}
           </Select>
 
-          <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Edit Domain Name<span style={{ color: 'red' }}>*</span></Typography>
+          <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Select Domain Name<span style={{ color: 'red' }}>*</span></Typography>
           <Select
             fullWidth
             value={data.domain_id}
@@ -141,7 +141,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
             ))}
           </Select>
 
-          <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Edit Sub-domain Name<span style={{ color: 'red' }}>*</span></Typography>
+          <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Select Sub-domain Name<span style={{ color: 'red' }}>*</span></Typography>
           <Select
             fullWidth
             value={data.subdomain_id}

@@ -38,7 +38,7 @@ interface TableData {
 interface CustomTableProps {
   data: TableData[];
   loading: boolean;
-  actionButton: any;
+  // actionButton: any;
   page: any;
   setPage: any;
   totalCount: any;
@@ -50,7 +50,7 @@ interface CustomTableProps {
 
 const CustomTable: React.FC<CustomTableProps> = ({
   data,
-  actionButton,
+  // actionButton,
   page,
   setPage,
   totalCount,
@@ -240,7 +240,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
               </Typography>
             </TableCell>
             <TableCell sx={{ borderBottom: "none", textAlign: "right" }}>
-              {actionButton}
+              {/* {actionButton} */}
             </TableCell>
           </TableRow>
         </TableHead>
