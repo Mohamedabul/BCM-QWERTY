@@ -59,10 +59,10 @@ const CustomDialog: React.FC<CustomDialogProps> = ({
           <>
             {selectedTab !== 1 && (
               <div className="dialog-row">
-                <Typography className="dialog-typography">
+                {/* <Typography className="dialog-typography">
                   Total Number of Records present
                 </Typography>
-                <span className="dialog-value">{applications}</span>
+                <span className="dialog-value">{applications}</span> */}
               </div>
             )}
             <div className="dialog-row">

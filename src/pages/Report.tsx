@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Table, Input, Button, Select, Pagination, Dropdown, Menu } from "antd";
+import { Table, Input, Button, Select,  Menu } from "antd";
 import { DownloadOutlined } from "@mui/icons-material";
 import { DownOutlined } from "@ant-design/icons";
 import { saveAs } from "file-saver";
 import { getReportData, getReportExport } from "apis";
+import { TablePagination } from "@mui/material";
 
 interface DataItem {
   country: string; // New field for Select Type filter
@@ -53,8 +54,20 @@ const Report: React.FC = () => {
   const fetchData = async () => {
     const body = JSON.stringify(getFilters());
     const data = await getReportData(body);
-    setData(data?.response);
-    setTotalData(data?.totalCount);
+    // setData(data?.response);
+    // setTotalData(data?.totalCount);
+    const processedData = data?.response.map((item: DataItem) => ({
+      country: item.country === "empty" || !item.country ? "-" : item.country,
+      region: item.region || "-", 
+      cap: item.cap || "-", 
+      domain: item.domain || "-", 
+      subdomain: item.subdomain || "-", 
+      name: item.name || "-", 
+      business_owner: item.business_owner || "-", 
+    }));
+  
+    setData(processedData || []); 
+    setTotalData(data?.totalCount || 0);
   };
 
   const getExport = async () => {
@@ -64,9 +77,9 @@ const Report: React.FC = () => {
     saveAs(data?.csvUrl,"export.csv");
   }
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+  // const handlePageChange = (page: number) => {
+  //   setCurrentPage(page);
+  // };
   useEffect(() => {
     fetchData();
   }, [pageSize,currentPage]);
@@ -75,18 +88,18 @@ const Report: React.FC = () => {
     fetchData();
   };
 
-  const handlePageSizeChange = (size: number) => {
-    setPageSize(size);
-    setCurrentPage(1);
-  };
+  // const handlePageSizeChange = (size: number) => {
+  //   setPageSize(size);
+  //   setCurrentPage(1);
+  // };
 
-  const pageSizeMenu = (
-    <Menu onClick={(e) => handlePageSizeChange(parseInt(e.key))}>
-      <Menu.Item key="10">10 items</Menu.Item>
-      <Menu.Item key="50">50 items</Menu.Item>
-      <Menu.Item key="100">100 items</Menu.Item>
-    </Menu>
-  );
+  // const pageSizeMenu = (
+  //   <Menu onClick={(e) => handlePageSizeChange(parseInt(e.key))}>
+  //     <Menu.Item key="10">10 items</Menu.Item>
+  //     <Menu.Item key="50">50 items</Menu.Item>
+  //     <Menu.Item key="100">100 items</Menu.Item>
+  //   </Menu>
+  // );
 
   return (
     <div className="regional-report">
@@ -107,14 +120,14 @@ const Report: React.FC = () => {
           style={{ flex: 1, maxWidth: "300px", height: "45px" }}
           value={selectType}
         >
-          <Select.Option value="Regional">Regional</Select.Option>
           <Select.Option value="global">Global</Select.Option>
+          <Select.Option value="Regional">Regional</Select.Option>
           <Select.Option value="Country">Country</Select.Option>
         </Select>
 
         {selectType !== "global" && (
           <Select
-            placeholder="Regional"
+            placeholder={selectType === "Regional" ? "Regional" : "Country"}
             onChange={(value: string) => setRegion(value)}
             allowClear
             style={{ flex: 1, maxWidth: "300px", height: "45px" }}
@@ -156,6 +169,9 @@ const Report: React.FC = () => {
         >
           Apply
         </Button>
+        <Button icon={<DownloadOutlined />} onClick={getExport}>
+          Export
+        </Button>
       </div>
 
       <div
@@ -167,10 +183,7 @@ const Report: React.FC = () => {
           marginBottom: "16px",
         }}
       >
-        <div></div> {/* Empty div to push export button to the right */}
-        <Button icon={<DownloadOutlined />} onClick={getExport}>
-          Export
-        </Button>
+        
       </div>
 
       <Table
@@ -182,9 +195,29 @@ const Report: React.FC = () => {
           y: 400,
           x: 'max-content',
         }}
+        
       />
 
-      <div
+  <TablePagination
+  component="div"
+  count={totalData}
+  page={currentPage - 1}
+  onPageChange={(event, newPage) => {
+    setCurrentPage(newPage + 1);
+  }}
+  rowsPerPage={pageSize}
+  onRowsPerPageChange={(event) => {
+    setPageSize(parseInt(event.target.value, 10));
+    setCurrentPage(1);
+  }}
+  rowsPerPageOptions={[10, 50, 100]}
+  labelDisplayedRows={({ from, to, count }) =>
+    `${from}-${to} of ${count} items`
+  }
+  sx={{ marginTop: 2 }}
+  />
+
+      {/* <div
         className="pagination-control"
         style={{
           display: "flex",
@@ -208,7 +241,7 @@ const Report: React.FC = () => {
           showSizeChanger={false}
           style={{ marginLeft: "auto" }}
         />
-      </div>
+      </div> */}
     </div>
   );
 };
