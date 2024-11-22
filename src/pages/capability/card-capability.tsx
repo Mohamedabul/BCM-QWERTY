@@ -15,6 +15,7 @@ import GridItem from "utils/GridItem";
 import { ShimmerBox } from "utils/ShimmerBox";
 import { objectToQueryString } from "components/common/helper";
 import CreateCapability from "./create-capability";
+import { createDomain, deleteCorecapability, fetchDomainByCapability, fetchTemplateDomainByCapability, patchCorecapability } from "apis";
 
 const CapabilityCard = (props: any) => {
   const { isEditable } = props;
@@ -30,21 +31,16 @@ const CapabilityCard = (props: any) => {
   const handleExpand = async () => {
     setLoading(true);
   
-    // Set the endpoint based on the `isEditable` flag
-    const endpoint = `${process.env.REACT_APP_API_URL}${
-      isEditable ? "domainByCapability" : "template/domainByCapability"
-    }`;
-  
     const params = { core_id: props.id };
     const queryString = objectToQueryString(params);
   
     try {
-      const resp = await fetch(`${endpoint}?${queryString}`);
-      if (!resp.ok) {
-        console.error("Error fetching domain by capability:", resp.statusText);
-        return;
+      let data;
+      if(isEditable){
+        data = await fetchDomainByCapability(queryString);
+      }else{
+        data = await fetchTemplateDomainByCapability(queryString);
       }
-      const data = await resp.json();
       setDomainList(data);
     } catch (error) {
       console.error("Error fetching domain by capability:", error);
@@ -52,17 +48,6 @@ const CapabilityCard = (props: any) => {
       setLoading(false);
     }
   };
-  // const handleExpand = async () => {
-  //   setLoading(true);
-  //   const params = { core_id: props.id };
-  //   const queryString = objectToQueryString(params);
-  //   const resp = await fetch(
-  //     process.env.REACT_APP_API_URL + `domainByCapability?${queryString}`
-  //   );
-  //   const data = await resp.json();
-  //   setDomainList(data);
-  //   setLoading(false);
-  // };
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -85,42 +70,15 @@ const CapabilityCard = (props: any) => {
   const updateCapabilityName = async (newName: string) => {
     try {
       setName(newName);
-      const resp = await fetch(
-        process.env.REACT_APP_API_URL + `coreCapability/${props.id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ name: newName }),
-        }
-      );
+      const resp = await patchCorecapability(props.id, JSON.stringify({ name: newName }));
 
-      if (resp.ok) {
-        console.log("Capability name updated successfully");
-      } else {
-        console.log("Failed to update capability name");
-      }
     } catch (error) {
       console.log("Error updating capability name:", error);
     }
   };
 
   const handleClick = async (obj:object, callback:any) => {
-    const response = await fetch(
-      process.env.REACT_APP_API_URL + "domain",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({...obj,core_id: props.id}),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to create capability: ${response.statusText}`);
-    }
+    const response = await createDomain(JSON.stringify({...obj,core_id: props.id}));
 
     console.log("Capability created successfully");
     callback();
@@ -130,18 +88,7 @@ const CapabilityCard = (props: any) => {
 
   const deleteCapability = async () => {
     try {
-      const resp = await fetch(
-        process.env.REACT_APP_API_URL + `coreCapability/${props.id}`,
-        {
-          method: "DELETE",
-        }
-      );
-      if (resp.ok) {
-        console.log("Capability deleted successfully");
-        props.fetchCabability();
-      } else {
-        console.log("Failed to delete capability");
-      }
+      const resp = await deleteCorecapability(props.id);
     } catch (error) {
       console.log("Error deleting capability:", error);
     }
@@ -160,7 +107,7 @@ const CapabilityCard = (props: any) => {
             capabilityName={props.name}
             label="Buissiness Capability"
             editEndpoint={`${process.env.REACT_APP_API_URL}coreCapability/${props.id}`}
-            deleteEndpoint={`${process.env.REACT_APP_API_URL}coreCapability/${props.id}`}
+            deleteEndpointCall={`${process.env.REACT_APP_API_URL}coreCapability/${props.id}`}
             onSave={(newName) => {
               updateCapabilityName(newName);
               setIsEditModalOpen(false);

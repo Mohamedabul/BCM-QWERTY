@@ -12,6 +12,7 @@ import SubDomainCardWithMenu from "pages/sub-domain/subdomaincardwithmenu";
 import { ShimmerBox } from "utils/ShimmerBox";
 import { objectToQueryString } from "components/common/helper";
 import CreateCapability from "pages/capability/create-capability";
+import { createSubdomain, fetchSubdomainByDomain, fetchTemplateSubdomainByDomain } from "apis";
 
 const DomainCard = (props: any) => {
   const { isEditable } = props;
@@ -27,12 +28,12 @@ const DomainCard = (props: any) => {
     const params = { domain_id: props.id };
     const queryString = objectToQueryString(params);
     try {
-      const resp = await fetch(`${endpoint}?${queryString}`);
-      if (!resp.ok) {
-        console.error("Error fetching subdomain by domains:", resp.statusText);
-        return;
+      let data;
+      if(isEditable){
+        data = await fetchSubdomainByDomain(queryString);
+      }else{
+        data = await fetchTemplateSubdomainByDomain(queryString);
       }
-      const data = await resp.json();
       setSubDomainList(data);
     } catch (error) {
       console.error("Error fetching domain by capability:", error);
@@ -42,17 +43,7 @@ const DomainCard = (props: any) => {
   };
 
   const handleClick = async (obj: object, callback: any) => {
-    const response = await fetch(process.env.REACT_APP_API_URL + "subdomain", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ ...obj, domain_id: props.id }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to create capability: ${response.statusText}`);
-    }
+    const response = await createSubdomain(JSON.stringify({ ...obj, domain_id: props.id }));
 
     console.log("Capability created successfully");
     callback();

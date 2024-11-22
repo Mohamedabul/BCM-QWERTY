@@ -18,6 +18,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CloseIcon from "@mui/icons-material/Close";
 import { CustomButton } from "components";
 import { MenuProps } from "interfaces/common";
+import { patchEndpoint, deleteEndpoint } from "apis";
 
 const modalStyle = {
   position: "absolute" as "absolute",
@@ -38,7 +39,7 @@ type EditCapabilityProps = {
   onSave?: (name: string) => void;
   color?: string;
   editEndpoint?: string;
-  deleteEndpoint?: string;
+  deleteEndpointCall?: string;
   menuStyle?: object;
 };
 
@@ -53,7 +54,7 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
   label,
   color,
   editEndpoint,
-  deleteEndpoint,
+  deleteEndpointCall,
   menuStyle,
   useCustomEditDialog = false,
   useCustomDeleteDialog = false,
@@ -84,14 +85,7 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
       return;
     }
     try {
-      const response = await fetch(editEndpoint ?? "", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name }),
-      });
-
+      const response = await patchEndpoint(editEndpoint ?? "",JSON.stringify({ name }))
       if (!response.ok) {
         throw new Error(`Failed to edit ${label}: ${response.statusText}`);
       }
@@ -105,17 +99,12 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
   };
 
   const confirmDelete = async () => {
-    if (!deleteEndpoint) {
+    if (!deleteEndpointCall) {
       console.error("Delete endpoint is missing");
       return;
     }
     try {
-      const response = await fetch(deleteEndpoint ?? "", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await deleteEndpoint(deleteEndpointCall ?? "")
 
       if (!response.ok) {
         throw new Error(`Failed to delete ${label}: ${response.statusText}`);

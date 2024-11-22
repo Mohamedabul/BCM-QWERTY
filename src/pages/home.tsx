@@ -3,13 +3,13 @@ import { useList } from "@refinedev/core";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
-
 import {
   PieChart,
   PropertyReferrals,
   TotalRevenue,
 } from "components";
 import CapabilityTable from "components/charts/TableCapability";
+import { getDashBoardCounts } from "apis";
 
 type DashboardCounts = {
   coreCapabilityCount: number;
@@ -36,11 +36,7 @@ const Home = () => {
   useEffect(() => {
     const fetchDashboardCounts = async () => {
       try {
-        const response = await fetch(process.env.REACT_APP_API_URL+"dashBoardCounts");
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
+        const data = await getDashBoardCounts();
         setDashboardCounts({
           coreCapabilityCount: Number(data.coreCapabilityCount),
           domainCount: Number(data.domainCount),
