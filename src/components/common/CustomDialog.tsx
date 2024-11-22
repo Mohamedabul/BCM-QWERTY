@@ -58,10 +58,6 @@ const CustomDialog: React.FC<CustomDialogProps> = ({
         ) : (
           <>
             <div className="dialog-row">
-              <Typography className="dialog-typography">Total Number of Record present</Typography>
-              <span className="dialog-value">{applications}</span>
-            </div>
-            <div className="dialog-row">
               <Typography className="dialog-typography">
               Total Number of Records Mapped
               </Typography>
