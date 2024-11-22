@@ -3,7 +3,7 @@ import { Table, Input, Button, Select,  Menu } from "antd";
 import { DownloadOutlined } from "@mui/icons-material";
 import { DownOutlined } from "@ant-design/icons";
 import { saveAs } from "file-saver";
-import { getReportData, getReportExport } from "apis";
+import { getReportData, getReportExport,getRegions, getCountrys } from "apis";
 import { TablePagination } from "@mui/material";
 
 interface DataItem {
@@ -24,6 +24,8 @@ const Report: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10); // Page size state
   const [data, setData] = useState<any>([]);
+  const [regions, setRegions] = useState<any>([]);
+  const [countries, setCountries] = useState<any>([]);
   const [totalData, setTotalData] = useState<number>(0);
 
   const columns = [
@@ -65,9 +67,34 @@ const Report: React.FC = () => {
       name: item.name || "-", 
       business_owner: item.business_owner || "-", 
     }));
-  
     setData(processedData || []); 
     setTotalData(data?.totalCount || 0);
+
+  };
+
+  const fetchRegions = async () => {
+    try {
+      const regionsData = await getRegions();
+      const filteredRegions = regionsData?.filter(
+        (region: any) => region.name && region.name.trim() !== "empty"
+      );
+      setRegions(filteredRegions || []);
+    } catch (error) {
+      console.error("Error fetching regions:", error);
+    }
+
+  };
+
+  const fetchCountries = async () => {
+    try {
+      const countriesData = await getCountrys();
+      const filteredCountries = countriesData?.filter(
+        (country: any) => country.name && country.name.trim() !== "empty"
+      );
+      setCountries(filteredCountries || []);
+    } catch (error) {
+      console.error("Error fetching countries:", error);
+    }
   };
 
   const getExport = async () => {
@@ -124,8 +151,37 @@ const Report: React.FC = () => {
           <Select.Option value="Regional">Regional</Select.Option>
           <Select.Option value="Country">Country</Select.Option>
         </Select>
-
-        {selectType !== "global" && (
+        {selectType === "Regional" && (
+          <Select
+            placeholder="Region"
+            onFocus={fetchRegions} 
+            onChange={(value: string) => setRegion(value)}
+            allowClear
+            style={{ flex: 1, maxWidth: "300px", height: "45px" }}
+          >
+            {regions.map((region: any) => (
+              <Select.Option key={region.id} value={region.name}>
+                {region.name}
+              </Select.Option>
+            ))}
+          </Select>
+        )}
+        {selectType === "Country" && (
+          <Select
+            placeholder="Country"
+            onFocus={fetchCountries} 
+            onChange={(value: string) => setRegion(value)}
+            allowClear
+            style={{ flex: 1, maxWidth: "300px", height: "45px" }}
+          >
+            {countries.map((country: any) => (
+              <Select.Option key={country.id} value={country.name}>
+                {country.name}
+              </Select.Option>
+            ))}
+          </Select>
+        )}
+        {/* {selectType !== "global" && (
           <Select
             placeholder={selectType === "Regional" ? "Regional" : "Country"}
             onChange={(value: string) => setRegion(value)}
@@ -136,7 +192,7 @@ const Report: React.FC = () => {
             <Select.Option value="APAC">APAC</Select.Option>
             <Select.Option value="EMEA">EMEA</Select.Option>
           </Select>
-        )}
+        )} */}
 
         <Select
           placeholder="Filter By"
