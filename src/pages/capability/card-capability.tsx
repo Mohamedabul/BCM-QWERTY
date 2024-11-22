@@ -71,7 +71,6 @@ const CapabilityCard = (props: any) => {
     try {
       setName(newName);
       const resp = await patchCorecapability(props.id, JSON.stringify({ name: newName }));
-
     } catch (error) {
       console.log("Error updating capability name:", error);
     }

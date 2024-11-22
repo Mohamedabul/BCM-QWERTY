@@ -328,6 +328,9 @@ const CustomTable: React.FC<CustomTableProps> = ({
           backgroundColor: "white",
           zIndex: 1,
         }}
+        labelDisplayedRows={({ from, to, count, page }) =>
+          `Page ${page + 1} of ${Math.ceil(count / pageSize)} (${count})`
+        }
       />
     </TableContainer>
   );

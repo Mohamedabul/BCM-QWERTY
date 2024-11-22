@@ -209,3 +209,28 @@ export const callRemap = async () => {
 
   return result;
 }
+
+
+export const getReportData = async (body:string) => {
+  const response = await fetch(baseUrl + "getReport", {
+    method: "POST",
+    headers: baseHeader,
+    body: body,
+  });
+  const result = await response.json();
+
+  return result;
+}
+
+
+
+export const getReportExport = async (body:string) => {
+  const response = await fetch(baseUrl + "getCSVreport", {
+    method: "POST",
+    headers: baseHeader,
+    body: body,
+  });
+  const result = await response.json();
+
+  return result;
+}

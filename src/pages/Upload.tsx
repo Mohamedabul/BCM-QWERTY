@@ -592,6 +592,7 @@ const Upload: React.FC<UploadProps> = () => {
         applications={applications}
         mappedApplications={mappedApplications}
         orphans={orphans}
+        selectedTab={selectedTab}
       />
     </Box>
   );
