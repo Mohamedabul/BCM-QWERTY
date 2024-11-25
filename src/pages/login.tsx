@@ -64,7 +64,7 @@ export const Login: React.FC = () => {
           }}
         >
           <div>
-          <img src="https://files.logomakr.com/3hk25r-LogoMakr.png" alt="caldarys Logo" />
+          <img src="https://files.logomakr.com/3hk25r-LogoMakr.png" alt="calderys Logo" />
           </div>
           <Box mt={4}>
             <GoogleButton />

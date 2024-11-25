@@ -17,6 +17,7 @@ interface CustomDialogProps {
   applications: any[];
   mappedApplications: any[];
   orphans: any[];
+  selectedTab: Number;
 }
 
 const CustomDialog: React.FC<CustomDialogProps> = ({
@@ -26,6 +27,7 @@ const CustomDialog: React.FC<CustomDialogProps> = ({
   applications,
   mappedApplications,
   orphans,
+  selectedTab,
 }) => {
   return (
     <Dialog
@@ -36,7 +38,7 @@ const CustomDialog: React.FC<CustomDialogProps> = ({
       onClose={onClose}
     >
       <DialogTitle className="dialog-title">
-        Upload Status
+        {selectedTab === 1 ? "Re-map" : "Upload"} Status
         <IconButton
           aria-label="close"
           onClick={onClose}
@@ -50,15 +52,11 @@ const CustomDialog: React.FC<CustomDialogProps> = ({
           <Box display="flex" justifyContent="center" alignItems="center" p={2}>
             <CircularProgress />
             <Typography variant="body1" sx={{ ml: 2, color: "black" }}>
-              Uploading in Progress...
+              {selectedTab === 1 ? "Re-mapping" : "Uploading"} in Progress...
             </Typography>
           </Box>
         ) : (
           <>
-            <div className="dialog-row">
-              <Typography className="dialog-typography">Total Number of Record present</Typography>
-              <span className="dialog-value">{applications}</span>
-            </div>
             <div className="dialog-row">
               <Typography className="dialog-typography">
               Total Number of Records Mapped
