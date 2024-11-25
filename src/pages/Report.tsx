@@ -44,7 +44,7 @@ const Report: React.FC = () => {
   const getFilters = () => {
     return {
       filter: {
-        ...(region ? { region } : {}),
+        ...(region ? (selectType === "Country" ? {country: region} : {region}) : {}),
         reportType: selectType,
         ...(search ? { [filterType]: search } : {}),
       },
@@ -60,14 +60,18 @@ const Report: React.FC = () => {
     // setTotalData(data?.totalCount);
     const processedData = data?.response.map((item: DataItem) => ({
       country: item.country === "empty" || !item.country ? "-" : item.country,
-      region: item.region || "-", 
+      region: item.region === "empty" || !item.region ? "-" : item.region, 
       cap: item.cap || "-", 
       domain: item.domain || "-", 
       subdomain: item.subdomain || "-", 
       name: item.name || "-", 
       business_owner: item.business_owner || "-", 
     }));
-    setData(processedData || []); 
+    if(selectType === "global"){
+      setData(processedData || []); 
+    }else{
+      setData(processedData.filter((e:any) => e.region !== "Global") || []);
+    }
     setTotalData(data?.totalCount || 0);
 
   };
@@ -78,7 +82,8 @@ const Report: React.FC = () => {
       const filteredRegions = regionsData?.filter(
         (region: any) => region.name && region.name.trim() !== "empty"
       );
-      setRegions(filteredRegions || []);
+      console.log(filteredRegions);
+      setRegions(filteredRegions.filter((e:any) => e.name !== "Global") || []);
     } catch (error) {
       console.error("Error fetching regions:", error);
     }
@@ -91,7 +96,7 @@ const Report: React.FC = () => {
       const filteredCountries = countriesData?.filter(
         (country: any) => country.name && country.name.trim() !== "empty"
       );
-      setCountries(filteredCountries || []);
+      setCountries(filteredCountries.filter((e:any) => e.name !== "Global") || []);
     } catch (error) {
       console.error("Error fetching countries:", error);
     }
@@ -267,8 +272,8 @@ const Report: React.FC = () => {
     setCurrentPage(1);
   }}
   rowsPerPageOptions={[10, 50, 100]}
-  labelDisplayedRows={({ from, to, count }) =>
-    `${from}-${to} of ${count} items`
+  labelDisplayedRows={({ from, to, count, page }) =>
+    `Page ${page + 1} of ${Math.ceil(count / pageSize)} (${count})`
   }
   sx={{ marginTop: 2 }}
   />
