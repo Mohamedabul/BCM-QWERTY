@@ -60,7 +60,7 @@ const Report: React.FC = () => {
     // setTotalData(data?.totalCount);
     const processedData = data?.response.map((item: DataItem) => ({
       country: item.country === "empty" || !item.country ? "-" : item.country,
-      region: item.region || "-", 
+      region: item.region === "empty" || !item.region ? "-" : item.region, 
       cap: item.cap || "-", 
       domain: item.domain || "-", 
       subdomain: item.subdomain || "-", 
