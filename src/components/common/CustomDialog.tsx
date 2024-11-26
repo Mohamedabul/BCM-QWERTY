@@ -38,7 +38,7 @@ const CustomDialog: React.FC<CustomDialogProps> = ({
       onClose={onClose}
     >
       <DialogTitle className="dialog-title">
-        {selectedTab === 1 ? "Remap" : "Upload"} Status
+        {selectedTab === 1 ? "Re-map" : "Upload"} Status
         <IconButton
           aria-label="close"
           onClick={onClose}
@@ -52,28 +52,20 @@ const CustomDialog: React.FC<CustomDialogProps> = ({
           <Box display="flex" justifyContent="center" alignItems="center" p={2}>
             <CircularProgress />
             <Typography variant="body1" sx={{ ml: 2, color: "black" }}>
-              {selectedTab === 1 ? "Remapping" : "Uploading"} in Progress...
+              {selectedTab === 1 ? "Re-mapping" : "Uploading"} in Progress...
             </Typography>
           </Box>
         ) : (
           <>
-            {selectedTab !== 1 && (
-              <div className="dialog-row">
-                {/* <Typography className="dialog-typography">
-                  Total Number of Records present
-                </Typography>
-                <span className="dialog-value">{applications}</span> */}
-              </div>
-            )}
             <div className="dialog-row">
               <Typography className="dialog-typography">
-                Total Number of Applications Mapped
+              Total Number of Records Mapped
               </Typography>
               <span className="dialog-value">{mappedApplications}</span>
             </div>
             <div className="dialog-row">
               <Typography className="dialog-typography">
-                Total Number of Applications under Orphan
+              Total Number of Records under Orphan
               </Typography>
               <span className="dialog-value">{orphans}</span>
             </div>

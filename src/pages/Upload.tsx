@@ -77,13 +77,17 @@ const Upload: React.FC<UploadProps> = () => {
       const params:any = {page: page, limit: pageSize};
       const queryString = new URLSearchParams(params).toString();
       const result = await getMappedApplications(queryString);
+      console.log("Result:", result);
       const { totalCount } = result;
       setTotalCount(totalCount);
       const mappedData = result.response.map((item: any) => ({
+        // const mappedData = result.response
+        // .filter((item: any) => item.capability) 
+        // .map((item: any) => ({
         id: item.software_id,
         businessCapabilityName: item.capability,
-        domain: item.domain,
-        subDomain: item.subdomain,
+        domain: item.domain !== "-" ? item.domain : "-",
+        subDomain: item.subdomain !== "-" ? item.subdomain : "-",
         applicationName: item.software_name,
       }));
       setMappedData(mappedData);
@@ -108,10 +112,14 @@ const Upload: React.FC<UploadProps> = () => {
       const { totalCount } = result;
       setTotalCount(totalCount);
       const orphanData = result.response.map((item: any) => ({
-        businessCapabilityName: item.capability,
-        domain: item.domain,
-        subDomain: item.subdomain,
-        applicationName: item.software_name,
+        // const orphanData = result.response
+        // .filter((item: any) => !item.capability) 
+        // .map((item: any) => ({
+          id: item.software_id,
+          businessCapabilityName: item.capability !== "-" ? item.capability : "-",
+          domain: item.domain !== "-" ? item.domain : "-",
+          subDomain: item.subdomain !== "-" ? item.subdomain : "-",
+          applicationName: item.software_name,
       }));
       setOrphanData(orphanData);
     } catch (error) {
@@ -318,6 +326,7 @@ const Upload: React.FC<UploadProps> = () => {
           </Tabs>}
 
           {/* Import File Button */}
+          <Box sx={{ display: "flex", gap: 2 }}>
           {showImportButton && selectedTab === 0 && (
             <CustomButton
               title="Import File"
@@ -330,8 +339,30 @@ const Upload: React.FC<UploadProps> = () => {
               variant="contained"
               icon={<AddIcon />}
               sx={{ borderRadius: "10px", margin: 0 }}
-            />
+            />)}
+            {selectedTab === 0 && (
+              <CustomButton
+                title="Add New"
+                backgroundColor="blue"
+                color="white"
+                handleClick={handleAddNew}
+                variant="contained"
+                icon={<AddIcon />}
+                sx={{ borderRadius: "10px", margin: 0 }}
+              />
           )}
+          {selectedTab === 1 && (
+              <CustomButton
+                title="Re-map"
+                backgroundColor="blue"
+                color="white"
+                handleClick={handleRemap}
+                variant="contained"
+                icon={<ReplayIcon />}
+                sx={{ borderRadius: "10px", margin: 0 }}
+              />
+          )}
+          </Box>
         </Box>
       </AppBar>
       {selectedTab === 0 && (
@@ -349,17 +380,6 @@ const Upload: React.FC<UploadProps> = () => {
           <CustomTable
             data={mappedData}
             loading={loading}
-            actionButton={
-              <CustomButton
-                title="Add New"
-                handleClick={handleAddNew}
-                backgroundColor="blue"
-                color="white"
-                variant="contained"
-                icon={<AddIcon />}
-                sx={{ borderRadius: "10px" }}
-              />
-            }
             page={page}
             setPage={setPage}
             totalCount={totalCount}
@@ -400,17 +420,17 @@ const Upload: React.FC<UploadProps> = () => {
           <CustomTable
             data={orphanData}
             loading={loading}
-            actionButton={
-              <CustomButton
-                title="Remap"
-                handleClick={handleRemap}
-                backgroundColor="blue"
-                color="white"
-                variant="contained"
-                icon={<ReplayIcon />}
-                sx={{ borderRadius: "10px" }}
-              />
-            }
+            // actionButton={
+            //   <CustomButton
+            //     title="Remap"
+            //     handleClick={handleRemap}
+            //     backgroundColor="blue"
+            //     color="white"
+            //     variant="contained"
+            //     icon={<ReplayIcon />}
+            //     sx={{ borderRadius: "10px" }}
+            //   />
+            // }
             page={page}
             setPage={setPage}
             totalCount={totalCount}
