@@ -155,12 +155,14 @@ export const getMappedApplications = async (queryString: string) => {
     baseUrl + "getMappedApplications?" + queryString
   );
   const result = await response.json();
+  console.log(result);
 
   return result;
 };
 
 export const getOrphans = async (queryString: string) => {
   const response = await fetch(baseUrl + "getOrphans?" + queryString);
+  console.log(response);
   const result = await response.json();
 
   return result;

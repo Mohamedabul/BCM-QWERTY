@@ -77,13 +77,17 @@ const Upload: React.FC<UploadProps> = () => {
       const params:any = {page: page, limit: pageSize};
       const queryString = new URLSearchParams(params).toString();
       const result = await getMappedApplications(queryString);
+      console.log("Result:", result);
       const { totalCount } = result;
       setTotalCount(totalCount);
       const mappedData = result.response.map((item: any) => ({
+        // const mappedData = result.response
+        // .filter((item: any) => item.capability) 
+        // .map((item: any) => ({
         id: item.software_id,
         businessCapabilityName: item.capability,
-        domain: item.domain,
-        subDomain: item.subdomain,
+        domain: item.domain !== "-" ? item.domain : "-",
+        subDomain: item.subdomain !== "-" ? item.subdomain : "-",
         applicationName: item.software_name,
       }));
       setMappedData(mappedData);
@@ -108,10 +112,14 @@ const Upload: React.FC<UploadProps> = () => {
       const { totalCount } = result;
       setTotalCount(totalCount);
       const orphanData = result.response.map((item: any) => ({
-        businessCapabilityName: item.capability,
-        domain: item.domain,
-        subDomain: item.subdomain,
-        applicationName: item.software_name,
+        // const orphanData = result.response
+        // .filter((item: any) => !item.capability) 
+        // .map((item: any) => ({
+          id: item.software_id,
+          businessCapabilityName: item.capability !== "-" ? item.capability : "-",
+          domain: item.domain !== "-" ? item.domain : "-",
+          subDomain: item.subdomain !== "-" ? item.subdomain : "-",
+          applicationName: item.software_name,
       }));
       setOrphanData(orphanData);
     } catch (error) {
