@@ -1,9 +1,6 @@
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import GridItem from "utils/GridItem";
-import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
 import { CustomButton } from "components";
 import CapabilityCard from "./card-capability";
 import CreateCapability from "./create-capability";
@@ -14,6 +11,16 @@ function AllCapabilities({ isEditable }: any) {
   const [cabablityList, setCapabilityList] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
 
+
+  const fetchCapabilities = async () => {
+    try {
+      const data = isEditable ? await fetchCorecapability() : await fetchTemplateCorecapability();
+      setCapabilityList(data);
+    } catch (error) {
+      console.error("Error fetching capabilities:", error);
+    }
+  };
+
   const handleCreateOpen = () => {
     setOpen(true);
   };
@@ -22,38 +29,19 @@ function AllCapabilities({ isEditable }: any) {
     setOpen(false);
   };
 
-  const handleSaveCapability = (name: string) => {
-    // Save the new capability to the capability list or database
-    console.log("New capability name:", name);
-    fetchCabability(); // Re-fetch to update list if needed
-    handleCreateClose(); // Close the modal after saving
-  };
+
   const handleClick = async (obj:object, callback:any) => {
     const response = await createCorecapability(JSON.stringify(obj));
 
     console.log("Capability created successfully");
     callback();
-    fetchCabability();
+    fetchCapabilities();
     handleCreateClose();
   };
 
-  const fetchCabability = async () => {
-    try {
-      let data;
-      if (isEditable){
-        data = await fetchCorecapability();
-      }else{
-        data = await fetchTemplateCorecapability();
-      }
-      
-      setCapabilityList(data);
-    } catch (error) {
-      console.error("Error fetching capabilities:", error);
-    }
-   
-  };
+
   useEffect(() => {
-    fetchCabability();
+    fetchCapabilities();
   }, []);
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -84,7 +72,9 @@ function AllCapabilities({ isEditable }: any) {
             key={cabablity.id}
             name={cabablity.name}
             id={cabablity.id}
-            fetchCabability={fetchCabability}
+            onUpdate={fetchCapabilities}
+            
+            fetchCabability={fetchCapabilities}
             isEdited={cabablity.is_edited}
             
           />

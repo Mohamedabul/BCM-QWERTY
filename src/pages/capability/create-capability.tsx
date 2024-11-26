@@ -44,6 +44,8 @@ const CreateCapability: React.FC<CombinedProps> = ({
   useEffect(() => {
     setName(capabilityName);
   }, [capabilityName]);
+
+  
   const handleSave = async () => {
     try {
       await clickHandler({name},() => {
