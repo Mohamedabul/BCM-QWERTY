@@ -85,6 +85,7 @@ function AllCapabilities({ isEditable }: any) {
             name={cabablity.name}
             id={cabablity.id}
             fetchCabability={fetchCabability}
+            isEdited={cabablity.is_edited}
             
           />
         ))}

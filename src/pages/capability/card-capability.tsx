@@ -15,6 +15,7 @@ import GridItem from "utils/GridItem";
 import { ShimmerBox } from "utils/ShimmerBox";
 import { objectToQueryString } from "components/common/helper";
 import CreateCapability from "./create-capability";
+import { HiTemplate } from 'react-icons/hi';
 import { createDomain, deleteCorecapability, fetchDomainByCapability, fetchTemplateDomainByCapability, patchCorecapability } from "apis";
 
 const CapabilityCard = (props: any) => {
@@ -112,6 +113,9 @@ const CapabilityCard = (props: any) => {
               setIsEditModalOpen(false);
             }}
           />
+        )}
+        {props.isEditable && !props.isEdited && (
+          <HiTemplate style={{position: "absolute", zIndex:10, top: 8, left: 4, color: 'white', fontSize: "20px"}}/>
         )}
         <Accordion
           sx={{
