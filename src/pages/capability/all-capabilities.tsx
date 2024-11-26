@@ -74,6 +74,8 @@ function AllCapabilities({ isEditable }: any) {
             id={cabablity.id}
             onUpdate={fetchCapabilities}
             
+            fetchCabability={fetchCapabilities}
+            isEdited={cabablity.is_edited}
             
           />
         ))}

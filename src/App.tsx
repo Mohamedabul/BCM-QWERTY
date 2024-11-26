@@ -7,6 +7,7 @@ import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined";
 import CssBaseline from "@mui/material/CssBaseline";
 import GlobalStyles from "@mui/material/GlobalStyles";
+import { HiTemplate } from 'react-icons/hi';
 import {
   GitHubBanner,
   type LegacyAuthProvider as AuthProvider,
@@ -151,7 +152,7 @@ function App() {
                   name: "template",
                   list: () => <AllCapabilities isEditable={false} />,
                   // show: CapabilityDetails,
-                  icon: <AssessmentIcon />,
+                  icon: <HiTemplate style={{fontSize: "25px"}} />,
                   options: { label: "Template" },
                 },
                 {

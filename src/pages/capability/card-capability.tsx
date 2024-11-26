@@ -8,9 +8,10 @@ import GridItem from "utils/GridItem";
 import { ShimmerBox } from "utils/ShimmerBox";
 import { objectToQueryString } from "components/common/helper";
 import CreateCapability from "./create-capability";
+import { HiTemplate } from 'react-icons/hi';
 import { createDomain, deleteCorecapability, fetchDomainByCapability, fetchTemplateDomainByCapability, patchCorecapability } from "apis";
 
-const CapabilityCard = ({ id, name, isEditable, onUpdate }: any) => {
+const CapabilityCard = ({ id, name, isEditable, onUpdate, isEdited }: any) => {
   const [domainList, setDomainList] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -91,7 +92,9 @@ const CapabilityCard = ({ id, name, isEditable, onUpdate }: any) => {
             }}
           />
         )}
-
+        {isEditable && !isEdited && (
+          <HiTemplate style={{position: "absolute", zIndex:10, top: 8, left: 4, color: 'white', fontSize: "20px"}}/>
+        )}
         <Accordion
           sx={{
             backgroundColor: bgColor,

@@ -120,19 +120,6 @@ const Report: React.FC = () => {
     fetchData();
   };
 
-  // const handlePageSizeChange = (size: number) => {
-  //   setPageSize(size);
-  //   setCurrentPage(1);
-  // };
-
-  // const pageSizeMenu = (
-  //   <Menu onClick={(e) => handlePageSizeChange(parseInt(e.key))}>
-  //     <Menu.Item key="10">10 items</Menu.Item>
-  //     <Menu.Item key="50">50 items</Menu.Item>
-  //     <Menu.Item key="100">100 items</Menu.Item>
-  //   </Menu>
-  // );
-
   return (
     <div className="regional-report">
       <h1>Report</h1>
