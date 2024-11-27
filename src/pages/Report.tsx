@@ -17,6 +17,8 @@ interface DataItem {
 }
 
 const Report: React.FC = () => {
+  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
+  const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [selectType, setSelectType] = useState<string>("global"); // New state for Select Type filter
   const [region, setRegion] = useState<string>("");
   const [filterType, setFilterType] = useState<string>(""); // New state for filter type
@@ -44,7 +46,8 @@ const Report: React.FC = () => {
   const getFilters = () => {
     return {
       filter: {
-        ...(region ? (selectType === "Country" ? {country: region} : {region}) : {}),
+        ...(selectedRegions.length > 0 && selectType === "Regional" ? { region: selectedRegions } : {}),
+        ...(selectedCountries.length > 0 && selectType === "Country" ? { country: selectedCountries } : {}),
         reportType: selectType,
         ...(search ? { [filterType]: search } : {}),
       },
@@ -143,7 +146,45 @@ const Report: React.FC = () => {
           <Select.Option value="Regional">Regional</Select.Option>
           <Select.Option value="Country">Country</Select.Option>
         </Select>
+
+
         {selectType === "Regional" && (
+          <Select
+            mode="multiple"
+            placeholder="Select Regions"
+            onFocus={fetchRegions}
+            onChange={(values: string[]) => setSelectedRegions(values)}
+            allowClear
+            style={{ flex: 1, maxWidth: "300px", height: "45px" }}
+          >
+            {regions.map((region: any) => (
+              <Select.Option key={region.id} value={region.name}>
+                {region.name}
+              </Select.Option>
+            ))}
+          </Select>
+        )}
+
+        {selectType === "Country" && (
+          <Select
+            mode="multiple"
+            placeholder="Select Countries"
+            onFocus={fetchCountries}
+            onChange={(values: string[]) => setSelectedCountries(values)}
+            allowClear
+            style={{ flex: 1, maxWidth: "300px", height: "45px" }}
+          >
+            {countries.map((country: any) => (
+              <Select.Option key={country.id} value={country.name}>
+                {country.name}
+              </Select.Option>
+            ))}
+          </Select>
+        )}
+
+
+
+        {/* {selectType === "Regional" && (
           <Select
             placeholder="Region"
             onFocus={fetchRegions} 
@@ -172,7 +213,10 @@ const Report: React.FC = () => {
               </Select.Option>
             ))}
           </Select>
-        )}
+        )} */}
+
+
+
         {/* {selectType !== "global" && (
           <Select
             placeholder={selectType === "Regional" ? "Regional" : "Country"}
