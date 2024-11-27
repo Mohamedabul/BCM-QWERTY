@@ -102,9 +102,9 @@ export const patchEndpoint = async (path: string, body: string) => {
     headers: baseHeader,
     body: body,
   });
-  const result = await response.json();
+  // const result = await response.json();
 
-  return result;
+  return response;
 };
 
 export const deleteEndpoint = async (path: string) => {
@@ -113,9 +113,9 @@ export const deleteEndpoint = async (path: string) => {
     headers: baseHeader,
   });
 
-  const result = await response.json();
+  // const result = await response.json();
 
-  return result;
+  return response;
 };
 
 export const createApplication = async (body: string) => {
@@ -135,9 +135,9 @@ export const patchApplication = async (id: string, body: string) => {
     headers: baseHeader,
     body: body,
   });
-  const result = await response.json();
+  // const result = await response.json();
 
-  return result;
+  return response;
 };
 
 export const deleteApplication = async (id: string) => {
@@ -145,9 +145,9 @@ export const deleteApplication = async (id: string) => {
     method: "DELETE",
     headers: baseHeader,
   });
-  const result = await response.json();
+  // const result = await response.json();
 
-  return result;
+  return response;
 };
 
 export const getMappedApplications = async (queryString: string) => {
@@ -155,12 +155,14 @@ export const getMappedApplications = async (queryString: string) => {
     baseUrl + "getMappedApplications?" + queryString
   );
   const result = await response.json();
+  console.log(result);
 
   return result;
 };
 
 export const getOrphans = async (queryString: string) => {
   const response = await fetch(baseUrl + "getOrphans?" + queryString);
+  console.log(response);
   const result = await response.json();
 
   return result;
