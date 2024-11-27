@@ -18,6 +18,8 @@ type DashboardCounts = {
   softwareCount: number;
   mappedCount: number;
   orphanCount: number;
+  appsMappedToCapsCount: number;
+  appsMappedToDomainCount: number;
 };
 
 const Home = () => {
@@ -43,7 +45,9 @@ const Home = () => {
           subDomainCount: Number(data.subDomainCount),
           softwareCount: Number(data.softwareCount),
           mappedCount: Number(data.mappedCount),
-          orphanCount:Number(data.orphanCount)
+          orphanCount:Number(data.orphanCount),
+          appsMappedToCapsCount: Number(data.appsMappedToCapsCount),
+          appsMappedToDomainCount: Number(data.appsMappedToDomainCount),
         });
         setIsLoading(false);
       } catch (error) {
@@ -65,7 +69,8 @@ const Home = () => {
         Dashboard
       </Typography>
 
-      <Box mt="20px" display="flex" flexWrap="wrap" gap={4}>
+      <Box mt="20px" margin={"auto"} display="flex" flexWrap="wrap" gap={4} justifyContent={"center"}>
+      <Box mt="20px"  display="flex" flexWrap="wrap" gap={4} >
         <PieChart
           title="Business Capabilities"
           value={dashboardCounts?.coreCapabilityCount ?? 0}
@@ -82,7 +87,7 @@ const Home = () => {
         <PieChart
           title="Applications"
           value={dashboardCounts?.softwareCount ?? 0}
-        />
+        /> 
         <PieChart
           title="Applications Mapped"
           value={dashboardCounts?.mappedCount ?? 0}
@@ -91,6 +96,19 @@ const Home = () => {
           title="Orphans"
           value={dashboardCounts?.orphanCount ?? 0}
         />
+        </Box>
+        <Box mt="20px"  display="flex" flexWrap="wrap" gap={4}>
+        
+        
+        <PieChart
+          title="Application Mapped to Business Capabilities"
+          value={dashboardCounts?.appsMappedToCapsCount ?? 0}
+        />
+        <PieChart
+          title="Application Mapped to Domains"
+          value={dashboardCounts?.appsMappedToDomainCount ?? 0}
+        />
+        </Box>
       </Box>
 
       <Stack
