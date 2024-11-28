@@ -68,7 +68,7 @@ function AllCapabilities({ isEditable }: any) {
       <Grid container spacing={2}>
         {cabablityList.map((cabablity) => (
           <CapabilityCard
-            // isEditable={isEditable}
+            isEditable={isEditable}
             key={cabablity.id}
             name={cabablity.name}
             id={cabablity.id}
