@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -59,12 +59,55 @@ const CustomTable: React.FC<CustomTableProps> = ({
   setPageSize,
   editCallback
 }) => {
+  const [sortConfig, setSortConfig] = React.useState<{ key: string; direction: "asc" | "desc" | "" }>({
+    key: "",
+    direction: "",
+  });
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedRow, setSelectedRow] = React.useState<TableData | null>(null);
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
   const [editData, setEditData] = React.useState<TableData | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
 
+
+
+  const sortedData = React.useMemo(() => {
+    if (!sortConfig.key || !sortConfig.direction) return data;
+  
+    return [...data].sort((a, b) => {
+      const key = sortConfig.key as keyof TableData;
+  
+      const valueA = a[key];
+      const valueB = b[key];
+  
+      if (valueA == null || valueB == null) {
+        return 0;
+      }
+      if (valueA < valueB) {
+        return sortConfig.direction === "asc" ? -1 : 1;
+      }
+      if (valueA > valueB) {
+        return sortConfig.direction === "asc" ? 1 : -1;
+      }
+      return 0;
+    });
+  }, [data, sortConfig]);
+
+  const handleSort = (key: string) => {
+    let direction: "asc" | "desc" = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+  
+  const renderSortIcon = (key: string) => {
+    if (sortConfig.key !== key) return null;
+    return sortConfig.direction === "asc" ? "↑" : "↓";
+  };
+
+
+  
   const handleOpenMenu = (
     event: React.MouseEvent<HTMLElement>,
     row: TableData
@@ -198,8 +241,43 @@ const CustomTable: React.FC<CustomTableProps> = ({
     >
       <Table stickyHeader>
         <TableHead>
-          <TableRow sx={{ "& th": { backgroundColor: "#e2e2e2" } }}>
-            <TableCell align="center" sx={{ borderBottom: "none" }}>
+        <TableRow sx={{ "& th": { backgroundColor: "#e2e2e2" } }}>
+        {[
+          { label: "Business Capability", key: "businessCapabilityName" },
+          { label: "Domain", key: "domain" },
+          { label: "Sub-domain", key: "subDomain" },
+          { label: "Application", key: "applicationName" },
+        ].map(({ label, key }) => (
+          <TableCell
+            key={key}
+            align="center"
+            sx={{
+              borderBottom: "none",
+              cursor: "pointer",
+              backgroundColor: sortConfig.key === key ? "#d1ecf1" : "inherit",
+              color: sortConfig.key === key ? "#0c5460" : "black",
+              fontWeight: sortConfig.key === key ? "bold" : "normal",
+              "&:hover": {
+                backgroundColor: "#f0f0f0", // Add hover effect
+              },
+            }}
+            onClick={() => handleSort(key)}
+          >
+            <Typography
+              variant="subtitle2"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {label}
+              {renderSortIcon(key)}
+            </Typography>
+
+
+
+            {/* <TableCell align="center" sx={{ borderBottom: "none" }}>
               <Typography
                 variant="subtitle2"
                 color="black"
@@ -237,15 +315,19 @@ const CustomTable: React.FC<CustomTableProps> = ({
                 fontSize={16}
               >
                 Application
-              </Typography>
+              </Typography> */}
+
+
+
             </TableCell>
+        ))}
             <TableCell sx={{ borderBottom: "none", textAlign: "right" }}>
               {/* {actionButton} */}
             </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((row, index) => (
+          {sortedData.map((row, index) => (
             <TableRow key={index} hover>
               <TableCell align="center" sx={{ borderBottom: "none" }}>
                 <Typography variant="body2" color="black">
