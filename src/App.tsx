@@ -43,6 +43,7 @@ import Report from "pages/Report";
 import Regional from "pages/report/regional";
 import Country from "pages/report/country";
 import Global from "pages/report/global";
+import Template from "pages/Template";
 
 const axiosInstance = axios.create();
 axiosInstance.interceptors.request.use(
@@ -150,7 +151,7 @@ function App() {
               resources={[
                 {
                   name: "template",
-                  list: () => <AllCapabilities isEditable={false} />,
+                  list: () => <Template/>,
                   // show: CapabilityDetails,
                   icon: <HiTemplate style={{fontSize: "25px"}} />,
                   options: { label: "Template" },
