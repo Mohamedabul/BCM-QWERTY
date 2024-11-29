@@ -56,6 +56,7 @@ const Upload: React.FC<UploadProps> = () => {
   const [filteredDomains, setFilteredDomains] = React.useState<any[]>([]);
   const [filteredSubDomains, setFilteredSubDomains] = React.useState<any[]>([]);
   const [page, setPage] = useState(1);
+  const [orphanPage, setOrphanPage] = useState(1);//new
   const [totalCount, setTotalCount] = useState(0);
   const [pageSize, setPageSize] = useState(10);
 
@@ -69,7 +70,7 @@ const Upload: React.FC<UploadProps> = () => {
     } else if (selectedTab === 1) {
       fetchOrphans();
     }
-  }, [selectedTab, page, pageSize]);
+  }, [selectedTab, page, orphanPage, pageSize]);//orphanPage
 
   const fetchMappedApplications = async () => {
     setLoading(true);
@@ -106,7 +107,7 @@ const Upload: React.FC<UploadProps> = () => {
   const fetchOrphans = async () => {
     setLoading(true);
     try {
-      const params:any = {page: page, limit: pageSize};
+      const params:any = {page: orphanPage, limit: pageSize};//orphanpage
       const queryString = new URLSearchParams(params).toString();
       const result = await getOrphans(queryString);
       const { totalCount } = result;
@@ -431,8 +432,8 @@ const Upload: React.FC<UploadProps> = () => {
             //     sx={{ borderRadius: "10px" }}
             //   />
             // }
-            page={page}
-            setPage={setPage}
+            page={orphanPage}//orphanpage
+            setPage={setOrphanPage}//setOrphaPage
             totalCount={totalCount}
             setTotalCount={setTotalCount}
             pageSize={pageSize}

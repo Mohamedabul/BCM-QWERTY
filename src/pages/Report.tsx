@@ -5,6 +5,15 @@ import { DownOutlined } from "@ant-design/icons";
 import { saveAs } from "file-saver";
 import { getReportData, getReportExport,getRegions, getCountrys } from "apis";
 import { TablePagination } from "@mui/material";
+import { 
+  Table as MUITable, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow, 
+  Paper 
+} from "@mui/material";
 
 interface DataItem {
   country: string; // New field for Select Type filter
@@ -266,29 +275,68 @@ const Report: React.FC = () => {
         </Button>
       </div>
 
-      <div
-        className="table-header"
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "16px",
+      
+
+      <TableContainer 
+        component={Paper} 
+        sx={{ 
+          maxHeight: 440, 
+          overflow: 'auto',
+          '& .MuiTable-root': {
+            borderCollapse: 'separate',
+            borderSpacing: 0,
+          }
         }}
       >
-        
-      </div>
-
-      <Table
-        columns={columns}
-        dataSource={data}
-        rowKey="application"
-        pagination={false}
-        scroll={{
-          y: 400,
-          x: 'max-content',
-        }}
-        
-      />
+        <MUITable 
+          stickyHeader 
+          sx={{ 
+            minWidth: 650,
+            '& .MuiTableCell-root': {
+              borderBottom: 'none', // Remove row separation lines
+              padding: '12px 16px'
+            }
+          }}
+        >
+          <TableHead>
+            <TableRow>
+              {columns.map((column) => (
+                <TableCell 
+                  key={column.key} 
+                  sx={{ 
+                    fontWeight: 'bold', 
+                    fontSize:16,
+                    backgroundColor: '#e2e2e2',
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 1
+                  }}
+                >
+                  {column.title}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.map((row: any, index: number) => (
+              <TableRow 
+                key={index} 
+                hover 
+                sx={{ 
+                  '&:last-child td': { border: 0 } 
+                }}
+              >
+                <TableCell>{row.country}</TableCell>
+                <TableCell>{row.region}</TableCell>
+                <TableCell>{row.cap}</TableCell>
+                <TableCell>{row.domain}</TableCell>
+                <TableCell>{row.subdomain}</TableCell>
+                <TableCell>{row.name}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </MUITable>
+      </TableContainer>
 
   <TablePagination
   component="div"
