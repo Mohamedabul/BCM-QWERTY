@@ -22,8 +22,10 @@ const Template = () => {
         fetchCapabilities();
       }, []);
 
+    
+    if (cabablityList.length === 0) return;
     return (
-        <Box className="template-container" sx={{ flexGrow: 1 }}>  
+        <Box sx={{ flexGrow: 1, boxShadow: 10, padding: "20px" }}>  
             
                 <Box className="template-dropdown" >
                 <Grid container spacing={2}>
