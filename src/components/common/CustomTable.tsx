@@ -384,8 +384,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
           onClose={handleEditDialogClose}
           onSave={handleEditSave}
           data={editData}
-          onChange={handleEditChange}
-        />
+          onChange={handleEditChange} sort={""}        />
       )}
       <CustomDeleteDialog
         open={deleteDialogOpen}
