@@ -15,9 +15,13 @@ export const getDashBoardCounts = async () => {
   return result;
 };
 
-export const fetchCorecapability = async () => {
-  const response = await fetch(baseUrl + "corecapability");
+
+const defaultSort = (JSON.stringify({ created_at: "DESC" }));
+
+export const fetchCorecapability = async (sort=defaultSort) => {
+  const response = await fetch(baseUrl + "corecapability" + `?sort=${sort}`);
   const result = await response.json();
+  console.log("fetch corecapability :", result);
   return result;
 };
 
@@ -51,8 +55,8 @@ export const deleteCorecapability = async (id: string) => {
   return result;
 };
 
-export const fetchDomain = async () => {
-  const response = await fetch(baseUrl + "domain");
+export const fetchDomain = async (sort=defaultSort) => {
+  const response = await fetch(baseUrl + "domain" + `?sort=${sort}`);
   const result = await response.json();
   return result;
 };
@@ -73,8 +77,8 @@ export const fetchDomainByCapability = async (queryString: string) => {
   return result;
 };
 
-export const fetchSubdomain = async () => {
-  const response = await fetch(baseUrl + "subdomain");
+export const fetchSubdomain = async (sort=defaultSort) => {
+  const response = await fetch(baseUrl + "subdomain" + `?sort=${sort}`);
   const result = await response.json();
   return result;
 };

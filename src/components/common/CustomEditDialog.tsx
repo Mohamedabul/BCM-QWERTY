@@ -9,6 +9,7 @@ interface CustomEditDialogProps {
   open: boolean;
   onClose: () => void;
   onSave: () => void;
+  sort: string;
   data: {
     core_id: string;
     domain_id: string;
@@ -38,7 +39,9 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
   useEffect(() => {
     const fetchCapabilities = async () => {
       try {
-        const result = await fetchCorecapability();
+        const sort = (JSON.stringify({ name: "ASC" }));
+        const result = await fetchCorecapability(sort);
+        // const sortedCapabilities = result.sort((a: { name: string; }, b: { name: any; }) => a.name.localeCompare(b.name));
         setCapabilities(result);
       } catch (error) {
         console.error("Error fetching capabilities:", error);
@@ -46,8 +49,10 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
     };
     const fetchDomains = async () => {
       try {
-        const domainResult = await fetchDomain();
-        setDomains(domainResult);
+        const sort = (JSON.stringify({ name: "ASC" }));
+        const domainResult = await fetchDomain(sort);
+        // const sortedDomains = domainResult.sort((a: { name: string; }, b: { name: any; }) => a.name.localeCompare(b.name));
+      setDomains(domainResult);
       } catch (error) {
         console.error("Error fetching domains:", error);
       }
@@ -55,7 +60,9 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
 
     const fetchSubDomains = async () => {
       try {
-        const subDomainResult = await fetchSubdomain();
+        const sort = (JSON.stringify({ name: "ASC" }));
+        const subDomainResult = await fetchSubdomain(sort);
+        // const sortedSubDomains = subDomainResult.sort((a: { name: string; }, b: { name: any; }) => a.name.localeCompare(b.name));
         setSubDomains(subDomainResult);
       } catch (error) {
         console.error("Error fetching subdomains:", error);
@@ -89,18 +96,18 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
   }, []);
 
     useEffect(() => {
-    const capabilityId = data.core_id;
-    setFilteredDomains(domains.filter((domain) => domain.core_id === capabilityId));
-    
-    
-  }, [data.core_id, domains, onChange]);
+      const capabilityId = data.core_id;
+      setFilteredDomains(domains.filter((domain) => domain.core_id === capabilityId));
+      
+      // setFilteredDomains(filtered.sort((a, b) => a.name.localeCompare(b.name)));
+    }, [data.core_id, domains]);
 
   
   useEffect(() => {
     const domainId = data.domain_id;
+    // const filtered = subDomains.filter((subDomain) => subDomain.domain_id === domainId);
     setFilteredSubDomains(subDomains.filter((subDomain) => subDomain.domain_id === domainId));
-    
-  }, [data.domain_id, subDomains, onChange]);
+  }, [data.domain_id, subDomains]);
 
  
 

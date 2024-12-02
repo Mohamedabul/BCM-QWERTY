@@ -280,7 +280,8 @@ const Report: React.FC = () => {
       <TableContainer 
         component={Paper} 
         sx={{ 
-          maxHeight: 440, 
+          minHeight: 500, 
+          maxHeight: 600, 
           overflow: 'auto',
           '& .MuiTable-root': {
             borderCollapse: 'separate',
@@ -294,7 +295,7 @@ const Report: React.FC = () => {
             minWidth: 650,
             '& .MuiTableCell-root': {
               borderBottom: 'none', // Remove row separation lines
-              padding: '12px 16px'
+              padding: '20px 16px'
             }
           }}
         >
@@ -323,8 +324,9 @@ const Report: React.FC = () => {
                 key={index} 
                 hover 
                 sx={{ 
-                  '&:last-child td': { border: 0 } 
+                  '&:last-child td': { border: 0 }
                 }}
+                
               >
                 <TableCell>{row.country}</TableCell>
                 <TableCell>{row.region}</TableCell>

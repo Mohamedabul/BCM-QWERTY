@@ -5,7 +5,7 @@ import { CustomButton } from "components";
 import CapabilityCard from "./card-capability";
 import CreateCapability from "./create-capability";
 import { useEffect, useState } from "react";
-import { createCorecapability, fetchTemplateCorecapability, fetchCorecapability } from "apis";
+import { createCorecapability,  fetchCorecapability } from "apis";
 
 function AllCapabilities({ isEditable }: any) {
   const [cabablityList, setCapabilityList] = useState<any[]>([]);
@@ -14,7 +14,7 @@ function AllCapabilities({ isEditable }: any) {
 
   const fetchCapabilities = async () => {
     try {
-      const data = isEditable ? await fetchCorecapability() : await fetchTemplateCorecapability();
+      const data =  await fetchCorecapability() ;
       setCapabilityList(data);
     } catch (error) {
       console.error("Error fetching capabilities:", error);
