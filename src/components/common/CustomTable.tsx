@@ -33,6 +33,10 @@ interface TableData {
   core_id: string;
   domain_id: string;
   subdomain_id: string;
+  //
+  region_id: string; 
+  country_id: string; 
+  status: string; 
 }
 
 interface CustomTableProps {
@@ -85,6 +89,10 @@ const CustomTable: React.FC<CustomTableProps> = ({
       core_id: row.core_id || "",
       domain_id: row.domain_id || "",
       subdomain_id: row.subdomain_id || "",
+      //
+      region_id: row.region_id || "", 
+    country_id: row.country_id || "", 
+    status: row.status || "",
     });
     setEditDialogOpen(true);
   };
@@ -101,6 +109,11 @@ const CustomTable: React.FC<CustomTableProps> = ({
         core_id: editData.core_id,
         domain_id: editData.domain_id,
         subdomain_id: editData.subdomain_id,
+        //
+        region_id: editData.region_id, 
+        country_id: editData.country_id, 
+        status: editData.status,
+        //
         name: editData.applicationName,
         applicationVersion: editData.applicationVersion,
       };

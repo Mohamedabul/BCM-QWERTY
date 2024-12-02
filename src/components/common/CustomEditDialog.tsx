@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Select, MenuItem, Box, Typography, IconButton } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Select, MenuItem, Box, Typography, IconButton, TextField } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CustomButton from './CustomButton';
-import { fetchCorecapability, fetchDomain, fetchSubdomain } from 'apis';
+import { fetchCorecapability, fetchDomain, fetchSubdomain, getCountrys, getRegions } from 'apis';
 import { Capability, Domain, SubDomain } from 'apis/interfaces';
 
 interface CustomEditDialogProps {
@@ -13,17 +13,27 @@ interface CustomEditDialogProps {
     core_id: string;
     domain_id: string;
     subdomain_id: string;
+    region_id: string;
+    country_id: string;
+    status: string;
   };
   onChange: (field: string, value: string) => void;
 }
+// dummy 
 
 
 const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSave, data, onChange }) => {
   const [capabilities, setCapabilities] = React.useState<Capability[]>([]);
   const [domains, setDomains] = React.useState<Domain[]>([]);
   const [subDomains, setSubDomains] = React.useState<SubDomain[]>([]);
+  //
+  const [regions, setRegions] = React.useState<any[]>([]);
+  const [countries, setCountries] = React.useState<any[]>([]);
+
+
   const [filteredDomains, setFilteredDomains] = React.useState<Domain[]>([]);
   const [filteredSubDomains, setFilteredSubDomains] = React.useState<SubDomain[]>([]);
+  
 
   useEffect(() => {
     const fetchCapabilities = async () => {
@@ -52,9 +62,30 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
       }
     };
 
+    const fetchRegions = async () => {
+      try {
+        const RegionResult = await getRegions();
+        setRegions(RegionResult);
+      } catch (error) {
+        console.error("Error fetching regions:", error);
+      }
+    };
+
+    const fetchCountries = async () => {
+      try {
+        const countryResult = await getCountrys();
+        setCountries(countryResult);
+      } catch (error) {
+        console.error("Error fetching countries:", error);
+      }
+    };
+
     fetchCapabilities();
     fetchDomains();
     fetchSubDomains();
+    //
+    fetchRegions();
+    fetchCountries();
   }, []);
 
     useEffect(() => {
@@ -71,6 +102,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
     
   }, [data.domain_id, subDomains, onChange]);
 
+ 
 
 
   return (
@@ -165,6 +197,86 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
               </MenuItem>
             ))}
           </Select>
+          
+           {/* Region Select */}
+           <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>
+            Select Region<span style={{ color: 'red' }}>*</span>
+          </Typography>
+          <Select
+            fullWidth
+            value={data.region_id}
+            onChange={(e) => onChange('region_id', e.target.value as string)}
+            displayEmpty
+            sx={{
+              backgroundColor: '#f0f2f5',
+              borderRadius: 1,
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: 'transparent' },
+                '&.Mui-focused fieldset': { borderColor: '#b0bec5' },
+              },
+              '& .MuiInputBase-input': { color: 'black' },
+            }}
+          >
+            <MenuItem value="" disabled>Select Region</MenuItem>
+            {regions.map((region) => (
+              <MenuItem key={region.id} value={region.id}>
+                {region.name}
+              </MenuItem>
+            ))}
+          </Select>
+
+          {/* Country Select */}
+          <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>
+            Select Country<span style={{ color: 'red' }}>*</span>
+          </Typography>
+          <Select
+            fullWidth
+            value={data.country_id}
+            onChange={(e) => onChange('country_id', e.target.value as string)}
+            displayEmpty
+            
+            sx={{
+              backgroundColor: '#f0f2f5',
+              borderRadius: 1,
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: 'transparent' },
+                '&.Mui-focused fieldset': { borderColor: '#b0bec5' },
+              },
+              '& .MuiInputBase-input': { color: 'black' },
+            }}
+          >
+            <MenuItem value="" disabled>Select Country</MenuItem>
+            {countries.map((country) => (
+              <MenuItem key={country.id} value={country.id}>
+                {country.name}
+              </MenuItem>
+            ))}
+          </Select>
+
+           {/* Status Text Field */}
+           <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>
+            Type Status<span style={{ color: 'red' }}>*</span>
+          </Typography>
+          <TextField
+            fullWidth
+            value={data.status || ''} // Default to an empty string if undefined
+            onChange={(e) => {
+              console.log('Input Value:', e.target.value); // Debugging
+              onChange('status', e.target.value);
+            }}
+            placeholder="Enter status"
+            sx={{
+              backgroundColor: '#f0f2f5',
+              borderRadius: 1,
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': { borderColor: 'transparent' },
+                '&.Mui-focused fieldset': { borderColor: '#b0bec5' },
+              },
+              '& .MuiInputBase-input': { color: 'black' },
+            }}
+          />
+
+
         </Box>
       </DialogContent>
       <DialogActions sx={{ backgroundColor: 'white', padding: '16px', justifyContent: 'space-between' }}>
