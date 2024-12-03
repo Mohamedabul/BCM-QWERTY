@@ -22,6 +22,7 @@ interface DataItem {
   domain: string;
   subdomain: string;
   name: string;
+  status: string;
   business_owner: string;
 }
 
@@ -43,13 +44,14 @@ const Report: React.FC = () => {
     { title: "Location", dataIndex: "country", key: "type" }, // Added Type column
     { title: "Region", dataIndex: "region", key: "regional" },
     {
-      title: "Business Capability Name",
+      title: "Business Capability",
       dataIndex: "cap",
       key: "businessCapability",
     },
     { title: "Domain", dataIndex: "domain", key: "domain" },
     { title: "Sub-domain", dataIndex: "subdomain", key: "subDomain" },
     { title: "Application Name", dataIndex: "name", key: "name" },
+    { title: "Status", dataIndex: "status", key: "status" },
   ];
 
   const getFilters = () => {
@@ -77,10 +79,11 @@ const Report: React.FC = () => {
       domain: item.domain || "-", 
       subdomain: item.subdomain || "-", 
       name: item.name || "-", 
+      status: item.status || "-",
       business_owner: item.business_owner || "-", 
     }));
     if(selectType === "global"){
-      setData(processedData || []); 
+      setData(processedData || []);
     }else{
       setData(processedData.filter((e:any) => e.region !== "Global") || []);
     }
@@ -334,6 +337,7 @@ const Report: React.FC = () => {
                 <TableCell>{row.domain}</TableCell>
                 <TableCell>{row.subdomain}</TableCell>
                 <TableCell>{row.name}</TableCell>
+                <TableCell>{row.status}</TableCell>
               </TableRow>
             ))}
           </TableBody>
