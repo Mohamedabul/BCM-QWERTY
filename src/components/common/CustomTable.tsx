@@ -353,6 +353,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
                   {row.applicationName || "-"}
                 </Typography>
               </TableCell>
+
               <TableCell align="right" sx={{ borderBottom: "none" }}>
                 <IconButton
                   onClick={(event) => handleOpenMenu(event, row)}
