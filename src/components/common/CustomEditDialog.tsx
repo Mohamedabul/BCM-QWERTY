@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Select, MenuItem, Box, Typography, IconButton, TextField } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Select, MenuItem, Box, Typography, IconButton, TextField, SelectChangeEvent, OutlinedInput } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CustomButton from './CustomButton';
 import { fetchCorecapability, fetchDomain, fetchSubdomain, getCountrys, getRegions } from 'apis';
 import { Capability, Domain, SubDomain } from 'apis/interfaces';
-import { countReset } from 'console';
 
 interface CustomEditDialogProps {
   open: boolean;
@@ -19,6 +18,8 @@ interface CustomEditDialogProps {
 
 const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSave, data, onChange }) => {
   const [capabilities, setCapabilities] = React.useState<Capability[]>([]);
+  const [selectedCapabilities, setSelectedCapabilities] = React.useState<any[]>(data.businessCapabilityName ? [data.businessCapabilityName] : []);
+  const [selectedDomain, setSelectedDomain] = React.useState<any[]>(data.domain ? [data.domain] : []);
   const [domains, setDomains] = React.useState<Domain[]>([]);
   const [subDomains, setSubDomains] = React.useState<SubDomain[]>([]);
   //
@@ -28,6 +29,24 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
 
   const [filteredDomains, setFilteredDomains] = React.useState<Domain[]>([]);
   const [filteredSubDomains, setFilteredSubDomains] = React.useState<SubDomain[]>([]);
+
+  const handleChange = (event: SelectChangeEvent<any>) => {
+    const {
+      target: { value },
+    } = event;
+    setSelectedCapabilities(
+      typeof value === 'string' ? value.split(',') : value,
+    );
+  };
+
+  const handleChangeDomain = (event: SelectChangeEvent<any>) => {
+    const {
+      target: { value },
+    } = event;
+    setSelectedDomain(
+      typeof value === 'string' ? value.split(',') : value,
+    );
+  };
   
 
   useEffect(() => {
@@ -128,10 +147,13 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
           <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Select Business Capability Name<span style={{ color: 'red' }}>*</span></Typography>
           <Select
             fullWidth
-            value={[data.core_id]}
-            onChange={(e) => onChange('core_id', e.target.value as string)}
-            displayEmpty
+            value={selectedCapabilities}
             multiple
+            onChange={handleChange}
+            input={<OutlinedInput label="Tag" />}
+            renderValue={(selected) => {
+              return selected.join(',')
+            }}
             sx={{
               backgroundColor: '#f0f2f5',
               borderRadius: 1,
@@ -143,10 +165,10 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
             }}
           >
             {
-              data.businessCapabilityName ? <MenuItem value="">{data.businessCapabilityName}</MenuItem> : <MenuItem value="" disabled>Select Business Capability</MenuItem>
+              !data.businessCapabilityName && <MenuItem value="" disabled>Select Business Capability</MenuItem>
             }
             {capabilities.map((capability) => (
-              <MenuItem key={capability.id} value={capability.id}>
+              <MenuItem key={capability.id} value={capability.name}>
                 {capability.name}
               </MenuItem>
             ))}
@@ -155,9 +177,13 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
           <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Select Domain Name<span style={{ color: 'red' }}>*</span></Typography>
           <Select
             fullWidth
-            value={data.domain_id}
-            onChange={(e) => onChange('domain_id', e.target.value as string)}
-            displayEmpty
+            value={selectedDomain}
+            onChange={handleChangeDomain}
+            multiple
+            input={<OutlinedInput label="Tag" />}
+            renderValue={(selected) => {
+              return selected.join(',')
+            }}
             disabled={!data.domain}
             sx={{
               backgroundColor: '#f0f2f5',
@@ -170,10 +196,10 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
             }}
           >
             {
-              data.domain ? <MenuItem value="">{data.domain}</MenuItem> : <MenuItem value="" disabled>Select Domain</MenuItem>
+              !data.domain && <MenuItem value="" disabled>Select Domain</MenuItem>
             }
-            {filteredDomains.map((domain) => (
-              <MenuItem key={domain.id} value={domain.id}>
+            {domains.map((domain) => (
+              <MenuItem key={domain.id} value={domain.name}>
                 {domain.name}
               </MenuItem>
             ))}

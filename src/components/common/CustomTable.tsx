@@ -132,7 +132,6 @@ const CustomTable: React.FC<CustomTableProps> = ({
       core_id: row.core_id || "",
       domain_id: row.domain_id || "",
       subdomain_id: row.subdomain_id || "",
-      //
       region_id: row.region_id || "", 
     country_id: row.country_id || "", 
     status: row.status || "",
