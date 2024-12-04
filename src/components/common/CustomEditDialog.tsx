@@ -4,20 +4,14 @@ import CloseIcon from '@mui/icons-material/Close';
 import CustomButton from './CustomButton';
 import { fetchCorecapability, fetchDomain, fetchSubdomain, getCountrys, getRegions } from 'apis';
 import { Capability, Domain, SubDomain } from 'apis/interfaces';
+import { countReset } from 'console';
 
 interface CustomEditDialogProps {
   open: boolean;
   onClose: () => void;
   onSave: () => void;
   sort: string;
-  data: {
-    core_id: string;
-    domain_id: string;
-    subdomain_id: string;
-    region_id: string;
-    country_id: string;
-    status: string;
-  };
+  data: any;
   onChange: (field: string, value: string) => void;
 }
 // dummy 
@@ -134,9 +128,10 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
           <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Select Business Capability Name<span style={{ color: 'red' }}>*</span></Typography>
           <Select
             fullWidth
-            value={data.core_id}
+            value={[data.core_id]}
             onChange={(e) => onChange('core_id', e.target.value as string)}
             displayEmpty
+            multiple
             sx={{
               backgroundColor: '#f0f2f5',
               borderRadius: 1,
@@ -147,7 +142,9 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
               '& .MuiInputBase-input': { color: 'black' },
             }}
           >
-            <MenuItem value="" disabled>Select Business Capability</MenuItem>
+            {
+              data.businessCapabilityName ? <MenuItem value="">{data.businessCapabilityName}</MenuItem> : <MenuItem value="" disabled>Select Business Capability</MenuItem>
+            }
             {capabilities.map((capability) => (
               <MenuItem key={capability.id} value={capability.id}>
                 {capability.name}
@@ -161,7 +158,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
             value={data.domain_id}
             onChange={(e) => onChange('domain_id', e.target.value as string)}
             displayEmpty
-            disabled={!data.core_id}
+            disabled={!data.domain}
             sx={{
               backgroundColor: '#f0f2f5',
               borderRadius: 1,
@@ -172,7 +169,9 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
               '& .MuiInputBase-input': { color: 'black' },
             }}
           >
-            <MenuItem value="" disabled>Select Domain</MenuItem>
+            {
+              data.domain ? <MenuItem value="">{data.domain}</MenuItem> : <MenuItem value="" disabled>Select Domain</MenuItem>
+            }
             {filteredDomains.map((domain) => (
               <MenuItem key={domain.id} value={domain.id}>
                 {domain.name}
@@ -186,7 +185,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
             value={data.subdomain_id}
             onChange={(e) => onChange('subdomain_id', e.target.value as string)}
             displayEmpty
-            disabled={!data.domain_id}
+            disabled={!data.subDomain}
             sx={{
               backgroundColor: '#f0f2f5',
               borderRadius: 1,
@@ -197,7 +196,10 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
               '& .MuiInputBase-input': { color: 'black' },
             }}
           >
-            <MenuItem value="" disabled>Select Sub-domain</MenuItem>
+            {
+              data.subDomain ? <MenuItem value="">{data.subDomain}</MenuItem> : <MenuItem value="" disabled>Select Sub-domain</MenuItem>
+            }
+            
             {filteredSubDomains.map((subDomain) => (
               <MenuItem key={subDomain.id} value={subDomain.id}>
                 {subDomain.name}
