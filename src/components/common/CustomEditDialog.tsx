@@ -30,7 +30,7 @@ import { Capability, Domain, SubDomain } from "apis/interfaces";
 interface CustomEditDialogProps {
   open: boolean;
   onClose: () => void;
-  onSave: () => void;
+  onSave: any;
   sort: string;
   data: any;
   onChange: (field: string, value: string) => void;
@@ -56,11 +56,14 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
   );
   const [domains, setDomains] = React.useState<any[]>([]);
   const [subDomains, setSubDomains] = React.useState<SubDomain[]>([]);
+  const [selectedValues, setSelectedValues] = React.useState<any>({});
   //
   const [regions, setRegions] = React.useState<any[]>([]);
   const [countries, setCountries] = React.useState<any[]>([]);
   const [selectedRegion, setSelectedRegion] = React.useState<any>(data.region);
-  const [selectedCountry, setSelectedCountry] = React.useState<any>(data.country);
+  const [selectedCountry, setSelectedCountry] = React.useState<any>(
+    data.country
+  );
   const [selectedStatus, setSelectedStatus] = React.useState<any>(data.status);
 
   const [filteredDomains, setFilteredDomains] = React.useState<Domain[]>([]);
@@ -167,6 +170,15 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
     );
   }, [data.domain_id, subDomains]);
 
+  const handleCheckboxToggleCap = (domainName: any) => {
+    setSelectedCapabilities((prevSelected) => {
+      if (prevSelected.includes(domainName)) {
+        return prevSelected.filter((item) => item !== domainName);
+      }
+      return [...prevSelected, domainName];
+    });
+  };
+
   const handleCheckboxToggle = (domainName: any) => {
     setSelectedDomain((prevSelected) => {
       if (prevSelected.includes(domainName)) {
@@ -183,6 +195,67 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
       }
       return [...prevSelected, domainName];
     });
+  };
+
+  const formatAndSave = () => {
+    console.log(
+      selectedCapabilities,
+      selectedDomain,
+      selectedSubdomain,
+      selectedRegion,
+      selectedCountry,
+      selectedStatus
+    );
+    const formattedData: any[] = [];
+
+    const filteredCap = capabilities.filter((x) =>
+      selectedCapabilities.includes(x.name)
+    );
+
+    filteredCap.forEach((cap) => {
+      const filteredDomain = domains.filter(
+        (x) => selectedDomain.includes(x.name) && x.core_id === cap.id
+      );
+      if (filteredDomain.length > 0) {
+        filteredDomain.forEach((domainId) => {
+          const filteredSubDomain = subDomains.filter(
+            (x) =>
+              selectedSubdomain.includes(x.name) && x.domain_id === domainId.id
+          );
+          if (filteredSubDomain.length > 0) {
+            filteredSubDomain.forEach((subdomainId) => {
+              formattedData.push({
+                core_id: cap.id,
+                domain_id: domainId.id,
+                subdomain_id: subdomainId.id,
+                region: selectedRegion,
+                country: selectedCountry,
+                status: selectedStatus,
+              });
+            });
+          } else {
+            formattedData.push({
+              core_id: cap.id,
+              domain_id: domainId.id,
+              subdomain_id: null,
+              region: selectedRegion,
+              country: selectedCountry,
+              status: selectedStatus,
+            });
+          }
+        });
+      } else {
+        formattedData.push({
+          core_id: cap.id,
+          domain_id: null,
+          subdomain_id: null,
+          region: selectedRegion,
+          country: selectedCountry,
+          status: selectedStatus,
+        });
+      }
+    });
+    onSave(formattedData);
   };
 
   return (
@@ -250,7 +323,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
               <MenuItem key={capability.id} value={capability.name}>
                 <Checkbox
                   checked={selectedCapabilities.indexOf(capability.name) > -1}
-                  onChange={() => handleCheckboxToggle(capability.name)}
+                  onChange={() => handleCheckboxToggleCap(capability.name)}
                 />
                 {capability.name}
               </MenuItem>
@@ -394,7 +467,10 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
           <Select
             fullWidth
             value={selectedRegion}
-            onChange={(e) => onChange("region", e.target.value as string)}
+            onChange={(e) => {
+              setSelectedRegion(e.target.value);
+              onChange("region", e.target.value as string);
+            }}
             displayEmpty
             sx={{
               backgroundColor: "#f0f2f5",
@@ -406,9 +482,11 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
               "& .MuiInputBase-input": { color: "black" },
             }}
           >
-            {!data.region && <MenuItem value="" disabled>
-              Select Region
-            </MenuItem>}
+            {!data.region && (
+              <MenuItem value="" disabled>
+                Select Region
+              </MenuItem>
+            )}
             {regions.map((region) => (
               <MenuItem key={region.id} value={region.name}>
                 {region.name}
@@ -426,7 +504,10 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
           <Select
             fullWidth
             value={selectedCountry}
-            onChange={(e) => onChange("country", e.target.value as string)}
+            onChange={(e) => {
+              setSelectedCountry(e.target.value);
+              onChange("country", e.target.value as string);
+            }}
             displayEmpty
             sx={{
               backgroundColor: "#f0f2f5",
@@ -459,7 +540,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
             fullWidth
             value={selectedStatus || ""} // Default to an empty string if undefined
             onChange={(e) => {
-              console.log("Input Value:", e.target.value); // Debugging
+              setSelectedStatus(e.target.value);
               onChange("status", e.target.value);
             }}
             placeholder="Enter status"
@@ -501,7 +582,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
           title="Save"
           backgroundColor="#1976d2"
           color="white"
-          handleClick={onSave}
+          handleClick={formatAndSave}
           sx={{
             backgroundColor: "#1976d2",
             color: "white",

@@ -143,22 +143,22 @@ const CustomTable: React.FC<CustomTableProps> = ({
     setEditDialogOpen(false);
     setEditData(null);
   };
-  const handleEditSave = async () => {
+  const handleEditSave = async (payload:any) => {
     if (!editData) return;
 
     try {
-      const payload = {
-        core_id: editData.core_id,
-        domain_id: editData.domain_id,
-        subdomain_id: editData.subdomain_id,
-        //
-        region: editData.region,
-        country: editData.country,
-        status: editData.status,
-        //
-        name: editData.applicationName,
-        applicationVersion: editData.applicationVersion,
-      };
+      // const payload = {
+      //   core_id: editData.core_id,
+      //   domain_id: editData.domain_id,
+      //   subdomain_id: editData.subdomain_id,
+      //   //
+      //   region: editData.region,
+      //   country: editData.country,
+      //   status: editData.status,
+      //   //
+      //   name: editData.applicationName,
+      //   applicationVersion: editData.applicationVersion,
+      // };
 
       const response = await patchApplication(
         editData.id,
@@ -390,7 +390,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
         <CustomEditDialog
           open={editDialogOpen}
           onClose={handleEditDialogClose}
-          onSave={handleEditSave}
+          onSave={(payload:any) => handleEditSave(payload)}
           data={editData}
           onChange={handleEditChange}
           sort={""}
