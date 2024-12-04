@@ -90,6 +90,9 @@ const Upload: React.FC<UploadProps> = () => {
         domain: item.domain !== "-" ? item.domain : "-",
         subDomain: item.subdomain !== "-" ? item.subdomain : "-",
         applicationName: item.software_name,
+        region: item.region,
+        country: item.country,
+        status: item.status,
       }));
       setMappedData(mappedData);
       // if(mappedData.length === 0){

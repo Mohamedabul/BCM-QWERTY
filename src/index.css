@@ -145,3 +145,8 @@ a {
 .fix-orphan-button:hover {
   background-color: #285bb5 !important;
 }
+
+optgroup {
+  font-style: normal;
+  padding: 0 10px;
+}

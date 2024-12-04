@@ -34,9 +34,9 @@ interface TableData {
   domain_id: string;
   subdomain_id: string;
   //
-  region_id: string; 
-  country_id: string; 
-  status: string; 
+  region: string;
+  country: string;
+  status: string;
 }
 
 interface CustomTableProps {
@@ -61,9 +61,12 @@ const CustomTable: React.FC<CustomTableProps> = ({
   setTotalCount,
   pageSize,
   setPageSize,
-  editCallback
+  editCallback,
 }) => {
-  const [sortConfig, setSortConfig] = React.useState<{ key: string; direction: "asc" | "desc" | "" }>({
+  const [sortConfig, setSortConfig] = React.useState<{
+    key: string;
+    direction: "asc" | "desc" | "";
+  }>({
     key: "",
     direction: "",
   });
@@ -73,17 +76,15 @@ const CustomTable: React.FC<CustomTableProps> = ({
   const [editData, setEditData] = React.useState<TableData | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
 
-
-
   const sortedData = React.useMemo(() => {
     if (!sortConfig.key || !sortConfig.direction) return data;
-  
+
     return [...data].sort((a, b) => {
       const key = sortConfig.key as keyof TableData;
-  
+
       const valueA = a[key];
       const valueB = b[key];
-  
+
       if (valueA == null || valueB == null) {
         return 0;
       }
@@ -104,14 +105,12 @@ const CustomTable: React.FC<CustomTableProps> = ({
     }
     setSortConfig({ key, direction });
   };
-  
+
   const renderSortIcon = (key: string) => {
     if (sortConfig.key !== key) return null;
     return sortConfig.direction === "asc" ? "↑" : "↓";
   };
 
-
-  
   const handleOpenMenu = (
     event: React.MouseEvent<HTMLElement>,
     row: TableData
@@ -127,14 +126,15 @@ const CustomTable: React.FC<CustomTableProps> = ({
   };
 
   const handleEditClick = (row: TableData) => {
+    console.log(row, "edict");
     setEditData({
       ...row,
       core_id: row.core_id || "",
       domain_id: row.domain_id || "",
       subdomain_id: row.subdomain_id || "",
-      region_id: row.region_id || "", 
-    country_id: row.country_id || "", 
-    status: row.status || "",
+      region: row.region || "",
+      country: row.country || "",
+      status: row.status || "",
     });
     setEditDialogOpen(true);
   };
@@ -152,8 +152,8 @@ const CustomTable: React.FC<CustomTableProps> = ({
         domain_id: editData.domain_id,
         subdomain_id: editData.subdomain_id,
         //
-        region_id: editData.region_id, 
-        country_id: editData.country_id, 
+        region: editData.region,
+        country: editData.country,
         status: editData.status,
         //
         name: editData.applicationName,
@@ -214,7 +214,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
       }
 
       console.log("Deleted data:", selectedRow);
-      
+
       setDeleteDialogOpen(false);
       setSelectedRow(null);
       await editCallback();
@@ -253,43 +253,42 @@ const CustomTable: React.FC<CustomTableProps> = ({
     >
       <Table stickyHeader>
         <TableHead>
-        <TableRow sx={{ "& th": { backgroundColor: "#e2e2e2" } }}>
-        {[
-          { label: "Business Capability", key: "businessCapabilityName" },
-          { label: "Domain", key: "domain" },
-          { label: "Sub-domain", key: "subDomain" },
-          { label: "Application", key: "applicationName" },
-        ].map(({ label, key }) => (
-          <TableCell
-            key={key}
-            align="center"
-            sx={{
-              borderBottom: "none",
-              cursor: "pointer",
-              backgroundColor: sortConfig.key === key ? "#d1ecf1" : "inherit",
-              color: sortConfig.key === key ? "#0c5460" : "black",
-              fontWeight: sortConfig.key === key ? "bold" : "normal",
-              "&:hover": {
-                backgroundColor: "#f0f0f0", // Add hover effect
-              },
-            }}
-            onClick={() => handleSort(key)}
-          >
-            <Typography
-              variant="subtitle2"
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              {label}
-              {renderSortIcon(key)}
-            </Typography>
+          <TableRow sx={{ "& th": { backgroundColor: "#e2e2e2" } }}>
+            {[
+              { label: "Business Capability", key: "businessCapabilityName" },
+              { label: "Domain", key: "domain" },
+              { label: "Sub-domain", key: "subDomain" },
+              { label: "Application", key: "applicationName" },
+            ].map(({ label, key }) => (
+              <TableCell
+                key={key}
+                align="center"
+                sx={{
+                  borderBottom: "none",
+                  cursor: "pointer",
+                  backgroundColor:
+                    sortConfig.key === key ? "#d1ecf1" : "inherit",
+                  color: sortConfig.key === key ? "#0c5460" : "black",
+                  fontWeight: sortConfig.key === key ? "bold" : "normal",
+                  "&:hover": {
+                    backgroundColor: "#f0f0f0", // Add hover effect
+                  },
+                }}
+                onClick={() => handleSort(key)}
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {label}
+                  {renderSortIcon(key)}
+                </Typography>
 
-
-
-            {/* <TableCell align="center" sx={{ borderBottom: "none" }}>
+                {/* <TableCell align="center" sx={{ borderBottom: "none" }}>
               <Typography
                 variant="subtitle2"
                 color="black"
@@ -328,11 +327,8 @@ const CustomTable: React.FC<CustomTableProps> = ({
               >
                 Application
               </Typography> */}
-
-
-
-            </TableCell>
-        ))}
+              </TableCell>
+            ))}
             <TableCell sx={{ borderBottom: "none", textAlign: "right" }}>
               {/* {actionButton} */}
             </TableCell>
@@ -396,7 +392,9 @@ const CustomTable: React.FC<CustomTableProps> = ({
           onClose={handleEditDialogClose}
           onSave={handleEditSave}
           data={editData}
-          onChange={handleEditChange} sort={""}        />
+          onChange={handleEditChange}
+          sort={""}
+        />
       )}
       <CustomDeleteDialog
         open={deleteDialogOpen}
