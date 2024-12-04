@@ -1,6 +1,7 @@
 export interface Capability {
   id: string;
   name: string;
+  capability: string;
 }
 export interface Domain {
   id: string;
