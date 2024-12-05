@@ -59,6 +59,12 @@ const Upload: React.FC<UploadProps> = () => {
   const [orphanPage, setOrphanPage] = useState(1);//new
   const [totalCount, setTotalCount] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: "ASC" | "DESC" | "" }>({
+    key: "",
+    direction: "",
+  });
+
+
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
@@ -70,12 +76,20 @@ const Upload: React.FC<UploadProps> = () => {
     } else if (selectedTab === 1) {
       fetchOrphans();
     }
-  }, [selectedTab, page, orphanPage, pageSize]);//orphanPage
+  }, [selectedTab, page, orphanPage, pageSize, sortConfig]);//orphanPage
+
+  const keyMapping: { [key: string]: string } = {
+    businessCapabilityName: "capability",
+    domain: "domain",
+    subDomain: "subdomain",
+    applicationName: "name",
+  };
 
   const fetchMappedApplications = async () => {
     setLoading(true);
     try {
-      const params:any = {page: page, limit: pageSize};
+      const mappedKey = keyMapping[sortConfig.key] || sortConfig.key; 
+      const params:any = {page: page, limit: pageSize,sortField: mappedKey, sortOrder: sortConfig.direction};
       const queryString = new URLSearchParams(params).toString();
       const result = await getMappedApplications(queryString);
       console.log("Result:", result);
@@ -110,7 +124,8 @@ const Upload: React.FC<UploadProps> = () => {
   const fetchOrphans = async () => {
     setLoading(true);
     try {
-      const params:any = {page: orphanPage, limit: pageSize};//orphanpage
+      const mappedKey = keyMapping[sortConfig.key] || sortConfig.key; 
+      const params:any = {page: orphanPage, limit: pageSize,sortField: mappedKey, sortOrder: sortConfig.direction};//orphanpage
       const queryString = new URLSearchParams(params).toString();
       const result = await getOrphans(queryString);
       const { totalCount } = result;
@@ -132,6 +147,16 @@ const Upload: React.FC<UploadProps> = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSort = (key: string) => {
+    setSortConfig((prevSortConfig) => {
+      let direction: "ASC" | "DESC" | "" = "ASC";
+      if (prevSortConfig.key === key) {
+        direction = prevSortConfig.direction === "ASC" ? "DESC" : "";
+      }
+      return { key, direction };
+    });
   };
 
   const handleFileAreaClick = () => {
@@ -391,6 +416,8 @@ const Upload: React.FC<UploadProps> = () => {
             pageSize={pageSize}
             setPageSize={setPageSize}
             editCallback={fetchMappedApplications}
+            sortConfig={sortConfig}
+            handleSort={handleSort}
           />
         </Box>
       )}
@@ -442,6 +469,8 @@ const Upload: React.FC<UploadProps> = () => {
             pageSize={pageSize}
             setPageSize={setPageSize}
             editCallback={fetchOrphans}
+            sortConfig={sortConfig}
+            handleSort={handleSort}
           />
         </Box>
       )}
