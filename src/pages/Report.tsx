@@ -22,6 +22,7 @@ interface DataItem {
   domain: string;
   subdomain: string;
   name: string;
+  status: string;
   business_owner: string;
 }
 
@@ -43,13 +44,14 @@ const Report: React.FC = () => {
     { title: "Location", dataIndex: "country", key: "type" }, // Added Type column
     { title: "Region", dataIndex: "region", key: "regional" },
     {
-      title: "Business Capability Name",
+      title: "Business Capability",
       dataIndex: "cap",
       key: "businessCapability",
     },
     { title: "Domain", dataIndex: "domain", key: "domain" },
     { title: "Sub-domain", dataIndex: "subdomain", key: "subDomain" },
     { title: "Application Name", dataIndex: "name", key: "name" },
+    { title: "Status", dataIndex: "status", key: "status" },
   ];
 
   const getFilters = () => {
@@ -77,10 +79,11 @@ const Report: React.FC = () => {
       domain: item.domain || "-", 
       subdomain: item.subdomain || "-", 
       name: item.name || "-", 
+      status: item.status || "-",
       business_owner: item.business_owner || "-", 
     }));
     if(selectType === "global"){
-      setData(processedData || []); 
+      setData(processedData || []);
     }else{
       setData(processedData.filter((e:any) => e.region !== "Global") || []);
     }
@@ -334,30 +337,32 @@ const Report: React.FC = () => {
                 <TableCell>{row.domain}</TableCell>
                 <TableCell>{row.subdomain}</TableCell>
                 <TableCell>{row.name}</TableCell>
+                <TableCell>{row.status}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </MUITable>
       </TableContainer>
 
-  <TablePagination
-  component="div"
-  count={totalData}
-  page={currentPage - 1}
-  onPageChange={(event, newPage) => {
-    setCurrentPage(newPage + 1);
-  }}
-  rowsPerPage={pageSize}
-  onRowsPerPageChange={(event) => {
-    setPageSize(parseInt(event.target.value, 10));
-    setCurrentPage(1);
-  }}
-  rowsPerPageOptions={[10, 50, 100]}
-  labelDisplayedRows={({ from, to, count, page }) =>
-    `Page ${page + 1} of ${Math.ceil(count / pageSize)} (${count})`
-  }
-  sx={{ marginTop: 2 }}
-  />
+      <TablePagination
+        component="div"
+        count={totalData}
+        page={currentPage - 1}
+        onPageChange={(event, newPage) => {
+          setCurrentPage(newPage + 1);
+        }}
+        rowsPerPage={pageSize}
+        onRowsPerPageChange={(event) => {
+          const value = parseInt(event.target.value, 10);
+          setPageSize(value === -1 ? totalData : value); // Set to totalData for "All"
+          setCurrentPage(1);
+        }}
+        rowsPerPageOptions={[10, 50, 100, { label: "All", value: -1 }]}
+        labelDisplayedRows={({ from, to, count, page }) =>
+          `Page ${page + 1} of ${Math.ceil(count / pageSize)} (${count})`
+        }
+        sx={{ marginTop: 2 }}
+      />
 
       {/* <div
         className="pagination-control"
