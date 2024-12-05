@@ -124,6 +124,16 @@ const Report: React.FC = () => {
     saveAs(data?.csvUrl,"export.csv");
   }
 
+  const clearButtons = () => {
+    setSelectedRegions([]);
+    setSelectedCountries([]);
+    setSelectType("global"); 
+    setFilterType("");
+    setSearch("");
+    setCurrentPage(1); 
+    fetchData();
+  };
+
   // const handlePageChange = (page: number) => {
   //   setCurrentPage(page);
   // };
@@ -137,7 +147,12 @@ const Report: React.FC = () => {
 
   return (
     <div className="regional-report">
-      <h1>Report</h1>
+      <div className="Report-header">
+        <h1 className="report-title">Report</h1>
+        <Button icon={<DownloadOutlined />} onClick={getExport} className="export-button">
+          Export
+        </Button>
+      </div>
       <div
         className="filters"
         style={{
@@ -273,8 +288,11 @@ const Report: React.FC = () => {
         >
           Apply
         </Button>
-        <Button icon={<DownloadOutlined />} onClick={getExport}>
-          Export
+        <Button
+        type="primary"
+         onClick={clearButtons}
+         style={{ flex: "none", padding: "20px" }}>
+          Clear
         </Button>
       </div>
 
