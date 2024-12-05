@@ -46,6 +46,8 @@ interface CustomTableProps {
   pageSize: any;
   setPageSize: any;
   editCallback: any;
+  sortConfig: { key: string; direction: "ASC" | "DESC" | "" };
+  handleSort: (key: string) => void;
 }
 
 const CustomTable: React.FC<CustomTableProps> = ({
@@ -57,12 +59,12 @@ const CustomTable: React.FC<CustomTableProps> = ({
   setTotalCount,
   pageSize,
   setPageSize,
-  editCallback
+  editCallback,
+  sortConfig,
+  handleSort,
+  
+  // fetchData,
 }) => {
-  const [sortConfig, setSortConfig] = React.useState<{ key: string; direction: "asc" | "desc" | "" }>({
-    key: "",
-    direction: "",
-  });
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedRow, setSelectedRow] = React.useState<TableData | null>(null);
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
@@ -70,40 +72,10 @@ const CustomTable: React.FC<CustomTableProps> = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
 
 
-
-  const sortedData = React.useMemo(() => {
-    if (!sortConfig.key || !sortConfig.direction) return data;
-  
-    return [...data].sort((a, b) => {
-      const key = sortConfig.key as keyof TableData;
-  
-      const valueA = a[key];
-      const valueB = b[key];
-  
-      if (valueA == null || valueB == null) {
-        return 0;
-      }
-      if (valueA < valueB) {
-        return sortConfig.direction === "asc" ? -1 : 1;
-      }
-      if (valueA > valueB) {
-        return sortConfig.direction === "asc" ? 1 : -1;
-      }
-      return 0;
-    });
-  }, [data, sortConfig]);
-
-  const handleSort = (key: string) => {
-    let direction: "asc" | "desc" = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
-    }
-    setSortConfig({ key, direction });
-  };
   
   const renderSortIcon = (key: string) => {
     if (sortConfig.key !== key) return null;
-    return sortConfig.direction === "asc" ? "↑" : "↓";
+    return sortConfig.direction === "ASC" ? "↑" : "↓";
   };
 
 
@@ -327,7 +299,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {sortedData.map((row, index) => (
+          {data.map((row, index) => (
             <TableRow key={index} hover>
               <TableCell align="center" sx={{ borderBottom: "none" }}>
                 <Typography variant="body2" color="black">
