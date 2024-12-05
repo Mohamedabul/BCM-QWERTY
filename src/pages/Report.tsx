@@ -344,24 +344,25 @@ const Report: React.FC = () => {
         </MUITable>
       </TableContainer>
 
-  <TablePagination
-  component="div"
-  count={totalData}
-  page={currentPage - 1}
-  onPageChange={(event, newPage) => {
-    setCurrentPage(newPage + 1);
-  }}
-  rowsPerPage={pageSize}
-  onRowsPerPageChange={(event) => {
-    setPageSize(parseInt(event.target.value, 10));
-    setCurrentPage(1);
-  }}
-  rowsPerPageOptions={[10, 50, 100]}
-  labelDisplayedRows={({ from, to, count, page }) =>
-    `Page ${page + 1} of ${Math.ceil(count / pageSize)} (${count})`
-  }
-  sx={{ marginTop: 2 }}
-  />
+      <TablePagination
+        component="div"
+        count={totalData}
+        page={currentPage - 1}
+        onPageChange={(event, newPage) => {
+          setCurrentPage(newPage + 1);
+        }}
+        rowsPerPage={pageSize}
+        onRowsPerPageChange={(event) => {
+          const value = parseInt(event.target.value, 10);
+          setPageSize(value === -1 ? totalData : value); // Set to totalData for "All"
+          setCurrentPage(1);
+        }}
+        rowsPerPageOptions={[10, 50, 100, { label: "All", value: -1 }]}
+        labelDisplayedRows={({ from, to, count, page }) =>
+          `Page ${page + 1} of ${Math.ceil(count / pageSize)} (${count})`
+        }
+        sx={{ marginTop: 2 }}
+      />
 
       {/* <div
         className="pagination-control"
