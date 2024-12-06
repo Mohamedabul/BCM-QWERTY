@@ -30,7 +30,7 @@ const Report: React.FC = () => {
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [selectType, setSelectType] = useState<string>("global"); // New state for Select Type filter
-  const [region, setRegion] = useState<string>("");
+  // const [region, setRegion] = useState<string>("");
   const [filterType, setFilterType] = useState<string>(""); // New state for filter type
   const [search, setSearch] = useState<string>(""); // Search term for the selected filter type
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -124,12 +124,25 @@ const Report: React.FC = () => {
     saveAs(data?.csvUrl,"export.csv");
   }
 
+  const clearButtons = () => {
+    setSelectedRegions([]);
+    setSelectedCountries([]);
+    setSelectType("global"); 
+    setFilterType("");
+    setSearch("");
+    setCurrentPage(1); 
+    setPageSize(10);
+    fetchData();
+    
+  };
+
   // const handlePageChange = (page: number) => {
   //   setCurrentPage(page);
   // };
   useEffect(() => {
     fetchData();
   }, [pageSize,currentPage]);
+  
 
   const handleApply = () => {
     fetchData();
@@ -137,7 +150,12 @@ const Report: React.FC = () => {
 
   return (
     <div className="regional-report">
-      <h1>Report</h1>
+      <div className="Report-header">
+        <h1 className="report-title">Report</h1>
+        <Button icon={<DownloadOutlined />} onClick={getExport} className="export-button">
+          Export
+        </Button>
+      </div>
       <div
         className="filters"
         style={{
@@ -244,6 +262,7 @@ const Report: React.FC = () => {
 
         <Select
           placeholder="Filter By"
+          value={filterType}  
           onChange={(value: string) => setFilterType(value)}
           allowClear
           style={{ flex: 1, maxWidth: "300px", height: "45px" }}
@@ -261,6 +280,7 @@ const Report: React.FC = () => {
 
         <Input
           placeholder="Search"
+          value={search}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setSearch(e.target.value)
           }
@@ -273,8 +293,11 @@ const Report: React.FC = () => {
         >
           Apply
         </Button>
-        <Button icon={<DownloadOutlined />} onClick={getExport}>
-          Export
+        <Button
+        type="primary"
+         onClick={clearButtons}
+         style={{ flex: "none", padding: "20px" }}>
+          Clear
         </Button>
       </div>
 
