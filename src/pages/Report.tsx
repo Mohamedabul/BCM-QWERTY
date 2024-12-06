@@ -29,7 +29,7 @@ interface DataItem {
 const Report: React.FC = () => {
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
-  const [selectType, setSelectType] = useState<string>("global"); // New state for Select Type filter
+  const [selectType, setSelectType] = useState<string>("All"); // New state for Select Type filter
   const [region, setRegion] = useState<string>("");
   const [filterType, setFilterType] = useState<string>(""); // New state for filter type
   const [search, setSearch] = useState<string>(""); // Search term for the selected filter type
@@ -57,10 +57,14 @@ const Report: React.FC = () => {
   const getFilters = () => {
     return {
       filter: {
-        ...(selectedRegions.length > 0 && selectType === "Regional" ? { region: selectedRegions } : {}),
-        ...(selectedCountries.length > 0 && selectType === "Country" ? { country: selectedCountries } : {}),
-        reportType: selectType,
+        ...(selectType === "Regional" && selectedRegions.length > 0
+          ? { region: selectedRegions }
+          : {}),
+        ...(selectType === "Country" && selectedCountries.length > 0
+          ? { country: selectedCountries }
+          : {}),
         ...(search ? { [filterType]: search } : {}),
+        ...(selectType !== "All" ? { reportType: selectType } : {}),
       },
       page: currentPage,
       limit: pageSize,
@@ -82,13 +86,15 @@ const Report: React.FC = () => {
       status: item.status || "-",
       business_owner: item.business_owner || "-",
     }));
-    if(selectType === "global"){
+    if (selectType === "All") {
+      setData(processedData || []); // Include all data
+    } else if (selectType === "global") {
       setData(processedData || []);
-    }else{
-      setData(processedData.filter((e:any) => e.region !== "Global") || []);
+    } else {
+      setData(processedData.filter((e: any) => e.region !== "Global") || []);
     }
+  
     setTotalData(data?.totalCount || 0);
-
   };
 
   const fetchRegions = async () => {
@@ -141,7 +147,7 @@ const Report: React.FC = () => {
   // };
   useEffect(() => {
     fetchData();
-  }, [pageSize,currentPage]);
+  }, [pageSize, currentPage]);
 
   const handleApply = () => {
     fetchData();
@@ -175,6 +181,7 @@ const Report: React.FC = () => {
           style={{ flex: 1, maxWidth: "300px", height: "45px" }}
           value={selectType}
         >
+          <Select.Option value="All">All</Select.Option>
           <Select.Option value="global">Global</Select.Option>
           <Select.Option value="Regional">Regional</Select.Option>
           <Select.Option value="Country">Country</Select.Option>
@@ -185,10 +192,24 @@ const Report: React.FC = () => {
             mode="multiple"
             placeholder="Select Regions"
             onFocus={fetchRegions}
-            onChange={(values: string[]) => setSelectedRegions(values)}
+            onChange={(values: string[]) => {
+              if (values.includes("all")) {
+                setSelectedRegions(regions.map((region: any) => region.name));
+              } else {
+                setSelectedRegions(values);
+              }
+            }}
+            value={
+              selectedRegions.length === regions.length
+                ? ["all"]
+                : selectedRegions
+            }
             allowClear
             style={{ flex: 1, maxWidth: "300px", height: "45px" }}
           >
+            <Select.Option key="all" value="all">
+              Select All
+            </Select.Option>
             {regions.map((region: any) => (
               <Select.Option key={region.id} value={region.name}>
                 {region.name}
@@ -219,6 +240,9 @@ const Report: React.FC = () => {
             allowClear
             style={{ flex: 1, maxWidth: "300px", height: "45px" }}
           >
+            <Select.Option key="all" value="all">
+              Select All
+            </Select.Option>
             {countries.map((country: any) => (
               <Select.Option key={country.id} value={country.name}>
                 {country.name}
@@ -291,6 +315,7 @@ const Report: React.FC = () => {
 
         <Input
           placeholder="Search"
+          value={search}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setSearch(e.target.value)
           }
@@ -390,7 +415,7 @@ const Report: React.FC = () => {
           setPageSize(value === -1 ? totalData : value); // Set to totalData for "All"
           setCurrentPage(1);
         }}
-        rowsPerPageOptions={[10, 50, 100, { label: "All", value: -1 }]}
+        rowsPerPageOptions={[10, 50, 100, { label: "All", value: -1 }]} // Map -1 to "All" in the options
         labelDisplayedRows={({ from, to, count, page }) =>
           `Page ${page + 1} of ${Math.ceil(count / pageSize)} (${count})`
         }

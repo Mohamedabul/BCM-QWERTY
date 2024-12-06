@@ -150,3 +150,16 @@ optgroup {
   font-style: normal;
   padding: 0 10px;
 }
+.Report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.export-button {
+  margin-left: 0;
+}
+
+.report-title {
+  margin-right: 0; 
+}
