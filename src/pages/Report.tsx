@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Table, Input, Button, Select,  Menu } from "antd";
+import { Table, Input, Button, Select, Menu } from "antd";
 import { DownloadOutlined } from "@mui/icons-material";
 import { DownOutlined } from "@ant-design/icons";
 import { saveAs } from "file-saver";
-import { getReportData, getReportExport,getRegions, getCountrys } from "apis";
+import { getReportData, getReportExport, getRegions, getCountrys } from "apis";
 import { TablePagination } from "@mui/material";
-import { 
-  Table as MUITable, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
-  Paper 
+import {
+  Table as MUITable,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
 } from "@mui/material";
 
 interface DataItem {
@@ -74,13 +74,13 @@ const Report: React.FC = () => {
     // setTotalData(data?.totalCount);
     const processedData = data?.response.map((item: DataItem) => ({
       country: item.country === "empty" || !item.country ? "-" : item.country,
-      region: item.region === "empty" || !item.region ? "-" : item.region, 
-      cap: item.cap || "-", 
-      domain: item.domain || "-", 
-      subdomain: item.subdomain || "-", 
-      name: item.name || "-", 
+      region: item.region === "empty" || !item.region ? "-" : item.region,
+      cap: item.cap || "-",
+      domain: item.domain || "-",
+      subdomain: item.subdomain || "-",
+      name: item.name || "-",
       status: item.status || "-",
-      business_owner: item.business_owner || "-", 
+      business_owner: item.business_owner || "-",
     }));
     if(selectType === "global"){
       setData(processedData || []);
@@ -98,11 +98,10 @@ const Report: React.FC = () => {
         (region: any) => region.name && region.name.trim() !== "empty"
       );
       console.log(filteredRegions);
-      setRegions(filteredRegions.filter((e:any) => e.name !== "Global") || []);
+      setRegions(filteredRegions.filter((e: any) => e.name !== "Global") || []);
     } catch (error) {
       console.error("Error fetching regions:", error);
     }
-
   };
 
   const fetchCountries = async () => {
@@ -111,7 +110,9 @@ const Report: React.FC = () => {
       const filteredCountries = countriesData?.filter(
         (country: any) => country.name && country.name.trim() !== "empty"
       );
-      setCountries(filteredCountries.filter((e:any) => e.name !== "Global") || []);
+      setCountries(
+        filteredCountries.filter((e: any) => e.name !== "Global") || []
+      );
     } catch (error) {
       console.error("Error fetching countries:", error);
     }
@@ -121,8 +122,19 @@ const Report: React.FC = () => {
     const body = JSON.stringify(getFilters());
     const data = await getReportExport(body);
     console.log(data);
-    saveAs(data?.csvUrl,"export.csv");
-  }
+    saveAs(data?.csvUrl, "export.csv");
+  };
+
+  const clearButtons = () => {
+    setSelectedRegions([]);
+    setSelectedCountries([]);
+    setSelectType("All");
+    setFilterType("");
+    setSearch("");
+    setCurrentPage(1);
+    setPageSize(10);
+    fetchData();
+  };
 
   // const handlePageChange = (page: number) => {
   //   setCurrentPage(page);
@@ -137,7 +149,16 @@ const Report: React.FC = () => {
 
   return (
     <div className="regional-report">
-      <h1>Report</h1>
+      <div className="Report-header">
+        <h1 className="report-title">Report</h1>
+        <Button
+          icon={<DownloadOutlined />}
+          onClick={getExport}
+          className="export-button"
+        >
+          Export
+        </Button>
+      </div>
       <div
         className="filters"
         style={{
@@ -158,7 +179,6 @@ const Report: React.FC = () => {
           <Select.Option value="Regional">Regional</Select.Option>
           <Select.Option value="Country">Country</Select.Option>
         </Select>
-
 
         {selectType === "Regional" && (
           <Select
@@ -182,7 +202,20 @@ const Report: React.FC = () => {
             mode="multiple"
             placeholder="Select Countries"
             onFocus={fetchCountries}
-            onChange={(values: string[]) => setSelectedCountries(values)}
+            onChange={(values: string[]) => {
+              if (values.includes("all")) {
+                setSelectedCountries(
+                  countries.map((country: any) => country.name)
+                );
+              } else {
+                setSelectedCountries(values);
+              }
+            }}
+            value={
+              selectedCountries.length === countries.length
+                ? ["all"]
+                : selectedCountries
+            }
             allowClear
             style={{ flex: 1, maxWidth: "300px", height: "45px" }}
           >
@@ -193,8 +226,6 @@ const Report: React.FC = () => {
             ))}
           </Select>
         )}
-
-
 
         {/* {selectType === "Regional" && (
           <Select
@@ -227,8 +258,6 @@ const Report: React.FC = () => {
           </Select>
         )} */}
 
-
-
         {/* {selectType !== "global" && (
           <Select
             placeholder={selectType === "Regional" ? "Regional" : "Country"}
@@ -244,6 +273,7 @@ const Report: React.FC = () => {
 
         <Select
           placeholder="Filter By"
+          value={filterType}
           onChange={(value: string) => setFilterType(value)}
           allowClear
           style={{ flex: 1, maxWidth: "300px", height: "45px" }}
@@ -273,47 +303,51 @@ const Report: React.FC = () => {
         >
           Apply
         </Button>
-        <Button icon={<DownloadOutlined />} onClick={getExport}>
-          Export
+        <Button
+          type="primary"
+          onClick={clearButtons}
+          style={{ flex: "none", padding: "20px" }}
+        >
+          Clear
         </Button>
       </div>
 
-      
-
-      <TableContainer 
-        component={Paper} 
-        sx={{ 
-          minHeight: 500, 
-          maxHeight: 600, 
-          overflow: 'auto',
-          '& .MuiTable-root': {
-            borderCollapse: 'separate',
+      <TableContainer
+        component={Paper}
+        sx={{
+          minHeight: 500,
+          maxHeight: 600,
+          overflow: "auto",
+          "& .MuiTable-root": {
+            borderCollapse: "separate",
             borderSpacing: 0,
-          }
+          },
         }}
       >
-        <MUITable 
-          stickyHeader 
-          sx={{ 
+        <MUITable
+          stickyHeader
+          sx={{
             minWidth: 650,
-            '& .MuiTableCell-root': {
-              borderBottom: 'none', // Remove row separation lines
-              padding: '20px 16px'
-            }
+            "& .MuiTableCell-root": {
+              borderBottom: "none",
+              padding: "20px 25px",
+            },
           }}
         >
           <TableHead>
-            <TableRow>
+            <TableRow
+            >
               {columns.map((column) => (
-                <TableCell 
-                  key={column.key} 
-                  sx={{ 
-                    fontWeight: 'bold', 
-                    fontSize:16,
-                    backgroundColor: '#e2e2e2',
-                    position: 'sticky',
+                <TableCell
+                  key={column.key}
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: 16,
+                    backgroundColor: "#e2e2e2",
+                    position: "sticky",
                     top: 0,
-                    zIndex: 1
+                    zIndex: 1,
+                    marginX: 6
                   }}
                 >
                   {column.title}
@@ -323,13 +357,12 @@ const Report: React.FC = () => {
           </TableHead>
           <TableBody>
             {data.map((row: any, index: number) => (
-              <TableRow 
-                key={index} 
-                hover 
-                sx={{ 
-                  '&:last-child td': { border: 0 }
+              <TableRow
+                key={index}
+                hover
+                sx={{
+                  "&:last-child td": { border: 0 },
                 }}
-                
               >
                 <TableCell>{row.country}</TableCell>
                 <TableCell>{row.region}</TableCell>
@@ -362,33 +395,13 @@ const Report: React.FC = () => {
           `Page ${page + 1} of ${Math.ceil(count / pageSize)} (${count})`
         }
         sx={{ marginTop: 2 }}
-      />
-
-      {/* <div
-        className="pagination-control"
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: "16px",
+        SelectProps={{
+          renderValue: (selected) => {
+            if (selected === -1) return "All"; // Display "All" for the -1 value
+            return `${selected}`; // Display numbers as strings
+          },
         }}
-      >
-        <Dropdown overlay={pageSizeMenu}>
-          <Button>
-            Show rows: {pageSize} <DownOutlined />
-          </Button>
-        </Dropdown>
-
-        <Pagination
-          current={currentPage}
-          total={totalData}
-          pageSize={pageSize}
-          onChange={handlePageChange}
-          showTotal={(total, range) => `${total} items`}
-          showSizeChanger={false}
-          style={{ marginLeft: "auto" }}
-        />
-      </div> */}
+      />
     </div>
   );
 };
