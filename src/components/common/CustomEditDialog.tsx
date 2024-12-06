@@ -24,6 +24,7 @@ import {
   fetchSubdomain,
   getCountrys,
   getRegions,
+  getStatuses,
 } from "apis";
 import { Capability, Domain, SubDomain } from "apis/interfaces";
 
@@ -60,10 +61,9 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
   //
   const [regions, setRegions] = React.useState<any[]>([]);
   const [countries, setCountries] = React.useState<any[]>([]);
+  const [statuses, setStatuses] = React.useState<any[]>([]);
   const [selectedRegion, setSelectedRegion] = React.useState<any>(data.region);
-  const [selectedCountry, setSelectedCountry] = React.useState<any>(
-    data.country
-  );
+  const [selectedCountry, setSelectedCountry] = React.useState<any>(data.country);
   const [selectedStatus, setSelectedStatus] = React.useState<any>(data.status);
 
   const [filteredDomains, setFilteredDomains] = React.useState<Domain[]>([]);
@@ -145,12 +145,24 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
       }
     };
 
+    const fetchStatus = async () => {
+      try {
+        const statusResult = await getStatuses();
+        setStatuses(statusResult);
+        console.log("status result :",statusResult);
+      } catch (error) {
+        console.error("Error fetching status:", error);
+      }
+    };
+
+
     fetchCapabilities();
     fetchDomains();
     fetchSubDomains();
     //
     fetchRegions();
     fetchCountries();
+    fetchStatus();
   }, []);
 
   useEffect(() => {
@@ -256,6 +268,11 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
       }
     });
     onSave(formattedData);
+
+    // useEffect(() => {
+    //   console.log("Initial data status:", data.status);
+    // }, [data.status]);
+   
   };
 
   return (
@@ -534,9 +551,36 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
             variant="body2"
             sx={{ fontWeight: "bold", color: "black" }}
           >
-            Type Status<span style={{ color: "red" }}>*</span>
+            Select Application Status<span style={{ color: "red" }}>*</span>
           </Typography>
-          <TextField
+          <Select
+            fullWidth
+            value={selectedStatus}
+            onChange={(e) => {
+              setSelectedStatus(e.target.value);
+              onChange("status", e.target.value);
+            }}
+            displayEmpty
+            sx={{
+              backgroundColor: "#f0f2f5",
+              borderRadius: 1,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "transparent" },
+                "&.Mui-focused fieldset": { borderColor: "#b0bec5" },
+              },
+              "& .MuiInputBase-input": { color: "black" },
+            }}
+          >
+            <MenuItem value={selectedStatus} >
+            {selectedStatus}
+            </MenuItem>
+            {statuses.map((status, index) => (
+              <MenuItem key={index} value={status}>
+                {status}
+              </MenuItem>
+            ))}
+          </Select>
+          {/* <TextField
             fullWidth
             value={selectedStatus || ""} // Default to an empty string if undefined
             onChange={(e) => {
@@ -553,7 +597,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
               },
               "& .MuiInputBase-input": { color: "black" },
             }}
-          />
+          /> */}
         </Box>
       </DialogContent>
       <DialogActions
