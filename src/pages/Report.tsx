@@ -30,7 +30,7 @@ const Report: React.FC = () => {
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [selectType, setSelectType] = useState<string>("global"); // New state for Select Type filter
-  const [region, setRegion] = useState<string>("");
+  // const [region, setRegion] = useState<string>("");
   const [filterType, setFilterType] = useState<string>(""); // New state for filter type
   const [search, setSearch] = useState<string>(""); // Search term for the selected filter type
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -131,7 +131,9 @@ const Report: React.FC = () => {
     setFilterType("");
     setSearch("");
     setCurrentPage(1); 
+    setPageSize(10);
     fetchData();
+    
   };
 
   // const handlePageChange = (page: number) => {
@@ -140,6 +142,7 @@ const Report: React.FC = () => {
   useEffect(() => {
     fetchData();
   }, [pageSize,currentPage]);
+  
 
   const handleApply = () => {
     fetchData();
@@ -259,6 +262,7 @@ const Report: React.FC = () => {
 
         <Select
           placeholder="Filter By"
+          value={filterType}  
           onChange={(value: string) => setFilterType(value)}
           allowClear
           style={{ flex: 1, maxWidth: "300px", height: "45px" }}
@@ -276,6 +280,7 @@ const Report: React.FC = () => {
 
         <Input
           placeholder="Search"
+          value={search}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setSearch(e.target.value)
           }
