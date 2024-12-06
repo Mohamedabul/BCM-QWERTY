@@ -381,10 +381,11 @@ const CustomTable: React.FC<CustomTableProps> = ({
         onPageChange={handleChangePage}
         rowsPerPage={pageSize}
         onRowsPerPageChange={(event) => {
-          setPageSize(parseInt(event.target.value, 10));
+          const value = (parseInt(event.target.value, 10));
+          setPageSize(value === -1 ? totalCount : value); // Set to totalCount for "All"
           setPage(1);
         }}
-        rowsPerPageOptions={[10, 50, 100]}
+        rowsPerPageOptions={[10, 50, 100, { label: "All", value: -1 }]}
         sx={{
           position: "sticky",
           bottom: 0,
