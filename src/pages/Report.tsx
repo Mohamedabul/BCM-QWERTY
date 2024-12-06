@@ -184,6 +184,79 @@ const Report: React.FC = () => {
         </Select>
 
 
+        {/* {selectType === "Regional" && (
+          <Select
+            mode="multiple"
+            placeholder="Select Regions"
+            onFocus={fetchRegions}
+            onChange={(values: string[]) => {
+              if (values.includes("all")) {
+                setSelectedRegions(regions.map((region: any) => region.name));
+              } else {
+                setSelectedRegions(values);
+              }
+            }}
+            value={selectedRegions.length === regions.length ? regions.map((region: any) => region.name) : selectedRegions}
+            allowClear
+            style={{
+              flex: 1,
+              maxWidth: "500px",
+              height: "60px",
+              overflowY: "auto",
+              overflowX: "auto",
+              display: "flex",
+              gap: "1px",
+              padding: "4px",
+              borderRadius: "4px",
+            }}
+            dropdownStyle={{
+              maxHeight: "400px",
+              overflowY: "auto",
+            }}
+            tagRender={(props) => {
+              const { label, value, closable, onClose } = props;
+              if (value === "all") return <></>;
+              return (
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    margin: "2px 2px 2px 0",
+                    padding: "4px 8px",
+                    borderRadius: "4px",
+                    fontSize: "14px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {label}
+                  {closable && (
+                    <span
+                      onClick={onClose}
+                      style={{
+                        marginLeft: "8px",
+                        cursor: "pointer",
+                        color: "#1890ff",
+                      }}
+                    >
+                      ✖
+                    </span>
+                  )}
+                </div>
+              );
+            }}
+          >
+          <Select.Option key="all" value="all">
+            Select all
+          </Select.Option>
+            {regions.map((region: any) => (
+              <Select.Option key={region.id} value={region.name}>
+                {region.name}
+              </Select.Option>
+            ))}
+          </Select>
+        )} */}
+
         {selectType === "Regional" && (
           <Select
             mode="multiple"
@@ -196,17 +269,53 @@ const Report: React.FC = () => {
                 setSelectedRegions(values);
               }
             }}
-            value={
-              selectedRegions.length === regions.length
-                ? ["all"]
-                : selectedRegions
-            }
-            allowClear
-            style={{ flex: 1, maxWidth: "300px", height: "45px" }}
+            value={selectedRegions.length === regions.length ? regions.map((region: any) => region.name) : selectedRegions}
+            style={{ width: "400px",
+              maxWidth: "500px",
+              // height: "55px",
+              // overflowY: "auto",
+              // overflowX: "hidden",
+              // display: "flex",
+              // gap: "1px",
+              // padding: "4px",
+              // borderRadius: "4px", 
+              }}
           >
+            tagRender={(props: { label: any; value: any; closable: any; onClose: any; }) => {
+              const { label, value, closable, onClose } = props;
+              if (value === "all") return <></>;
+              return (
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    margin: "2px 2px 2px 0",
+                    padding: "4px 8px",
+                    borderRadius: "4px",
+                    fontSize: "14px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {label}
+                  {closable && (
+                    <span
+                      onClick={onClose}
+                      style={{
+                        marginLeft: "8px",
+                        cursor: "pointer",
+                        color: "#1890ff",
+                      }}
+                    >
+                      ✖
+                    </span>
+                  )}
+                </div>
+              );
+            }}
             <Select.Option key="all" value="all">
-              Select All
-            </Select.Option>
+            Select all
+          </Select.Option>
             {regions.map((region: any) => (
               <Select.Option key={region.id} value={region.name}>
                 {region.name}
@@ -214,6 +323,8 @@ const Report: React.FC = () => {
             ))}
           </Select>
         )}
+
+
 
         {selectType === "Country" && (
           <Select
@@ -227,13 +338,55 @@ const Report: React.FC = () => {
                 setSelectedCountries(values);
               }
             }}
-            value={
-              selectedCountries.length === countries.length
-                ? ["all"]
-                : selectedCountries
-            }
+            value={selectedCountries.length === countries.length ? countries.map((country: any) => country.name) : selectedCountries}
             allowClear
-            style={{ flex: 1, maxWidth: "300px", height: "45px" }}
+            style={{
+              flex: 1,
+              maxWidth: "500px",
+              height: "60px",
+              overflowY: "auto",
+              overflowX: "hidden",
+              display: "flex",
+              gap: "1px",
+              padding: "4px",
+              borderRadius: "4px",
+            }}
+            dropdownStyle={{
+              maxHeight: "400px",
+              overflowY: "auto",
+            }}
+            tagRender={(props) => {
+              const { label, value, closable, onClose } = props;
+              if (value === "all") return <></>;
+              return (
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    margin: "2px 2px 2px 0",
+                    padding: "4px 8px",
+                    borderRadius: "4px",
+                    fontSize: "14px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {label}
+                  {closable && (
+                    <span
+                      onClick={onClose}
+                      style={{
+                        marginLeft: "8px",
+                        cursor: "pointer",
+                        color: "#1890ff",
+                      }}
+                    >
+                      ✖
+                    </span>
+                  )}
+                </div>
+              );
+            }}
           >
             <Select.Option key="all" value="all">
               Select All
@@ -409,18 +562,18 @@ const Report: React.FC = () => {
         rowsPerPage={pageSize}
         onRowsPerPageChange={(event) => {
           const value = parseInt(event.target.value, 10);
-          setPageSize(value === -1 ? totalData : value); // Set to totalData for "All"
+          setPageSize(value === -1 ? totalData : value);
           setCurrentPage(1);
         }}
-        rowsPerPageOptions={[10, 50, 100, { label: "All", value: -1 }]} // Map -1 to "All" in the options
+        rowsPerPageOptions={[10, 50, 100, { label: "All", value: -1 }]}
         labelDisplayedRows={({ from, to, count, page }) =>
           `Page ${page + 1} of ${Math.ceil(count / pageSize)} (${count})`
         }
         sx={{ marginTop: 2 }}
         SelectProps={{
           renderValue: (selected) => {
-            if (selected === -1) return 'All'; // Display "All" for the -1 value
-            return `${selected}`; // Display numbers as strings
+            if (selected === -1) return 'All';
+            return `${selected}`;
           },
         }}
       />
