@@ -249,6 +249,14 @@ export const getCountrys = async () => {
   return result;
 }
 
+export const getStatuses = async () => {
+  const response = await fetch(baseUrl + "getStatuses",{
+    
+  });
+  const result = await response.json();
+  return result;
+}
+
 
 
 export const getReportExport = async (body:string) => {
