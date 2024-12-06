@@ -148,6 +148,9 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
     const fetchStatus = async () => {
       try {
         const statusResult = await getStatuses();
+        if(!statusResult.includes(data.status)){
+          statusResult.push(data.status)
+        }
         setStatuses(statusResult);
         console.log("status result :",statusResult);
       } catch (error) {
@@ -571,9 +574,6 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
               "& .MuiInputBase-input": { color: "black" },
             }}
           >
-            <MenuItem value={selectedStatus} >
-            {selectedStatus}
-            </MenuItem>
             {statuses.map((status, index) => (
               <MenuItem key={index} value={status}>
                 {status}
