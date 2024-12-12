@@ -22,6 +22,7 @@ import {
   fetchCorecapability,
   fetchDomain,
   fetchSubdomain,
+  // getMappedApplications,
   getCountrys,
   getRegions,
   getStatuses,
@@ -63,7 +64,10 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
   const [countries, setCountries] = React.useState<any[]>([]);
   const [statuses, setStatuses] = React.useState<any[]>([]);
   const [selectedRegion, setSelectedRegion] = React.useState<any>(data.region);
-  const [selectedCountry, setSelectedCountry] = React.useState<any>(data.country);
+  const [selectedCountry, setSelectedCountry] = React.useState<any>(
+    data.country
+  );
+  const [selectedApplication, setSelectedApplication] = React.useState<any>(data.applicationName);
   const [selectedStatus, setSelectedStatus] = React.useState<any>(data.status);
 
   const [filteredDomains, setFilteredDomains] = React.useState<Domain[]>([]);
@@ -217,6 +221,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
       selectedCapabilities,
       selectedDomain,
       selectedSubdomain,
+      selectedApplication,
       selectedRegion,
       selectedCountry,
       selectedStatus
@@ -243,6 +248,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
                 core_id: cap.id,
                 domain_id: domainId.id,
                 subdomain_id: subdomainId.id,
+                name: selectedApplication,
                 region: selectedRegion,
                 country: selectedCountry,
                 status: selectedStatus,
@@ -253,6 +259,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
               core_id: cap.id,
               domain_id: domainId.id,
               subdomain_id: null,
+              name: selectedApplication,
               region: selectedRegion,
               country: selectedCountry,
               status: selectedStatus,
@@ -264,6 +271,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
           core_id: cap.id,
           domain_id: null,
           subdomain_id: null,
+          name: selectedApplication,
           region: selectedRegion,
           country: selectedCountry,
           status: selectedStatus,
@@ -476,6 +484,34 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
               </div>
             ))}
           </Select>
+
+
+          {/* Application Text Field */}
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: "bold", color: "black" }}
+          >
+            Update Application<span style={{ color: "red" }}>*</span>
+          </Typography>
+          <TextField
+            fullWidth
+            value={selectedApplication || ""} // Default to an empty string if undefined
+            onChange={(e) => {
+              setSelectedApplication(e.target.value);
+              onChange("application", e.target.value);
+            }}
+            placeholder="Enter application"
+            sx={{
+              backgroundColor: "#f0f2f5",
+              borderRadius: 1,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "transparent" },
+                "&.Mui-focused fieldset": { borderColor: "#b0bec5" },
+              },
+              "& .MuiInputBase-input": { color: "black" },
+            }}
+          />
+
 
           {/* Region Select */}
           <Typography

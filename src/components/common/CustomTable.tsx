@@ -230,6 +230,9 @@ const CustomTable: React.FC<CustomTableProps> = ({
               { label: "Domain", key: "domain" },
               { label: "Sub-domain", key: "subDomain" },
               { label: "Application", key: "applicationName" },
+              { label: "Region", key: "region"},
+              { label: "Country", key: "country"},
+              { label: "Status", key: "status"},
             ].map(({ label, key }) => (
               <TableCell
                 key={key}
@@ -330,6 +333,24 @@ const CustomTable: React.FC<CustomTableProps> = ({
               <TableCell align="center" sx={{ borderBottom: "none" }}>
                 <Typography variant="body2" color="black">
                   {row.applicationName || "-"}
+                </Typography>
+              </TableCell>
+
+              <TableCell align="center" sx={{ borderBottom: "none" }}>
+                <Typography variant="body2" color="black">
+                  {row.region || "-"}
+                </Typography>
+              </TableCell>
+
+              <TableCell align="center" sx={{ borderBottom: "none" }}>
+                <Typography variant="body2" color="black">
+                  {row.country || "-"}
+                </Typography>
+              </TableCell>
+
+              <TableCell align="center" sx={{ borderBottom: "none" }}>
+                <Typography variant="body2" color="black">
+                  {row.status || "-"}
                 </Typography>
               </TableCell>
 
