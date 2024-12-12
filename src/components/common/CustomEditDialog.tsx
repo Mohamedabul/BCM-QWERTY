@@ -491,7 +491,7 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
             variant="body2"
             sx={{ fontWeight: "bold", color: "black" }}
           >
-            Update Application<span style={{ color: "red" }}>*</span>
+            Edit Application Name<span style={{ color: "red" }}>*</span>
           </Typography>
           <TextField
             fullWidth

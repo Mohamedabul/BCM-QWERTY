@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Table, Input, Button, Select, Menu } from "antd";
-import { DownloadOutlined } from "@mui/icons-material";
+import { DownloadOutlined, ArrowUpwardOutlined, ArrowDownwardOutlined } from "@mui/icons-material";
 import { DownOutlined } from "@ant-design/icons";
 import { saveAs } from "file-saver";
 import { getReportData, getReportExport, getRegions, getCountrys } from "apis";
@@ -39,6 +39,24 @@ const Report: React.FC = () => {
   const [regions, setRegions] = useState<any>([]);
   const [countries, setCountries] = useState<any>([]);
   const [totalData, setTotalData] = useState<number>(0);
+  const [sortConfig, setSortConfig] = useState<{
+    key: string;
+    direction: "ASC" | "DESC" | "";
+  }>({
+    key: "",
+    direction: "",
+  });
+
+  const keyMapping: { [key: string]: string } = {
+    country: "country",
+    region: "region",
+    cap: "businessCapability",
+    domain: "domain",
+    subdomain: "subDomain",
+    name: "applicationName",
+    status: "status"
+  };
+
 
   const columns = [
     { title: "Location", dataIndex: "country", key: "type" }, // Added Type column
@@ -46,7 +64,7 @@ const Report: React.FC = () => {
     {
       title: "Business Capability",
       dataIndex: "cap",
-      key: "businessCapability",
+      key: "cap",
     },
     { title: "Domain", dataIndex: "domain", key: "domain" },
     { title: "Sub-domain", dataIndex: "subdomain", key: "subDomain" },
@@ -54,7 +72,20 @@ const Report: React.FC = () => {
     { title: "Status", dataIndex: "status", key: "status" },
   ];
 
+  // Updated sort handler
+  const handleSort = (key: string) => {
+    setSortConfig((prevSortConfig) => {
+      let direction: "ASC" | "DESC" | "" = "ASC";
+      if (prevSortConfig.key === key) {
+        direction = prevSortConfig.direction === "ASC" ? "DESC" : "";
+      }
+      return { key, direction };
+    });
+  };
+
+
   const getFilters = () => {
+    const mappedKey = keyMapping[sortConfig.key] || sortConfig.key;
     return {
       filter: {
         ...(selectType === "Regional" && selectedRegions.length > 0
@@ -68,6 +99,8 @@ const Report: React.FC = () => {
       },
       page: currentPage,
       limit: pageSize,
+      sortField: mappedKey,
+      sortOrder: sortConfig.direction,
     };
   };
 
@@ -147,7 +180,7 @@ const Report: React.FC = () => {
   // };
   useEffect(() => {
     fetchData();
-  }, [pageSize, currentPage]);
+  }, [pageSize, currentPage, sortConfig]);
 
   const handleApply = () => {
     fetchData();
@@ -435,7 +468,7 @@ const Report: React.FC = () => {
             minWidth: 650,
             "& .MuiTableCell-root": {
               borderBottom: "none",
-              padding: "20px 25px",
+              padding: "20px 16px",
             },
           }}
         >
@@ -452,10 +485,18 @@ const Report: React.FC = () => {
                     position: "sticky",
                     top: 0,
                     zIndex: 1,
-                    marginX: 6
+                    cursor: 'pointer'
                   }}
+                  onClick={() => handleSort(column.dataIndex)}
                 >
                   {column.title}
+                  {sortConfig.key === column.dataIndex && (
+                    sortConfig.direction === "ASC" 
+                      ? <ArrowUpwardOutlined style={{ marginLeft: 8, fontSize: 16 }} /> 
+                      : sortConfig.direction === "DESC"
+                        ? <ArrowDownwardOutlined style={{ marginLeft: 8, fontSize: 16 }} />
+                        : null
+                  )}
                 </TableCell>
               ))}
             </TableRow>
