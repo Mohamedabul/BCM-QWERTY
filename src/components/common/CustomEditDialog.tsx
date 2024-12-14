@@ -63,10 +63,8 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
   const [regions, setRegions] = React.useState<any[]>([]);
   const [countries, setCountries] = React.useState<any[]>([]);
   const [statuses, setStatuses] = React.useState<any[]>([]);
-  const [selectedRegion, setSelectedRegion] = React.useState<any>(data.region);
-  const [selectedCountry, setSelectedCountry] = React.useState<any>(
-    data.country
-  );
+  const [selectedRegions, setSelectedRegions] = React.useState<string[]>(data.region ? [data.region] : []);
+  const [selectedCountries, setSelectedCountries] = React.useState<string[]>(data.country ? [data.country] : []);
   const [selectedApplication, setSelectedApplication] = React.useState<any>(data.applicationName);
   const [selectedStatus, setSelectedStatus] = React.useState<any>(data.status);
 
@@ -216,14 +214,35 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
     });
   };
 
+    // Handle checkbox toggle for Regions
+    const handleCheckboxToggleRegion = (regionName: string) => {
+      setSelectedRegions((prevSelected) => {
+        if (prevSelected.includes(regionName)) {
+          return prevSelected.filter((item) => item !== regionName);
+        }
+        return [...prevSelected, regionName];
+      });
+    };
+
+    // Handle checkbox toggle for Countries
+    const handleCheckboxToggleCountry = (countryName: string) => {
+      setSelectedCountries((prevSelected) => {
+        if (prevSelected.includes(countryName)) {
+          return prevSelected.filter((item) => item !== countryName);
+        }
+        return [...prevSelected, countryName];
+      });
+    };
+
+
   const formatAndSave = () => {
     console.log(
       selectedCapabilities,
       selectedDomain,
       selectedSubdomain,
       selectedApplication,
-      selectedRegion,
-      selectedCountry,
+      selectedRegions,
+      selectedCountries,
       selectedStatus
     );
     const formattedData: any[] = [];
@@ -244,37 +263,49 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
           );
           if (filteredSubDomain.length > 0) {
             filteredSubDomain.forEach((subdomainId) => {
+              selectedRegions.forEach((region) => {
+                selectedCountries.forEach((country) => {
               formattedData.push({
                 core_id: cap.id,
                 domain_id: domainId.id,
                 subdomain_id: subdomainId.id,
                 name: selectedApplication,
-                region: selectedRegion,
-                country: selectedCountry,
+                region: region,
+                country: country,
                 status: selectedStatus,
+              });
+              });
               });
             });
           } else {
+            selectedRegions.forEach((region) => {
+            selectedCountries.forEach((country) => {
             formattedData.push({
               core_id: cap.id,
               domain_id: domainId.id,
               subdomain_id: null,
               name: selectedApplication,
-              region: selectedRegion,
-              country: selectedCountry,
+              region: region,
+              country: country,
               status: selectedStatus,
+            });
+            });
             });
           }
         });
       } else {
+        selectedRegions.forEach((region) => {
+        selectedCountries.forEach((country) => {
         formattedData.push({
           core_id: cap.id,
           domain_id: null,
           subdomain_id: null,
           name: selectedApplication,
-          region: selectedRegion,
-          country: selectedCountry,
+          region: region,
+          country: country,
           status: selectedStatus,
+        });
+        });
         });
       }
     });
@@ -514,20 +545,16 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
 
 
           {/* Region Select */}
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: "bold", color: "black" }}
-          >
+          <Typography variant="body2" sx={{ fontWeight: "bold", color: "black" }}>
             Select Region<span style={{ color: "red" }}>*</span>
           </Typography>
           <Select
             fullWidth
-            value={selectedRegion}
-            onChange={(e) => {
-              setSelectedRegion(e.target.value);
-              onChange("region", e.target.value as string);
-            }}
-            displayEmpty
+            value={selectedRegions}
+            onChange={(e) => setSelectedRegions(typeof e.target.value === "string" ? e.target.value.split(",") : e.target.value)}
+            multiple
+            input={<OutlinedInput label="Tag" />}
+            renderValue={(selected) => selected.filter(Boolean).join(",")}
             sx={{
               backgroundColor: "#f0f2f5",
               borderRadius: 1,
@@ -537,14 +564,21 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
               },
               "& .MuiInputBase-input": { color: "black" },
             }}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 300,
+                  overflowY: "auto",
+                },
+              },
+            }}
           >
-            {!data.region && (
-              <MenuItem value="" disabled>
-                Select Region
-              </MenuItem>
-            )}
             {regions.map((region) => (
               <MenuItem key={region.id} value={region.name}>
+                <Checkbox
+                  checked={selectedRegions.indexOf(region.name) > -1}
+                  onChange={() => handleCheckboxToggleRegion(region.name)}
+                />
                 {region.name}
               </MenuItem>
             ))}
@@ -559,12 +593,11 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
           </Typography>
           <Select
             fullWidth
-            value={selectedCountry}
-            onChange={(e) => {
-              setSelectedCountry(e.target.value);
-              onChange("country", e.target.value as string);
-            }}
-            displayEmpty
+            value={selectedCountries}
+            onChange={(e) => setSelectedCountries(typeof e.target.value === "string" ? e.target.value.split(",") : e.target.value)}
+            multiple
+            input={<OutlinedInput label="Tag" />}
+            renderValue={(selected) => selected.filter(Boolean).join(",")}
             sx={{
               backgroundColor: "#f0f2f5",
               borderRadius: 1,
@@ -574,12 +607,21 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
               },
               "& .MuiInputBase-input": { color: "black" },
             }}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 300,
+                  overflowY: "auto",
+                },
+              },
+            }}
           >
-            <MenuItem value="" disabled>
-              Select Country
-            </MenuItem>
             {countries.map((country) => (
               <MenuItem key={country.id} value={country.name}>
+                <Checkbox
+                  checked={selectedCountries.indexOf(country.name) > -1}
+                  onChange={() => handleCheckboxToggleCountry(country.name)}
+                />
                 {country.name}
               </MenuItem>
             ))}
