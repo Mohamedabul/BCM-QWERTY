@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -21,7 +21,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CustomMenu from "./CustomMenu";
 import CustomEditDialog from "./CustomEditDialog";
 import CustomDeleteDialog from "./CustomDeleteDialog";
-import CustomButton from "./CustomButton";
+import { deleteApplication, patchApplication } from "apis";
 
 interface TableData {
   id: string;
@@ -33,35 +33,54 @@ interface TableData {
   core_id: string;
   domain_id: string;
   subdomain_id: string;
+  //
+  region: string;
+  country: string;
+  status: string;
 }
 
 interface CustomTableProps {
   data: TableData[];
   loading: boolean;
-  actionButton: any;
+  // actionButton: any;
   page: any;
   setPage: any;
   totalCount: any;
   setTotalCount: any;
   pageSize: any;
   setPageSize: any;
+  editCallback: any;
+  sortConfig: { key: string; direction: "ASC" | "DESC" | "" };
+  handleSort: (key: string) => void;
 }
 
 const CustomTable: React.FC<CustomTableProps> = ({
   data,
-  actionButton,
+  // actionButton,
   page,
   setPage,
   totalCount,
   setTotalCount,
   pageSize,
   setPageSize,
+  editCallback,
+  sortConfig,
+  handleSort,
+  
+  // fetchData,
 }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedRow, setSelectedRow] = React.useState<TableData | null>(null);
   const [editDialogOpen, setEditDialogOpen] = React.useState(false);
   const [editData, setEditData] = React.useState<TableData | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+
+
+  
+  const renderSortIcon = (key: string) => {
+    if (sortConfig.key !== key) return null;
+    return sortConfig.direction === "ASC" ? "↑" : "↓";
+  };
 
   const handleOpenMenu = (
     event: React.MouseEvent<HTMLElement>,
@@ -78,11 +97,15 @@ const CustomTable: React.FC<CustomTableProps> = ({
   };
 
   const handleEditClick = (row: TableData) => {
+    console.log(row, "edict");
     setEditData({
       ...row,
       core_id: row.core_id || "",
       domain_id: row.domain_id || "",
       subdomain_id: row.subdomain_id || "",
+      region: row.region || "",
+      country: row.country || "",
+      status: row.status || "",
     });
     setEditDialogOpen(true);
   };
@@ -91,29 +114,27 @@ const CustomTable: React.FC<CustomTableProps> = ({
     setEditDialogOpen(false);
     setEditData(null);
   };
-  const handleEditSave = async () => {
+  const handleEditSave = async (payload:any) => {
     if (!editData) return;
 
     try {
-      const payload = {
-        core_id: editData.core_id,
-        domain_id: editData.domain_id,
-        subdomain_id: editData.subdomain_id,
-        name: editData.applicationName,
-        applicationVersion: editData.applicationVersion,
-      };
+      // const payload = {
+      //   core_id: editData.core_id,
+      //   domain_id: editData.domain_id,
+      //   subdomain_id: editData.subdomain_id,
+      //   //
+      //   region: editData.region,
+      //   country: editData.country,
+      //   status: editData.status,
+      //   //
+      //   name: editData.applicationName,
+      //   applicationVersion: editData.applicationVersion,
+      // };
 
-      const response = await fetch(
-        `http://localhost:5000/api/application/${editData.id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
+      const response = await patchApplication(
+        editData.id,
+        JSON.stringify(payload)
       );
-
       if (!response.ok) {
         throw new Error("Failed to update the application");
       }
@@ -124,6 +145,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
       // Close the dialog after successful edit
       setEditDialogOpen(false);
       setEditData(null);
+      await editCallback();
 
       // Refresh the data (fetch the updated data here if needed)
     } catch (error) {
@@ -141,8 +163,8 @@ const CustomTable: React.FC<CustomTableProps> = ({
     setDeleteDialogOpen(true);
   };
 
-  const handleChangePage = (event:any, newPage:any) => {
-    setPage(newPage+1);
+  const handleChangePage = (event: any, newPage: any) => {
+    setPage(newPage + 1);
   };
 
   const handleDeleteConfirm = async () => {
@@ -151,19 +173,8 @@ const CustomTable: React.FC<CustomTableProps> = ({
       return;
     }
     console.log("Deleting application with ID:", selectedRow.id);
-    console.log(
-      `Attempting to delete: http://localhost:5000/api/application/${selectedRow.id}`
-    );
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/application/${selectedRow.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await deleteApplication(selectedRow.id);
       console.log("Response status:", response.status);
       if (!response.ok) {
         console.error(
@@ -177,6 +188,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
 
       setDeleteDialogOpen(false);
       setSelectedRow(null);
+      await editCallback();
     } catch (error) {
       console.error("Error deleting application:", error);
       alert(
@@ -213,7 +225,44 @@ const CustomTable: React.FC<CustomTableProps> = ({
       <Table stickyHeader>
         <TableHead>
           <TableRow sx={{ "& th": { backgroundColor: "#e2e2e2" } }}>
-            <TableCell align="center" sx={{ borderBottom: "none" }}>
+            {[
+              { label: "Business Capability", key: "businessCapabilityName" },
+              { label: "Domain", key: "domain" },
+              { label: "Sub-domain", key: "subDomain" },
+              { label: "Application", key: "applicationName" },
+              { label: "Region", key: "region"},
+              { label: "Country", key: "country"},
+              { label: "Status", key: "status"},
+            ].map(({ label, key }) => (
+              <TableCell
+                key={key}
+                align="center"
+                sx={{
+                  borderBottom: "none",
+                  cursor: "pointer",
+                  backgroundColor:
+                    sortConfig.key === key ? "#d1ecf1" : "inherit",
+                  color: sortConfig.key === key ? "#0c5460" : "black",
+                  fontWeight: sortConfig.key === key ? "bold" : "normal",
+                  "&:hover": {
+                    backgroundColor: "#f0f0f0", // Add hover effect
+                  },
+                }}
+                onClick={() => handleSort(key)}
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {label}
+                  {renderSortIcon(key)}
+                </Typography>
+
+                {/* <TableCell align="center" sx={{ borderBottom: "none" }}>
               <Typography
                 variant="subtitle2"
                 color="black"
@@ -251,10 +300,11 @@ const CustomTable: React.FC<CustomTableProps> = ({
                 fontSize={16}
               >
                 Application
-              </Typography>
-            </TableCell>
+              </Typography> */}
+              </TableCell>
+            ))}
             <TableCell sx={{ borderBottom: "none", textAlign: "right" }}>
-              {actionButton}
+              {/* {actionButton} */}
             </TableCell>
           </TableRow>
         </TableHead>
@@ -285,6 +335,25 @@ const CustomTable: React.FC<CustomTableProps> = ({
                   {row.applicationName || "-"}
                 </Typography>
               </TableCell>
+
+              <TableCell align="center" sx={{ borderBottom: "none" }}>
+                <Typography variant="body2" color="black">
+                  {row.region || "-"}
+                </Typography>
+              </TableCell>
+
+              <TableCell align="center" sx={{ borderBottom: "none" }}>
+                <Typography variant="body2" color="black">
+                  {row.country || "-"}
+                </Typography>
+              </TableCell>
+
+              <TableCell align="center" sx={{ borderBottom: "none" }}>
+                <Typography variant="body2" color="black">
+                  {row.status || "-"}
+                </Typography>
+              </TableCell>
+
               <TableCell align="right" sx={{ borderBottom: "none" }}>
                 <IconButton
                   onClick={(event) => handleOpenMenu(event, row)}
@@ -314,9 +383,10 @@ const CustomTable: React.FC<CustomTableProps> = ({
         <CustomEditDialog
           open={editDialogOpen}
           onClose={handleEditDialogClose}
-          onSave={handleEditSave}
+          onSave={(payload:any) => handleEditSave(payload)}
           data={editData}
           onChange={handleEditChange}
+          sort={""}
         />
       )}
       <CustomDeleteDialog
@@ -332,16 +402,20 @@ const CustomTable: React.FC<CustomTableProps> = ({
         onPageChange={handleChangePage}
         rowsPerPage={pageSize}
         onRowsPerPageChange={(event) => {
-          setPageSize(parseInt(event.target.value, 10));
+          const value = (parseInt(event.target.value, 10));
+          setPageSize(value === -1 ? totalCount : value); // Set to totalCount for "All"
           setPage(1);
         }}
-        rowsPerPageOptions={[10, 50, 100]}
+        rowsPerPageOptions={[10, 50, 100, { label: "All", value: -1 }]}
         sx={{
           position: "sticky",
           bottom: 0,
           backgroundColor: "white",
           zIndex: 1,
         }}
+        labelDisplayedRows={({ from, to, count, page }) =>
+          `Page ${page + 1} of ${Math.ceil(count / pageSize)} (${count})`
+        }
       />
     </TableContainer>
   );

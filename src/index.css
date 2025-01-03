@@ -99,7 +99,7 @@ a {
 
 /* Label Styling */
 .dialog-typography {
-  font-size: 13px !important;
+  font-size: 15px !important;
   font-weight: bold !important;
 }
 
@@ -144,4 +144,22 @@ a {
 
 .fix-orphan-button:hover {
   background-color: #285bb5 !important;
+}
+
+optgroup {
+  font-style: normal;
+  padding: 0 10px;
+}
+.Report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.export-button {
+  margin-left: 0;
+}
+
+.report-title {
+  margin-right: 0; 
 }

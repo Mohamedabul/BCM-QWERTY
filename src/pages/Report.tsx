@@ -1,9 +1,555 @@
-function Report() {
-  return (
-    <div>
-      <h1>Report</h1>
-    </div>
-  )
+import React, { useEffect, useState } from "react";
+import { Table, Input, Button, Select, Menu } from "antd";
+import { DownloadOutlined, ArrowUpwardOutlined, ArrowDownwardOutlined } from "@mui/icons-material";
+import { DownOutlined } from "@ant-design/icons";
+import { saveAs } from "file-saver";
+import { getReportData, getReportExport, getRegions, getCountrys } from "apis";
+import { TablePagination } from "@mui/material";
+import {
+  Table as MUITable,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
+
+interface DataItem {
+  country: string; // New field for Select Type filter
+  region: string;
+  cap: string;
+  domain: string;
+  subdomain: string;
+  name: string;
+  status: string;
+  business_owner: string;
 }
 
-export default Report
+const Report: React.FC = () => {
+  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
+  const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
+  const [selectType, setSelectType] = useState<string>("All"); // New state for Select Type filter
+  const [region, setRegion] = useState<string>("");
+  const [filterType, setFilterType] = useState<string>(""); // New state for filter type
+  const [search, setSearch] = useState<string>(""); // Search term for the selected filter type
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10); // Page size state
+  const [data, setData] = useState<any>([]);
+  const [regions, setRegions] = useState<any>([]);
+  const [countries, setCountries] = useState<any>([]);
+  const [totalData, setTotalData] = useState<number>(0);
+  const [sortConfig, setSortConfig] = useState<{
+    key: string;
+    direction: "ASC" | "DESC" | "";
+  }>({
+    key: "",
+    direction: "",
+  });
+
+  const keyMapping: { [key: string]: string } = {
+    country: "country",
+    region: "region",
+    cap: "businessCapability",
+    domain: "domain",
+    subdomain: "subDomain",
+    name: "applicationName",
+    status: "status"
+  };
+
+
+  const columns = [
+    { title: "Location", dataIndex: "country", key: "type" }, // Added Type column
+    { title: "Region", dataIndex: "region", key: "regional" },
+    {
+      title: "Business Capability",
+      dataIndex: "cap",
+      key: "cap",
+    },
+    { title: "Domain", dataIndex: "domain", key: "domain" },
+    { title: "Sub-domain", dataIndex: "subdomain", key: "subDomain" },
+    { title: "Application Name", dataIndex: "name", key: "name" },
+    { title: "Status", dataIndex: "status", key: "status" },
+  ];
+
+  // Updated sort handler
+  const handleSort = (key: string) => {
+    setSortConfig((prevSortConfig) => {
+      let direction: "ASC" | "DESC" | "" = "ASC";
+      if (prevSortConfig.key === key) {
+        direction = prevSortConfig.direction === "ASC" ? "DESC" : "";
+      }
+      return { key, direction };
+    });
+  };
+
+
+  const getFilters = () => {
+    const mappedKey = keyMapping[sortConfig.key] || sortConfig.key;
+    return {
+      filter: {
+        ...(selectType === "Regional" && selectedRegions.length > 0
+          ? { region: selectedRegions }
+          : {}),
+        ...(selectType === "Country" && selectedCountries.length > 0
+          ? { country: selectedCountries }
+          : {}),
+        ...(search ? { [filterType]: search } : {}),
+        ...(selectType !== "All" ? { reportType: selectType } : {}),
+      },
+      page: currentPage,
+      limit: pageSize,
+      sortField: mappedKey,
+      sortOrder: sortConfig.direction,
+    };
+  };
+
+  const fetchData = async () => {
+    const body = JSON.stringify(getFilters());
+    const data = await getReportData(body);
+    // setData(data?.response);
+    // setTotalData(data?.totalCount);
+    const processedData = data?.response.map((item: DataItem) => ({
+      country: item.country === "empty" || !item.country ? "-" : item.country,
+      region: item.region === "empty" || !item.region ? "-" : item.region,
+      cap: item.cap || "-",
+      domain: item.domain || "-",
+      subdomain: item.subdomain || "-",
+      name: item.name || "-",
+      status: item.status || "-",
+      business_owner: item.business_owner || "-",
+    }));
+    if (selectType === "All") {
+      setData(processedData || []); // Include all data
+    } else if (selectType === "global") {
+      setData(processedData || []);
+    } else {
+      setData(processedData.filter((e: any) => e.region !== "Global") || []);
+    }
+  
+    setTotalData(data?.totalCount || 0);
+  };
+
+  const fetchRegions = async () => {
+    try {
+      const regionsData = await getRegions();
+      const filteredRegions = regionsData?.filter(
+        (region: any) => region.name && region.name.trim() !== "empty"
+      );
+      console.log(filteredRegions);
+      setRegions(filteredRegions.filter((e: any) => e.name !== "Global") || []);
+    } catch (error) {
+      console.error("Error fetching regions:", error);
+    }
+  };
+
+  const fetchCountries = async () => {
+    try {
+      const countriesData = await getCountrys();
+      const filteredCountries = countriesData?.filter(
+        (country: any) => country.name && country.name.trim() !== "empty"
+      );
+      setCountries(
+        filteredCountries.filter((e: any) => e.name !== "Global") || []
+      );
+    } catch (error) {
+      console.error("Error fetching countries:", error);
+    }
+  };
+
+  const getExport = async () => {
+    const body = JSON.stringify(getFilters());
+    const data = await getReportExport(body);
+    console.log(data);
+    saveAs(data?.csvUrl, "export.csv");
+  };
+
+  const clearButtons = () => {
+    setSelectedRegions([]);
+    setSelectedCountries([]);
+    setSelectType("All");
+    setFilterType("");
+    setSearch("");
+    setCurrentPage(1);
+    setPageSize(10);
+    fetchData();
+  };
+
+  // const handlePageChange = (page: number) => {
+  //   setCurrentPage(page);
+  // };
+  useEffect(() => {
+    fetchData();
+  }, [pageSize, currentPage, sortConfig]);
+
+  const handleApply = () => {
+    fetchData();
+  };
+
+  return (
+    <div className="regional-report">
+      <div className="Report-header">
+        <h1 className="report-title">Report</h1>
+        <Button
+          icon={<DownloadOutlined />}
+          onClick={getExport}
+          className="export-button"
+        >
+          Export
+        </Button>
+      </div>
+      <div
+        className="filters"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          marginBottom: "15px",
+        }}
+      >
+        <Select
+          placeholder="Select Type"
+          onChange={(value: string) => setSelectType(value)}
+          allowClear
+          style={{ flex: 1, maxWidth: "300px", height: "45px" }}
+          value={selectType}
+        >
+          <Select.Option value="All">All</Select.Option>
+          <Select.Option value="global">Global</Select.Option>
+          <Select.Option value="Regional">Regional</Select.Option>
+          <Select.Option value="Country">Country</Select.Option>
+        </Select>
+
+        {selectType === "Regional" && (
+          <Select
+            mode="multiple"
+            placeholder="Select Regions"
+            onFocus={fetchRegions}
+            onChange={(values: string[]) => {
+              if (values.includes("all")) {
+                setSelectedRegions(regions.map((region: any) => region.name));
+              } else {
+                setSelectedRegions(values);
+              }
+            }}
+            value={selectedRegions.length === regions.length ? regions.map((region: any) => region.name) : selectedRegions}
+            style={{ width: "400px",
+              maxWidth: "500px",
+              // height: "55px",
+              // overflowY: "auto",
+              // overflowX: "hidden",
+              // display: "flex",
+              // gap: "1px",
+              // padding: "4px",
+              // borderRadius: "4px", 
+              }}
+          >
+            tagRender={(props: { label: any; value: any; closable: any; onClose: any; }) => {
+              const { label, value, closable, onClose } = props;
+              if (value === "all") return <></>;
+              return (
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    margin: "2px 2px 2px 0",
+                    padding: "4px 8px",
+                    borderRadius: "4px",
+                    fontSize: "14px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {label}
+                  {closable && (
+                    <span
+                      onClick={onClose}
+                      style={{
+                        marginLeft: "8px",
+                        cursor: "pointer",
+                        color: "#1890ff",
+                      }}
+                    >
+                      ✖
+                    </span>
+                  )}
+                </div>
+              );
+            }}
+            <Select.Option key="all" value="all">
+            Select all
+          </Select.Option>
+            {regions.map((region: any) => (
+              <Select.Option key={region.id} value={region.name}>
+                {region.name}
+              </Select.Option>
+            ))}
+          </Select>
+        )}
+
+
+
+        {selectType === "Country" && (
+          <Select
+            mode="multiple"
+            placeholder="Select Countries"
+            onFocus={fetchCountries}
+            onChange={(values: string[]) => {
+              if (values.includes("all")) {
+                setSelectedCountries(
+                  countries.map((country: any) => country.name)
+                );
+              } else {
+                setSelectedCountries(values);
+              }
+            }}
+            value={selectedCountries.length === countries.length ? countries.map((country: any) => country.name) : selectedCountries}
+            allowClear
+            style={{
+              flex: 1,
+              maxWidth: "500px",
+              height: "60px",
+              overflowY: "auto",
+              overflowX: "hidden",
+              display: "flex",
+              gap: "1px",
+              padding: "4px",
+              borderRadius: "4px",
+            }}
+            dropdownStyle={{
+              maxHeight: "400px",
+              overflowY: "auto",
+            }}
+            tagRender={(props) => {
+              const { label, value, closable, onClose } = props;
+              if (value === "all") return <></>;
+              return (
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    margin: "2px 2px 2px 0",
+                    padding: "4px 8px",
+                    borderRadius: "4px",
+                    fontSize: "14px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {label}
+                  {closable && (
+                    <span
+                      onClick={onClose}
+                      style={{
+                        marginLeft: "8px",
+                        cursor: "pointer",
+                        color: "#1890ff",
+                      }}
+                    >
+                      ✖
+                    </span>
+                  )}
+                </div>
+              );
+            }}
+          >
+            <Select.Option key="all" value="all">
+              Select All
+            </Select.Option>
+            {countries.map((country: any) => (
+              <Select.Option key={country.id} value={country.name}>
+                {country.name}
+              </Select.Option>
+            ))}
+          </Select>
+        )}
+
+        {/* {selectType === "Regional" && (
+          <Select
+            placeholder="Region"
+            onFocus={fetchRegions} 
+            onChange={(value: string) => setRegion(value)}
+            allowClear
+            style={{ flex: 1, maxWidth: "300px", height: "45px" }}
+          >
+            {regions.map((region: any) => (
+              <Select.Option key={region.id} value={region.name}>
+                {region.name}
+              </Select.Option>
+            ))}
+          </Select>
+        )}
+        {selectType === "Country" && (
+          <Select
+            placeholder="Country"
+            onFocus={fetchCountries} 
+            onChange={(value: string) => setRegion(value)}
+            allowClear
+            style={{ flex: 1, maxWidth: "300px", height: "45px" }}
+          >
+            {countries.map((country: any) => (
+              <Select.Option key={country.id} value={country.name}>
+                {country.name}
+              </Select.Option>
+            ))}
+          </Select>
+        )} */}
+
+        {/* {selectType !== "global" && (
+          <Select
+            placeholder={selectType === "Regional" ? "Regional" : "Country"}
+            onChange={(value: string) => setRegion(value)}
+            allowClear
+            style={{ flex: 1, maxWidth: "300px", height: "45px" }}
+          >
+            <Select.Option value="AMERICAS">AMERICAS</Select.Option>
+            <Select.Option value="APAC">APAC</Select.Option>
+            <Select.Option value="EMEA">EMEA</Select.Option>
+          </Select>
+        )} */}
+
+        <Select
+          placeholder="Filter By"
+          value={filterType}
+          onChange={(value: string) => setFilterType(value)}
+          allowClear
+          style={{ flex: 1, maxWidth: "300px", height: "45px" }}
+        >
+          {columns
+            .filter(
+              (col) => col.dataIndex !== "region" && col.dataIndex !== "country"
+            )
+            .map((col) => (
+              <Select.Option key={col.dataIndex} value={col.dataIndex}>
+                {col.title}
+              </Select.Option>
+            ))}
+        </Select>
+
+        <Input
+          placeholder="Search"
+          value={search}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setSearch(e.target.value)
+          }
+          style={{ flex: 2, maxWidth: "500px", padding: "10px" }}
+        />
+        <Button
+          type="primary"
+          onClick={handleApply}
+          style={{ flex: "none", padding: "20px" }}
+        >
+          Apply
+        </Button>
+        <Button
+          type="primary"
+          onClick={clearButtons}
+          style={{ flex: "none", padding: "20px" }}
+        >
+          Clear
+        </Button>
+      </div>
+
+      <TableContainer
+        component={Paper}
+        sx={{
+          minHeight: 500,
+          maxHeight: 600,
+          overflow: "auto",
+          "& .MuiTable-root": {
+            borderCollapse: "separate",
+            borderSpacing: 0,
+          },
+        }}
+      >
+        <MUITable
+          stickyHeader
+          sx={{
+            minWidth: 650,
+            "& .MuiTableCell-root": {
+              borderBottom: "none",
+              padding: "20px 16px",
+            },
+          }}
+        >
+          <TableHead>
+            <TableRow
+            >
+              {columns.map((column) => (
+                <TableCell
+                  key={column.key}
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: 16,
+                    backgroundColor: "#e2e2e2",
+                    position: "sticky",
+                    top: 0,
+                    zIndex: 1,
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => handleSort(column.dataIndex)}
+                >
+                  {column.title}
+                  {sortConfig.key === column.dataIndex && (
+                    sortConfig.direction === "ASC" 
+                      ? <ArrowUpwardOutlined style={{ marginLeft: 8, fontSize: 16 }} /> 
+                      : sortConfig.direction === "DESC"
+                        ? <ArrowDownwardOutlined style={{ marginLeft: 8, fontSize: 16 }} />
+                        : null
+                  )}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.map((row: any, index: number) => (
+              <TableRow
+                key={index}
+                hover
+                sx={{
+                  "&:last-child td": { border: 0 },
+                }}
+              >
+                <TableCell>{row.country}</TableCell>
+                <TableCell>{row.region}</TableCell>
+                <TableCell>{row.cap}</TableCell>
+                <TableCell>{row.domain}</TableCell>
+                <TableCell>{row.subdomain}</TableCell>
+                <TableCell>{row.name}</TableCell>
+                <TableCell>{row.status}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </MUITable>
+      </TableContainer>
+
+      <TablePagination
+        component="div"
+        count={totalData}
+        page={currentPage - 1}
+        onPageChange={(event, newPage) => {
+          setCurrentPage(newPage + 1);
+        }}
+        rowsPerPage={pageSize}
+        onRowsPerPageChange={(event) => {
+          const value = parseInt(event.target.value, 10);
+          setPageSize(value === -1 ? totalData : value);
+          setCurrentPage(1);
+        }}
+        rowsPerPageOptions={[10, 50, 100, { label: "All", value: -1 }]}
+        labelDisplayedRows={({ from, to, count, page }) =>
+          `Page ${page + 1} of ${Math.ceil(count / pageSize)} (${count})`
+        }
+        sx={{ marginTop: 2 }}
+        SelectProps={{
+          renderValue: (selected) => {
+            if (selected === -1) return "All"; // Display "All" for the -1 value
+            return `${selected}`; // Display numbers as strings
+          },
+        }}
+      />
+    </div>
+  );
+};
+
+export default Report;

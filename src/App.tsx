@@ -7,6 +7,7 @@ import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined";
 import CssBaseline from "@mui/material/CssBaseline";
 import GlobalStyles from "@mui/material/GlobalStyles";
+import { HiTemplate } from 'react-icons/hi';
 import {
   GitHubBanner,
   type LegacyAuthProvider as AuthProvider,
@@ -39,6 +40,10 @@ import {
 } from "pages";
 import Upload from "pages/Upload";
 import Report from "pages/Report";
+import Regional from "pages/report/regional";
+import Country from "pages/report/country";
+import Global from "pages/report/global";
+import Template from "pages/Template";
 
 const axiosInstance = axios.create();
 axiosInstance.interceptors.request.use(
@@ -146,9 +151,9 @@ function App() {
               resources={[
                 {
                   name: "template",
-                  list: () => <AllCapabilities isEditable={false} />,
+                  list: () => <Template/>,
                   // show: CapabilityDetails,
-                  icon: <AssessmentIcon />,
+                  icon: <HiTemplate style={{fontSize: "25px"}} />,
                   options: { label: "Template" },
                 },
                 {

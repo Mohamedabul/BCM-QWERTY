@@ -1,46 +1,107 @@
-import React, { useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Select, MenuItem, Box, Typography, IconButton } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import CustomButton from './CustomButton';
+import React, { useEffect } from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Select,
+  MenuItem,
+  Box,
+  Typography,
+  IconButton,
+  TextField,
+  SelectChangeEvent,
+  OutlinedInput,
+  Checkbox,
+  ListItemText,
+  ListSubheader,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import CustomButton from "./CustomButton";
+import {
+  fetchCorecapability,
+  fetchDomain,
+  fetchSubdomain,
+  // getMappedApplications,
+  getCountrys,
+  getRegions,
+  getStatuses,
+} from "apis";
+import { Capability, Domain, SubDomain } from "apis/interfaces";
 
 interface CustomEditDialogProps {
   open: boolean;
   onClose: () => void;
-  onSave: () => void;
-  data: {
-    core_id: string;
-    domain_id: string;
-    subdomain_id: string;
-  };
+  onSave: any;
+  sort: string;
+  data: any;
   onChange: (field: string, value: string) => void;
 }
-interface Capability {
-  id: string;
-  name: string;
-}
-interface Domain {
-  id: string;
-  name: string;
-  core_id: string;
-}
-interface SubDomain {
-  id: string;
-  name: string;
-  domain_id: string;
-}
+// dummy
 
-const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSave, data, onChange }) => {
+const CustomEditDialog: React.FC<CustomEditDialogProps> = ({
+  open,
+  onClose,
+  onSave,
+  data,
+  onChange,
+}) => {
   const [capabilities, setCapabilities] = React.useState<Capability[]>([]);
-  const [domains, setDomains] = React.useState<Domain[]>([]);
+  const [selectedCapabilities, setSelectedCapabilities] = React.useState<any[]>(
+    data.businessCapabilityName ? [data.businessCapabilityName] : []
+  );
+  const [selectedDomain, setSelectedDomain] = React.useState<any[]>(
+    data.domain ? [data.domain] : []
+  );
+  const [selectedSubdomain, setSelectedSubdomain] = React.useState<any[]>(
+    data.subDomain ? [data.subDomain] : []
+  );
+  const [domains, setDomains] = React.useState<any[]>([]);
   const [subDomains, setSubDomains] = React.useState<SubDomain[]>([]);
+  const [selectedValues, setSelectedValues] = React.useState<any>({});
+  //
+  const [regions, setRegions] = React.useState<any[]>([]);
+  const [countries, setCountries] = React.useState<any[]>([]);
+  const [statuses, setStatuses] = React.useState<any[]>([]);
+  const [selectedRegions, setSelectedRegions] = React.useState<string[]>(data.region ? [data.region] : []);
+  const [selectedCountries, setSelectedCountries] = React.useState<string[]>(data.country ? [data.country] : []);
+  const [selectedApplication, setSelectedApplication] = React.useState<any>(data.applicationName);
+  const [selectedStatus, setSelectedStatus] = React.useState<any>(data.status);
+
   const [filteredDomains, setFilteredDomains] = React.useState<Domain[]>([]);
-  const [filteredSubDomains, setFilteredSubDomains] = React.useState<SubDomain[]>([]);
+  const [filteredSubDomains, setFilteredSubDomains] = React.useState<
+    SubDomain[]
+  >([]);
+
+  const handleChange = (event: SelectChangeEvent<any>) => {
+    const {
+      target: { value },
+    } = event;
+    setSelectedCapabilities(
+      typeof value === "string" ? value.split(",") : value
+    );
+  };
+
+  const handleChangeDomain = (event: SelectChangeEvent<any>) => {
+    const {
+      target: { value },
+    } = event;
+    setSelectedDomain(typeof value === "string" ? value.split(",") : value);
+  };
+
+  const handleChangeSubDomain = (event: SelectChangeEvent<any>) => {
+    const {
+      target: { value },
+    } = event;
+    setSelectedSubdomain(typeof value === "string" ? value.split(",") : value);
+  };
 
   useEffect(() => {
     const fetchCapabilities = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/corecapability');
-        const result = await response.json();
+        const sort = JSON.stringify({ name: "ASC" });
+        const result = await fetchCorecapability(sort);
+        // const sortedCapabilities = result.sort((a: { name: string; }, b: { name: any; }) => a.name.localeCompare(b.name));
         setCapabilities(result);
       } catch (error) {
         console.error("Error fetching capabilities:", error);
@@ -48,8 +109,9 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
     };
     const fetchDomains = async () => {
       try {
-        const domainResponse = await fetch('http://localhost:5000/api/domain');
-        const domainResult = await domainResponse.json();
+        const sort = JSON.stringify({ name: "ASC" });
+        const domainResult = await fetchDomain(sort);
+        // const sortedDomains = domainResult.sort((a: { name: string; }, b: { name: any; }) => a.name.localeCompare(b.name));
         setDomains(domainResult);
       } catch (error) {
         console.error("Error fetching domains:", error);
@@ -58,160 +120,601 @@ const CustomEditDialog: React.FC<CustomEditDialogProps> = ({ open, onClose, onSa
 
     const fetchSubDomains = async () => {
       try {
-        const subDomainResponse = await fetch('http://localhost:5000/api/subdomain');
-        const subDomainResult = await subDomainResponse.json();
+        const sort = JSON.stringify({ name: "ASC" });
+        const subDomainResult = await fetchSubdomain(sort);
+        // const sortedSubDomains = subDomainResult.sort((a: { name: string; }, b: { name: any; }) => a.name.localeCompare(b.name));
         setSubDomains(subDomainResult);
       } catch (error) {
         console.error("Error fetching subdomains:", error);
       }
     };
 
+    const fetchRegions = async () => {
+      try {
+        const RegionResult = await getRegions();
+        setRegions(RegionResult);
+      } catch (error) {
+        console.error("Error fetching regions:", error);
+      }
+    };
+
+    const fetchCountries = async () => {
+      try {
+        const countryResult = await getCountrys();
+        setCountries(countryResult);
+      } catch (error) {
+        console.error("Error fetching countries:", error);
+      }
+    };
+
+    const fetchStatus = async () => {
+      try {
+        const statusResult = await getStatuses();
+        if(!statusResult.includes(data.status)){
+          statusResult.push(data.status)
+        }
+        setStatuses(statusResult);
+        console.log("status result :",statusResult);
+      } catch (error) {
+        console.error("Error fetching status:", error);
+      }
+    };
+
+
     fetchCapabilities();
     fetchDomains();
     fetchSubDomains();
+    //
+    fetchRegions();
+    fetchCountries();
+    fetchStatus();
   }, []);
 
-    useEffect(() => {
+  useEffect(() => {
     const capabilityId = data.core_id;
-    setFilteredDomains(domains.filter((domain) => domain.core_id === capabilityId));
-    
-    
-  }, [data.core_id, domains, onChange]);
+    setFilteredDomains(
+      domains.filter((domain) => domain.core_id === capabilityId)
+    );
 
-  
+    // setFilteredDomains(filtered.sort((a, b) => a.name.localeCompare(b.name)));
+  }, [data.core_id, domains]);
+
   useEffect(() => {
     const domainId = data.domain_id;
-    setFilteredSubDomains(subDomains.filter((subDomain) => subDomain.domain_id === domainId));
-    
-  }, [data.domain_id, subDomains, onChange]);
+    // const filtered = subDomains.filter((subDomain) => subDomain.domain_id === domainId);
+    setFilteredSubDomains(
+      subDomains.filter((subDomain) => subDomain.domain_id === domainId)
+    );
+  }, [data.domain_id, subDomains]);
+
+  const handleCheckboxToggleCap = (domainName: any) => {
+    setSelectedCapabilities((prevSelected) => {
+      if (prevSelected.includes(domainName)) {
+        return prevSelected.filter((item) => item !== domainName);
+      }
+      return [...prevSelected, domainName];
+    });
+  };
+
+  const handleCheckboxToggle = (domainName: any) => {
+    setSelectedDomain((prevSelected) => {
+      if (prevSelected.includes(domainName)) {
+        return prevSelected.filter((item) => item !== domainName);
+      }
+      return [...prevSelected, domainName];
+    });
+  };
+
+  const handleCheckboxToggleSub = (domainName: any) => {
+    setSelectedSubdomain((prevSelected) => {
+      if (prevSelected.includes(domainName)) {
+        return prevSelected.filter((item) => item !== domainName);
+      }
+      return [...prevSelected, domainName];
+    });
+  };
+
+    // Handle checkbox toggle for Regions
+    const handleCheckboxToggleRegion = (regionName: string) => {
+      setSelectedRegions((prevSelected) => {
+        if (prevSelected.includes(regionName)) {
+          return prevSelected.filter((item) => item !== regionName);
+        }
+        return [...prevSelected, regionName];
+      });
+    };
+
+    // Handle checkbox toggle for Countries
+    const handleCheckboxToggleCountry = (countryName: string) => {
+      setSelectedCountries((prevSelected) => {
+        if (prevSelected.includes(countryName)) {
+          return prevSelected.filter((item) => item !== countryName);
+        }
+        return [...prevSelected, countryName];
+      });
+    };
 
 
+  const formatAndSave = () => {
+    console.log(
+      selectedCapabilities,
+      selectedDomain,
+      selectedSubdomain,
+      selectedApplication,
+      selectedRegions,
+      selectedCountries,
+      selectedStatus
+    );
+    const formattedData: any[] = [];
+
+    const filteredCap = capabilities.filter((x) =>
+      selectedCapabilities.includes(x.name)
+    );
+
+    filteredCap.forEach((cap) => {
+      const filteredDomain = domains.filter(
+        (x) => selectedDomain.includes(x.name) && x.core_id === cap.id
+      );
+      if (filteredDomain.length > 0) {
+        filteredDomain.forEach((domainId) => {
+          const filteredSubDomain = subDomains.filter(
+            (x) =>
+              selectedSubdomain.includes(x.name) && x.domain_id === domainId.id
+          );
+          if (filteredSubDomain.length > 0) {
+            filteredSubDomain.forEach((subdomainId) => {
+              selectedRegions.forEach((region) => {
+                selectedCountries.forEach((country) => {
+              formattedData.push({
+                core_id: cap.id,
+                domain_id: domainId.id,
+                subdomain_id: subdomainId.id,
+                name: selectedApplication,
+                region: region,
+                country: country,
+                status: selectedStatus,
+              });
+              });
+              });
+            });
+          } else {
+            selectedRegions.forEach((region) => {
+            selectedCountries.forEach((country) => {
+            formattedData.push({
+              core_id: cap.id,
+              domain_id: domainId.id,
+              subdomain_id: null,
+              name: selectedApplication,
+              region: region,
+              country: country,
+              status: selectedStatus,
+            });
+            });
+            });
+          }
+        });
+      } else {
+        selectedRegions.forEach((region) => {
+        selectedCountries.forEach((country) => {
+        formattedData.push({
+          core_id: cap.id,
+          domain_id: null,
+          subdomain_id: null,
+          name: selectedApplication,
+          region: region,
+          country: country,
+          status: selectedStatus,
+        });
+        });
+        });
+      }
+    });
+    onSave(formattedData);
+
+    // useEffect(() => {
+    //   console.log("Initial data status:", data.status);
+    // }, [data.status]);
+   
+  };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <Box
         sx={{
-          backgroundColor: 'white',
-          color: 'black',
+          backgroundColor: "white",
+          color: "black",
           padding: 2,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
-        <DialogTitle margin={-2} sx={{ fontWeight: 'bold', color: 'black' }}>Edit</DialogTitle>
-        <IconButton onClick={onClose} sx={{ color: 'black' }}>
+        <DialogTitle margin={-2} sx={{ fontWeight: "bold", color: "black" }}>
+          Change Mapping
+        </DialogTitle>
+        <IconButton onClick={onClose} sx={{ color: "black" }}>
           <CloseIcon />
         </IconButton>
       </Box>
-      <DialogContent dividers sx={{ backgroundColor: 'white', color: 'black' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Edit Business Capability Name<span style={{ color: 'red' }}>*</span></Typography>
+      <DialogContent dividers sx={{ backgroundColor: "white", color: "black" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: "bold", color: "black" }}
+          >
+            Select Business Capability Name
+            <span style={{ color: "red" }}>*</span>
+          </Typography>
           <Select
             fullWidth
-            value={data.core_id}
-            onChange={(e) => onChange('core_id', e.target.value as string)}
-            displayEmpty
+            value={selectedCapabilities}
+            multiple
+            onChange={handleChange}
+            input={<OutlinedInput label="Tag" />}
+            renderValue={(selected) => selected.filter(Boolean).join(",")}
             sx={{
-              backgroundColor: '#f0f2f5',
+              backgroundColor: "#f0f2f5",
               borderRadius: 1,
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': { borderColor: 'transparent' },
-                '&.Mui-focused fieldset': { borderColor: '#b0bec5' },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "transparent" },
+                "&.Mui-focused fieldset": { borderColor: "#b0bec5" },
               },
-              '& .MuiInputBase-input': { color: 'black' },
+              "& .MuiInputBase-input": { color: "black" },
+            }}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 300,
+                  overflowY: "auto",
+                },
+              },
             }}
           >
-            <MenuItem value="" disabled>Select Business Capability</MenuItem>
+            {/* Default "Select Business Capability" message when no selection */}
+            {!data.businessCapabilityName && (
+              <MenuItem value="" disabled>
+                Select Business Capability
+              </MenuItem>
+            )}
+
+            {/* Render each capability directly without any grouping */}
             {capabilities.map((capability) => (
-              <MenuItem key={capability.id} value={capability.id}>
+              <MenuItem key={capability.id} value={capability.name}>
+                <Checkbox
+                  checked={selectedCapabilities.indexOf(capability.name) > -1}
+                  onChange={() => handleCheckboxToggleCap(capability.name)}
+                />
                 {capability.name}
               </MenuItem>
             ))}
           </Select>
 
-          <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Edit Domain Name<span style={{ color: 'red' }}>*</span></Typography>
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: "bold", color: "black" }}
+          >
+            Select Domain Name<span style={{ color: "red" }}>*</span>
+          </Typography>
           <Select
             fullWidth
-            value={data.domain_id}
-            onChange={(e) => onChange('domain_id', e.target.value as string)}
-            displayEmpty
-            disabled={!data.core_id}
+            value={selectedDomain}
+            onChange={handleChangeDomain}
+            multiple
+            input={<OutlinedInput label="Tag" />}
+            renderValue={(selected) => selected.filter(Boolean).join(",")}
+            disabled={!data.domain}
             sx={{
-              backgroundColor: '#f0f2f5',
+              backgroundColor: "#f0f2f5",
               borderRadius: 1,
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': { borderColor: 'transparent' },
-                '&.Mui-focused fieldset': { borderColor: '#b0bec5' },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "transparent" },
+                "&.Mui-focused fieldset": { borderColor: "#b0bec5" },
               },
-              '& .MuiInputBase-input': { color: 'black' },
+              "& .MuiInputBase-input": { color: "black" },
+            }}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 300,
+                  overflowY: "auto",
+                },
+              },
             }}
           >
-            <MenuItem value="" disabled>Select Domain</MenuItem>
-            {filteredDomains.map((domain) => (
-              <MenuItem key={domain.id} value={domain.id}>
-                {domain.name}
+            {!data.domain && (
+              <MenuItem value="" disabled>
+                Select Domain
+              </MenuItem>
+            )}
+
+            {selectedCapabilities.map((cap) => (
+              <div key={cap}>
+                <ListSubheader
+                  sx={{ fontWeight: "bold", color: "black", fontSize: "20px" }}
+                >
+                  {cap}
+                </ListSubheader>
+                {domains
+                  .filter(
+                    (dmn) =>
+                      dmn.core_id ===
+                      capabilities.find((x) => x.name === cap)?.id
+                  )
+                  .map((filtDmn) => (
+                    <MenuItem key={filtDmn.id} value={filtDmn.name}>
+                      <Checkbox
+                        checked={selectedDomain.indexOf(filtDmn.name) > -1}
+                        onChange={() => handleCheckboxToggle(filtDmn.name)}
+                      />
+                      <ListItemText primary={filtDmn.name} />
+                    </MenuItem>
+                  ))}
+              </div>
+            ))}
+          </Select>
+
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: "bold", color: "black" }}
+          >
+            Select Sub-domain Name<span style={{ color: "red" }}>*</span>
+          </Typography>
+          <Select
+            fullWidth
+            value={selectedSubdomain}
+            onChange={handleChangeSubDomain}
+            multiple
+            input={<OutlinedInput label="Tag" />}
+            renderValue={(selected) => selected.filter(Boolean).join(",")}
+            disabled={!data.subDomain}
+            sx={{
+              backgroundColor: "#f0f2f5",
+              borderRadius: 1,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "transparent" },
+                "&.Mui-focused fieldset": { borderColor: "#b0bec5" },
+              },
+              "& .MuiInputBase-input": { color: "black" },
+            }}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 300,
+                  overflowY: "auto",
+                },
+              },
+            }}
+          >
+            {!data.subDomain && (
+              <MenuItem value="" disabled>
+                Select Sub-Domain
+              </MenuItem>
+            )}
+
+            {selectedDomain.map((cap) => (
+              <div key={cap}>
+                <ListSubheader
+                  sx={{ fontWeight: "bold", color: "black", fontSize: "20px" }}
+                >
+                  {cap}
+                </ListSubheader>
+                {subDomains
+                  .filter(
+                    (dmn) =>
+                      dmn.domain_id === domains.find((x) => x.name === cap)?.id
+                  )
+                  .map((filtDmn) => (
+                    <MenuItem key={filtDmn.id} value={filtDmn.name}>
+                      <Checkbox
+                        checked={selectedSubdomain.indexOf(filtDmn.name) > -1}
+                        onChange={() => handleCheckboxToggleSub(filtDmn.name)}
+                      />
+                      <ListItemText primary={filtDmn.name} />
+                    </MenuItem>
+                  ))}
+              </div>
+            ))}
+          </Select>
+
+
+          {/* Application Text Field */}
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: "bold", color: "black" }}
+          >
+            Edit Application Name<span style={{ color: "red" }}>*</span>
+          </Typography>
+          <TextField
+            fullWidth
+            value={selectedApplication || ""} // Default to an empty string if undefined
+            onChange={(e) => {
+              setSelectedApplication(e.target.value);
+              onChange("application", e.target.value);
+            }}
+            placeholder="Enter application"
+            sx={{
+              backgroundColor: "#f0f2f5",
+              borderRadius: 1,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "transparent" },
+                "&.Mui-focused fieldset": { borderColor: "#b0bec5" },
+              },
+              "& .MuiInputBase-input": { color: "black" },
+            }}
+          />
+
+
+          {/* Region Select */}
+          <Typography variant="body2" sx={{ fontWeight: "bold", color: "black" }}>
+            Select Region<span style={{ color: "red" }}>*</span>
+          </Typography>
+          <Select
+            fullWidth
+            value={selectedRegions}
+            onChange={(e) => setSelectedRegions(typeof e.target.value === "string" ? e.target.value.split(",") : e.target.value)}
+            multiple
+            input={<OutlinedInput label="Tag" />}
+            renderValue={(selected) => selected.filter(Boolean).join(",")}
+            sx={{
+              backgroundColor: "#f0f2f5",
+              borderRadius: 1,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "transparent" },
+                "&.Mui-focused fieldset": { borderColor: "#b0bec5" },
+              },
+              "& .MuiInputBase-input": { color: "black" },
+            }}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 300,
+                  overflowY: "auto",
+                },
+              },
+            }}
+          >
+            {regions.map((region) => (
+              <MenuItem key={region.id} value={region.name}>
+                <Checkbox
+                  checked={selectedRegions.indexOf(region.name) > -1}
+                  onChange={() => handleCheckboxToggleRegion(region.name)}
+                />
+                {region.name}
               </MenuItem>
             ))}
           </Select>
 
-          <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'black' }}>Edit Sub-domain Name<span style={{ color: 'red' }}>*</span></Typography>
+          {/* Country Select */}
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: "bold", color: "black" }}
+          >
+            Select Country<span style={{ color: "red" }}>*</span>
+          </Typography>
           <Select
             fullWidth
-            value={data.subdomain_id}
-            onChange={(e) => onChange('subdomain_id', e.target.value as string)}
-            displayEmpty
-            disabled={!data.domain_id}
+            value={selectedCountries}
+            onChange={(e) => setSelectedCountries(typeof e.target.value === "string" ? e.target.value.split(",") : e.target.value)}
+            multiple
+            input={<OutlinedInput label="Tag" />}
+            renderValue={(selected) => selected.filter(Boolean).join(",")}
             sx={{
-              backgroundColor: '#f0f2f5',
+              backgroundColor: "#f0f2f5",
               borderRadius: 1,
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': { borderColor: 'transparent' },
-                '&.Mui-focused fieldset': { borderColor: '#b0bec5' },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "transparent" },
+                "&.Mui-focused fieldset": { borderColor: "#b0bec5" },
               },
-              '& .MuiInputBase-input': { color: 'black' },
+              "& .MuiInputBase-input": { color: "black" },
+            }}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 300,
+                  overflowY: "auto",
+                },
+              },
             }}
           >
-            <MenuItem value="" disabled>Select Sub-domain</MenuItem>
-            {filteredSubDomains.map((subDomain) => (
-              <MenuItem key={subDomain.id} value={subDomain.id}>
-                {subDomain.name}
+            {countries.map((country) => (
+              <MenuItem key={country.id} value={country.name}>
+                <Checkbox
+                  checked={selectedCountries.indexOf(country.name) > -1}
+                  onChange={() => handleCheckboxToggleCountry(country.name)}
+                />
+                {country.name}
               </MenuItem>
             ))}
           </Select>
+
+          {/* Status Text Field */}
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: "bold", color: "black" }}
+          >
+            Select Application Status<span style={{ color: "red" }}>*</span>
+          </Typography>
+          <Select
+            fullWidth
+            value={selectedStatus}
+            onChange={(e) => {
+              setSelectedStatus(e.target.value);
+              onChange("status", e.target.value);
+            }}
+            displayEmpty
+            sx={{
+              backgroundColor: "#f0f2f5",
+              borderRadius: 1,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "transparent" },
+                "&.Mui-focused fieldset": { borderColor: "#b0bec5" },
+              },
+              "& .MuiInputBase-input": { color: "black" },
+            }}
+          >
+            {statuses.map((status, index) => (
+              <MenuItem key={index} value={status}>
+                {status}
+              </MenuItem>
+            ))}
+          </Select>
+          {/* <TextField
+            fullWidth
+            value={selectedStatus || ""} // Default to an empty string if undefined
+            onChange={(e) => {
+              setSelectedStatus(e.target.value);
+              onChange("status", e.target.value);
+            }}
+            placeholder="Enter status"
+            sx={{
+              backgroundColor: "#f0f2f5",
+              borderRadius: 1,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": { borderColor: "transparent" },
+                "&.Mui-focused fieldset": { borderColor: "#b0bec5" },
+              },
+              "& .MuiInputBase-input": { color: "black" },
+            }}
+          /> */}
         </Box>
       </DialogContent>
-      <DialogActions sx={{ backgroundColor: 'white', padding: '16px', justifyContent: 'space-between' }}>
+      <DialogActions
+        sx={{
+          backgroundColor: "white",
+          padding: "16px",
+          justifyContent: "space-between",
+        }}
+      >
         <CustomButton
           title="Cancel"
           backgroundColor="white"
           color="black"
           handleClick={onClose}
           sx={{
-            color: '#1D1F20',
-            borderColor: '#ccc',
-            padding: '8px 16px',
-            fontWeight: 'bold',
-            textTransform: 'none',
-            borderRadius: '8px',
-            width: '45%',
+            color: "#1D1F20",
+            borderColor: "#ccc",
+            padding: "8px 16px",
+            fontWeight: "bold",
+            textTransform: "none",
+            borderRadius: "8px",
+            width: "45%",
           }}
         />
         <CustomButton
           title="Save"
           backgroundColor="#1976d2"
           color="white"
-          handleClick={onSave}
+          handleClick={formatAndSave}
           sx={{
-            backgroundColor: '#1976d2',
-            color: 'white',
-            padding: '8px 16px',
-            fontWeight: 'bold',
-            textTransform: 'none',
-            borderRadius: '8px',
-            width: '45%',
-            '&:hover': {
-              backgroundColor: '#155ab0',
+            backgroundColor: "#1976d2",
+            color: "white",
+            padding: "8px 16px",
+            fontWeight: "bold",
+            textTransform: "none",
+            borderRadius: "8px",
+            width: "45%",
+            "&:hover": {
+              backgroundColor: "#155ab0",
             },
           }}
         />

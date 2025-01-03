@@ -56,7 +56,7 @@ function withMenu<T extends WrappedComponentProps>(
             onSave && onSave();
           }}
           editEndpoint={editEndpoint}
-          deleteEndpoint={deleteEndpoint}
+          deleteEndpointCall={deleteEndpoint}
           menuStyle={{ left: "90%", paddingX: 1 }}
         />
       </div>

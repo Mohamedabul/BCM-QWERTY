@@ -20,6 +20,13 @@ import { IResourceComponentsProps } from "@refinedev/core";
 import CustomDialog from "components/common/CustomDialog";
 import CustomTable from "components/common/CustomTable";
 import CustomAddDialog from "components/common/CustomAddDialog";
+import {
+  callRemap,
+  createApplication,
+  getMappedApplications,
+  getOrphans,
+  uploadFile,
+} from "apis";
 
 interface UploadProps extends IResourceComponentsProps<any, any> {}
 
@@ -39,13 +46,13 @@ const Upload: React.FC<UploadProps> = () => {
   const [orphanData, setOrphanData] = React.useState([]);
   const [data, setData] = React.useState({
     businessCapabilityName: "",
-  domain: "",
-  subDomain: "",
-  applicationName: "",
-  core_id: "",
-  domain_id: "",
-  subdomain_id: "",
-  name: "",
+    domain: "",
+    subDomain: "",
+    applicationName: "",
+    core_id: "",
+    domain_id: "",
+    subdomain_id: "",
+    name: "",
   });
   const [businessCapabilities, setBusinessCapabilities] = React.useState<
     string[]
@@ -55,8 +62,16 @@ const Upload: React.FC<UploadProps> = () => {
   const [filteredDomains, setFilteredDomains] = React.useState<any[]>([]);
   const [filteredSubDomains, setFilteredSubDomains] = React.useState<any[]>([]);
   const [page, setPage] = useState(1);
+  const [orphanPage, setOrphanPage] = useState(1); //new
   const [totalCount, setTotalCount] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  const [sortConfig, setSortConfig] = useState<{
+    key: string;
+    direction: "ASC" | "DESC" | "";
+  }>({
+    key: "",
+    direction: "",
+  });
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
@@ -68,69 +83,48 @@ const Upload: React.FC<UploadProps> = () => {
     } else if (selectedTab === 1) {
       fetchOrphans();
     }
-  }, [selectedTab, page, pageSize]);
+  }, [selectedTab, page, orphanPage, pageSize, sortConfig]); //orphanPage
 
-  // useEffect(() => {
-  //   fetchBusinessCapabilities();
-  //   fetchDomains();
-  //   fetchSubDomains();
-  // }, []);
-
-  // const fetchBusinessCapabilities = async () => {
-  //   try {
-  //     const response = await fetch("http://localhost:5000/api/coreCapability");
-  //     const result = await response.json();
-  //     setBusinessCapabilities(result);
-  //   } catch (error) {
-  //     console.error("Error fetching business capabilities:", error);
-  //   }
-  // };
-
-  // const fetchDomains = async () => {
-  //   try {
-  //     const response = await fetch("http://localhost:5000/api/domain");
-  //     const result = await response.json();
-  //     setDomains(result);
-  //   } catch (error) {
-  //     console.error("Error fetching domains:", error);
-  //   }
-  // };
-
-  // const fetchSubDomains = async () => {
-  //   try {
-  //     const response = await fetch("http://localhost:5000/api/subdomain");
-  //     const result = await response.json();
-  //     setSubDomains(result); // assuming result is an array of subdomain names
-  //   } catch (error) {
-  //     console.error("Error fetching subdomains:", error);
-  //   }
-  // };
+  const keyMapping: { [key: string]: string } = {
+    businessCapabilityName: "capability",
+    domain: "domain",
+    subDomain: "subdomain",
+    applicationName: "name",
+  };
 
   const fetchMappedApplications = async () => {
     setLoading(true);
     try {
-      const params:any = {page: page, limit: pageSize};
+      const mappedKey = keyMapping[sortConfig.key] || sortConfig.key;
+      const params: any = {
+        page: page,
+        limit: pageSize,
+        sortField: mappedKey,
+        sortOrder: sortConfig.direction,
+      };
       const queryString = new URLSearchParams(params).toString();
-      const response = await fetch(
-        `http://localhost:5000/api/getMappedApplications?${queryString}`
-      );
-      if (!response.ok) throw new Error("Failed to fetch mapped applications");
-
-      const result = await response.json();
+      const result = await getMappedApplications(queryString);
+      console.log("Result:", result);
       const { totalCount } = result;
       setTotalCount(totalCount);
       const mappedData = result.response.map((item: any) => ({
+        // const mappedData = result.response
+        // .filter((item: any) => item.capability)
+        // .map((item: any) => ({
         id: item.software_id,
         businessCapabilityName: item.capability,
-        domain: item.domain,
-        subDomain: item.subdomain,
+        domain: item.domain !== "-" ? item.domain : "-",
+        subDomain: item.subdomain !== "-" ? item.subdomain : "-",
         applicationName: item.software_name,
+        region: item.region,
+        country: item.country,
+        status: item.status,
       }));
       setMappedData(mappedData);
-      if(mappedData.length === 0){
-        openUpload();
-        setSelectedTab(-1);
-      }
+      // if(mappedData.length === 0){
+      //   openUpload();
+      //   setSelectedTab(-1);
+      // }
     } catch (error) {
       console.error("Error fetching mapped applications:", error);
       alert("Failed to fetch mapped applications. Please try again later.");
@@ -142,19 +136,29 @@ const Upload: React.FC<UploadProps> = () => {
   const fetchOrphans = async () => {
     setLoading(true);
     try {
-      const params:any = {page: page, limit: pageSize};
+      const mappedKey = keyMapping[sortConfig.key] || sortConfig.key;
+      const params: any = {
+        page: orphanPage,
+        limit: pageSize,
+        sortField: mappedKey,
+        sortOrder: sortConfig.direction,
+      }; //orphanpage
       const queryString = new URLSearchParams(params).toString();
-      const response = await fetch(`http://localhost:5000/api/getOrphans?${queryString}`);
-      if (!response.ok) throw new Error("Failed to fetch orphans");
-
-      const result = await response.json();
+      const result = await getOrphans(queryString);
       const { totalCount } = result;
       setTotalCount(totalCount);
       const orphanData = result.response.map((item: any) => ({
-        businessCapabilityName: item.capability,
-        domain: item.domain,
-        subDomain: item.subdomain,
+        // const orphanData = result.response
+        // .filter((item: any) => !item.capability)
+        // .map((item: any) => ({
+        id: item.software_id,
+        businessCapabilityName: item.capability !== "-" ? item.capability : "-",
+        domain: item.domain !== "-" ? item.domain : "-",
+        subDomain: item.subdomain !== "-" ? item.subdomain : "-",
         applicationName: item.software_name,
+        region: item.region,
+        country: item.country,
+        status: item.status,
       }));
       setOrphanData(orphanData);
     } catch (error) {
@@ -163,6 +167,16 @@ const Upload: React.FC<UploadProps> = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSort = (key: string) => {
+    setSortConfig((prevSortConfig) => {
+      let direction: "ASC" | "DESC" | "" = "ASC";
+      if (prevSortConfig.key === key) {
+        direction = prevSortConfig.direction === "ASC" ? "DESC" : "";
+      }
+      return { key, direction };
+    });
   };
 
   const handleFileAreaClick = () => {
@@ -203,6 +217,19 @@ const Upload: React.FC<UploadProps> = () => {
     }
   };
 
+  const handleRemap = async () => {
+    setOpenDialog(true);
+    setLoading(true);
+    try {
+      const data = await callRemap();
+      setApplications(data.applications);
+      setMappedApplications(data.mappedAppliactions);
+      setOrphans(data.orphans);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleUploadClick = async () => {
     if (!file) {
       alert("Please select a file to upload.");
@@ -218,14 +245,7 @@ const Upload: React.FC<UploadProps> = () => {
     try {
       // const apiUrl = process.env.React_APP_API_URL;
       // console.log(apiUrl);
-      const response = await fetch("http://localhost:5000/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      if (!response.ok) {
-        throw new Error("file upload failed");
-      }
-      const data = await response.json();
+      const data = await uploadFile(formData);
       setFile(null);
       setApplications(data.applications);
       setMappedApplications(data.mappedAppliactions);
@@ -269,7 +289,6 @@ const Upload: React.FC<UploadProps> = () => {
     setOpen(true);
     // setOpenDialog(true);
   };
-  const fixOrphan = () => {};
   const handleAddNew = () => {
     setOpenAddDialog(true);
   };
@@ -284,32 +303,19 @@ const Upload: React.FC<UploadProps> = () => {
         subdomain_id: data.subDomain,
         name: data.applicationName,
       };
-      
-  
-      const response = await fetch("http://localhost:5000/api/application", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
 
-      if (!response.ok) {
-        throw new Error("Failed to add new application");
-      }
-
-      const result = await response.json();
+      const result = await createApplication(JSON.stringify(data));
       console.log("New item added successfully:", result);
 
       setData({
         businessCapabilityName: "",
-      domain: "",
-      subDomain: "",
-      applicationName: "",
-      core_id: "",
-      domain_id: "",
-      subdomain_id: "",
-      name: "",
+        domain: "",
+        subDomain: "",
+        applicationName: "",
+        core_id: "",
+        domain_id: "",
+        subdomain_id: "",
+        name: "",
       });
       setOpenAddDialog(false);
       await fetchMappedApplications();
@@ -321,7 +327,7 @@ const Upload: React.FC<UploadProps> = () => {
   const handleInputChange = (field: string, value: string) => {
     setData((prevData) => {
       const updatedData = { ...prevData, [field]: value };
-  
+
       if (field === "businessCapabilityName") {
         updatedData.core_id = value; // Map businessCapabilityName to core_id
       } else if (field === "domain") {
@@ -331,7 +337,7 @@ const Upload: React.FC<UploadProps> = () => {
       } else if (field === "applicationName") {
         updatedData.name = value; // Map applicationName to name
       }
-  
+
       return updatedData;
     });
   };
@@ -353,36 +359,62 @@ const Upload: React.FC<UploadProps> = () => {
           }}
         >
           {/* Tabs for Mapping and Orphan */}
-          {selectedTab !== -1 && <Tabs
-            value={selectedTab}
-            onChange={handleTabChange}
-            aria-label="Upload Tabs"
-          >
-            <Tab
-              label="Mapping"
-              sx={{ fontWeight: "bold", fontSize: "16px", color: "black" }}
-            />
-            <Tab
-              label="Orphan"
-              sx={{ fontWeight: "bold", fontSize: "16px", color: "black" }}
-            />
-          </Tabs>}
+          {selectedTab !== -1 && (
+            <Tabs
+              value={selectedTab}
+              onChange={handleTabChange}
+              aria-label="Upload Tabs"
+            >
+              <Tab
+                label="Mapping"
+                sx={{ fontWeight: "bold", fontSize: "16px", color: "black" }}
+              />
+              <Tab
+                label="Orphan"
+                sx={{ fontWeight: "bold", fontSize: "16px", color: "black" }}
+              />
+            </Tabs>
+          )}
 
           {/* Import File Button */}
-          {showImportButton && selectedTab === 0 && (
-            <CustomButton
-              title="Import File"
-              backgroundColor="black"
-              color="white"
-              handleClick={() => {
-                openUpload();
-                setSelectedTab(-1);
-              }}
-              variant="contained"
-              icon={<AddIcon />}
-              sx={{ borderRadius: "10px", margin: 0 }}
-            />
-          )}
+          <Box sx={{ display: "flex", gap: 2 }}>
+            {showImportButton && selectedTab === 0 && (
+              <CustomButton
+                title="Import File"
+                backgroundColor="black"
+                color="white"
+                handleClick={() => {
+                  openUpload();
+                  setSelectedTab(-1);
+                }}
+                variant="contained"
+                icon={<AddIcon />}
+                sx={{ borderRadius: "10px", margin: 0 }}
+              />
+            )}
+            {selectedTab === 0 && (
+              <CustomButton
+                title="Add New"
+                backgroundColor="blue"
+                color="white"
+                handleClick={handleAddNew}
+                variant="contained"
+                icon={<AddIcon />}
+                sx={{ borderRadius: "10px", margin: 0 }}
+              />
+            )}
+            {selectedTab === 1 && (
+              <CustomButton
+                title="Re-map"
+                backgroundColor="blue"
+                color="white"
+                handleClick={handleRemap}
+                variant="contained"
+                icon={<ReplayIcon />}
+                sx={{ borderRadius: "10px", margin: 0 }}
+              />
+            )}
+          </Box>
         </Box>
       </AppBar>
       {selectedTab === 0 && (
@@ -400,23 +432,15 @@ const Upload: React.FC<UploadProps> = () => {
           <CustomTable
             data={mappedData}
             loading={loading}
-            actionButton={
-              <CustomButton
-                title="Add New"
-                handleClick={handleAddNew}
-                backgroundColor="blue"
-                color="white"
-                variant="contained"
-                icon={<AddIcon />}
-                sx={{ borderRadius: "10px" }}
-              />
-            }
             page={page}
             setPage={setPage}
             totalCount={totalCount}
             setTotalCount={setTotalCount}
             pageSize={pageSize}
             setPageSize={setPageSize}
+            editCallback={fetchMappedApplications}
+            sortConfig={sortConfig}
+            handleSort={handleSort}
           />
         </Box>
       )}
@@ -450,23 +474,15 @@ const Upload: React.FC<UploadProps> = () => {
           <CustomTable
             data={orphanData}
             loading={loading}
-            actionButton={
-              <CustomButton
-                title="Re-map"
-                handleClick={fixOrphan}
-                backgroundColor="blue"
-                color="white"
-                variant="contained"
-                icon={<ReplayIcon />}
-                sx={{ borderRadius: "10px" }}
-              />
-            }
-            page={page}
-            setPage={setPage}
+            page={orphanPage} //orphanpage
+            setPage={setOrphanPage} //setOrphaPage
             totalCount={totalCount}
             setTotalCount={setTotalCount}
             pageSize={pageSize}
             setPageSize={setPageSize}
+            editCallback={fetchOrphans}
+            sortConfig={sortConfig}
+            handleSort={handleSort}
           />
         </Box>
       )}
@@ -641,6 +657,7 @@ const Upload: React.FC<UploadProps> = () => {
         applications={applications}
         mappedApplications={mappedApplications}
         orphans={orphans}
+        selectedTab={selectedTab}
       />
     </Box>
   );

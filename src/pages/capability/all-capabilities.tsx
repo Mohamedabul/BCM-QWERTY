@@ -1,17 +1,25 @@
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import GridItem from "utils/GridItem";
-import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
 import { CustomButton } from "components";
 import CapabilityCard from "./card-capability";
 import CreateCapability from "./create-capability";
 import { useEffect, useState } from "react";
+import { createCorecapability,  fetchCorecapability } from "apis";
 
 function AllCapabilities({ isEditable }: any) {
   const [cabablityList, setCapabilityList] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
+
+
+  const fetchCapabilities = async () => {
+    try {
+      const data =  await fetchCorecapability() ;
+      setCapabilityList(data);
+    } catch (error) {
+      console.error("Error fetching capabilities:", error);
+    }
+  };
 
   const handleCreateOpen = () => {
     setOpen(true);
@@ -21,54 +29,19 @@ function AllCapabilities({ isEditable }: any) {
     setOpen(false);
   };
 
-  const handleSaveCapability = (name: string) => {
-    // Save the new capability to the capability list or database
-    console.log("New capability name:", name);
-    fetchCabability(); // Re-fetch to update list if needed
-    handleCreateClose(); // Close the modal after saving
-  };
-  const handleClick = async (obj:object, callback:any) => {
-    const response = await fetch(
-      process.env.REACT_APP_API_URL + "coreCapability",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(obj),
-      }
-    );
 
-    if (!response.ok) {
-      throw new Error(`Failed to create capability: ${response.statusText}`);
-    }
+  const handleClick = async (obj:object, callback:any) => {
+    const response = await createCorecapability(JSON.stringify(obj));
 
     console.log("Capability created successfully");
     callback();
-    fetchCabability();
+    fetchCapabilities();
     handleCreateClose();
   };
 
-  const fetchCabability = async () => {
-    const endpoint = `${process.env.REACT_APP_API_URL}${
-      isEditable ? "coreCapability" : "template/coreCapability"
-    }`;
 
-    try {
-      const response = await fetch(endpoint);
-      if (!response.ok) {
-        console.error("Error fetching capabilities:", response.statusText);
-        return;
-      }
-      const data = await response.json();
-      setCapabilityList(data);
-    } catch (error) {
-      console.error("Error fetching capabilities:", error);
-    }
-   
-  };
   useEffect(() => {
-    fetchCabability();
+    fetchCapabilities();
   }, []);
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -99,7 +72,10 @@ function AllCapabilities({ isEditable }: any) {
             key={cabablity.id}
             name={cabablity.name}
             id={cabablity.id}
-            fetchCabability={fetchCabability}
+            onUpdate={fetchCapabilities}
+            
+            fetchCabability={fetchCapabilities}
+            isEdited={cabablity.is_edited}
             
           />
         ))}

@@ -11,9 +11,9 @@ export const Title: React.FC<TitleProps> = ({ collapsed }) => {
     <Button fullWidth variant="text" disableRipple>
       <Link to="/">
         {collapsed ? (
-          <img src="https://dev.digitalt3.com/wp-content/uploads/2024/10/cal_icon.png" alt="caldarys logo" width="28px" />
+          <img src="https://dev.digitalt3.com/wp-content/uploads/2024/10/cal_icon.png" alt="calderys logo" width="28px" />
         ) : (
-          <img src="https://files.logomakr.com/3hk25r-LogoMakr.png" alt="caldarys" width="140px" />
+          <img src="https://files.logomakr.com/3hk25r-LogoMakr.png" alt="calderys" width="140px" />
         )}
       </Link>
     </Button>

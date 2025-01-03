@@ -1,4 +1,3 @@
-// Menu.tsx
 import React, { useState, useEffect } from "react";
 import {
   Menu,
@@ -18,6 +17,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import CloseIcon from "@mui/icons-material/Close";
 import { CustomButton } from "components";
 import { MenuProps } from "interfaces/common";
+import { patchEndpoint, deleteEndpoint, fetchCorecapability } from "apis";
 
 const modalStyle = {
   position: "absolute" as "absolute",
@@ -30,6 +30,7 @@ const modalStyle = {
   p: 4,
   borderRadius: 2,
 };
+
 type EditCapabilityProps = {
   open?: boolean;
   onClose?: () => void;
@@ -38,8 +39,11 @@ type EditCapabilityProps = {
   onSave?: (name: string) => void;
   color?: string;
   editEndpoint?: string;
-  deleteEndpoint?: string;
+  deleteEndpointCall?: string;
   menuStyle?: object;
+  useCustomEditDialog?: boolean;
+  useCustomDeleteDialog?: boolean;
+  onDelete?: () => void;
 };
 
 const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
@@ -53,7 +57,7 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
   label,
   color,
   editEndpoint,
-  deleteEndpoint,
+  deleteEndpointCall,
   menuStyle,
   useCustomEditDialog = false,
   useCustomDeleteDialog = false,
@@ -64,11 +68,9 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
 
   const handleEditOpen = () => {
     if (useCustomEditDialog) {
-      // If custom dialog is requested, call onEdit directly and skip the internal modal
-      onEdit();
+      onEdit(); // Custom edit behavior
       onClose();
     } else {
-      // Otherwise, use the internal edit modal
       setEditOpen(true);
       onClose();
     }
@@ -79,72 +81,67 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
   };
 
   const handleSave = async () => {
-    if (!editEndpoint) {
-      console.error("Edit endpoint is missing");
-      return;
-    }
     try {
-      const response = await fetch(editEndpoint ?? "", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name }),
-      });
-
+      if (!editEndpoint) {
+        console.error("Edit endpoint is missing");
+        return;
+      }
+      const response = await patchEndpoint(editEndpoint, JSON.stringify({ name }));
+      console.log("Patch response:", response); // Debug the response
       if (!response.ok) {
         throw new Error(`Failed to edit ${label}: ${response.statusText}`);
       }
-
-      onSave?.(name);
+      if (onSave) {
+        onSave(name);
+      }
       console.log(`Saved ${label} name:`, name);
-      handleEditClose();
+      setEditOpen(false);
+
     } catch (error) {
       console.error(`Error saving ${label}:`, error);
     }
+    
   };
 
   const confirmDelete = async () => {
-    if (!deleteEndpoint) {
+    if (!deleteEndpointCall) {
       console.error("Delete endpoint is missing");
       return;
     }
-    try {
-      const response = await fetch(deleteEndpoint ?? "", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
 
+    try {
+      const response = await deleteEndpoint(deleteEndpointCall);
       if (!response.ok) {
         throw new Error(`Failed to delete ${label}: ${response.statusText}`);
       }
 
+      // Notify parent component about the deletion
       if (onDelete) onDelete();
       console.log(`Confirmed deletion of ${label}:`, name);
-      setIsDeleteDialogOpen(false);
+
     } catch (error) {
       console.error(`Error deleting ${label}:`, error);
+    } finally {
+      setIsDeleteDialogOpen(false);
     }
   };
+
   const handleDeleteOpen = () => {
     if (useCustomDeleteDialog) {
-      // If custom delete dialog is requested, call onDelete directly and skip the internal delete dialog
-      onDelete();
+      onDelete(); // Custom delete behavior
       onClose();
     } else {
-      // Otherwise, open the internal delete dialog
       setIsDeleteDialogOpen(true);
       onClose();
     }
   };
+
   const handleDeleteClose = () => {
     setIsDeleteDialogOpen(false);
   };
 
   useEffect(() => {
-    setName(capabilityName);
+    setName(capabilityName); // Update name when capabilityName changes
   }, [capabilityName]);
 
   return (
@@ -175,13 +172,7 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
       {/* Modal for editing capability */}
       <Modal open={isEditOpen} onClose={handleEditClose}>
         <Box sx={modalStyle}>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <Typography variant="h6">Edit {label} Information</Typography>
             <IconButton onClick={handleEditClose} sx={{ color: "black" }}>
               <CloseIcon />
@@ -190,11 +181,7 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
           <Typography variant="body2" sx={{ mt: 2 }}>
             Edit {label} name<span style={{ color: "red" }}> *</span>
           </Typography>
-          <Typography
-            variant="body1"
-            color="textSecondary"
-            sx={{ mb: 2, fontSize: "12px" }}
-          >
+          <Typography variant="body1" color="textSecondary" sx={{ mb: 2, fontSize: "12px" }}>
             Include min. 40 characters to make it more interesting
           </Typography>
           <TextField
@@ -205,7 +192,7 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
             onChange={(e) => setName(e.target.value)}
             sx={{
               "&:focus": {
-                backgroundColor:"blue",
+                backgroundColor: "blue",
               },
             }}
           />
@@ -225,6 +212,8 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
           </Box>
         </Box>
       </Modal>
+
+      {/* Delete Confirmation Dialog */}
       <Dialog
         open={isDeleteDialogOpen}
         onClose={handleDeleteClose}
@@ -235,11 +224,11 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
         <DialogContent>
           <DialogContentText id="delete-dialog-description">
             Are you sure you want to delete the {label} "{capabilityName}"? 
-            <DialogContentText id="delete-dialog-description" sx={{color: "warning.main"}}>
-            All items associated with this will be permanently deleted.
+            <DialogContentText sx={{ color: "warning.main" }}>
+              All items associated with this will be permanently deleted.
             </DialogContentText>
-            <DialogContentText id="delete-dialog-description" sx={{color: "red"}}>
-            This action cannot be undone.
+            <DialogContentText sx={{ color: "red" }}>
+              This action cannot be undone.
             </DialogContentText>
           </DialogContentText>
         </DialogContent>
@@ -263,3 +252,5 @@ const CustomMenu: React.FC<MenuProps & EditCapabilityProps> = ({
 };
 
 export default CustomMenu;
+
+
