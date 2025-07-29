@@ -63,5 +63,9 @@
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "typescript": "^5.4.2"
+  },
+  "scripts": {
+  "test": "react-scripts test --env=jsdom",
+  "test:coverage": "react-scripts test --coverage --watchAll=false"
   }
 }
