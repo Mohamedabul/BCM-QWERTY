@@ -1,4 +1,4 @@
-name: build
+name: Build and Analyze
 
 on:
   push:
@@ -22,20 +22,17 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run tests with coverage
         run: npm test -- --coverage --watchAll=false
 
-      - name: List coverage files (for debugging)
+      - name: Debug coverage output
         run: ls -R coverage
 
-      - name: Run SonarCloud scan
+      - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
-          args: >
-            -Dsonar.projectKey=Mohamedabul_BCM-QWERTY
-            -Dsonar.organization=Mohamedabul
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+          projectBaseDir: .
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
