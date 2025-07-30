@@ -65,7 +65,6 @@
     "typescript": "^5.4.2"
   },
   "scripts": {
-  "test": "react-scripts test --env=jsdom",
-  "test:coverage": "react-scripts test --coverage --watchAll=false"
+  "test": "react-scripts test --coverage --watchAll=false"
   }
 }
